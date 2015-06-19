@@ -1,12 +1,52 @@
 
 
+# == title
+# Normalize regions to a matrix
+#
+# == param
+# -gr a `GenomicRanges::GRanges` object
+# -center a `GenomicRanges::GRanges` object
+# -extend extension to the upstream and downstream of ``center``. It can be a vector of length one or two.
+# -w window size for splitting upstream and downstream
+# -value_column index for column in ``gr`` that map to colors. If the value is ``NULL``, an internal column
+#         which contains 1 will be attached.
+# -empty_value values for windows that don't overlap with ``gr``
+# -mean_mode when a window overlaps with more than one regions in ``gr``, how to calculate 
+#       the mean values in this window.
+# -show_body  whether show ``center``
+# -body_ratio  the ratio of width of ``center`` in the heatmap
+# -smooth whether apply smoothing in every row in the matrix. The smoothing is applied by `stats::loess`
+# -span degree of smoothing, pass to `stats::loess`.
+#
+# == details
+# Following illustrates different settings for ``mean_mode``:
+#
+#        4      5      2     values
+#     ++++++   +++   +++++   gr
+#       ================     window (16bp)
+#
+#     absolute: (4 + 5 + 2)/3
+#     weighted: (4*4 + 5*3 + 2*3)/(4 + 3 + 3)
+#     w0:       (4*4 + 5*3 + 2*3)/16
+#
+# == value
+# A matrix with following additional attributes:
+#
+# -upstream_index column index corresponding to upstream
+# -body_index column index corresponding to body
+# -downstream_index column index corresponding to downstream
+# -extend extension on upstream and downstream
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
 # gr = GRanges(seqnames = "chr1", 
-# 	ranges = IRanges(start = c(1, 4, 7, 11, 14, 17, 21, 24, 27),
-#                    end = c(2, 5, 8, 12, 15, 18, 22, 25, 28)))
-# center = GRanges(seqnames = "chr1",
-#   ranges = IRanges(start = 10, end = 20))
-# normalizeToMatrix(gr, center, extend = 10, w = 2, k = 5)
-normalizeToMatrix = function(gr, center, extend = 5000, w = NULL, value_column = NULL,
+# 	  ranges = IRanges(start = c(1, 4, 7, 11, 14, 17, 21, 24, 27),
+#                      end = c(2, 5, 8, 12, 15, 18, 22, 25, 28)))
+# center = GRanges(seqnames = "chr1", ranges = IRanges(start = 10, end = 20))
+# normalizeToMatrix(gr, center, extend = 10, w = 2)
+normalizeToMatrix = function(gr, center, extend = 5000, w = extend/50, value_column = NULL,
     empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), show_body = any(width(center) > 1),
     body_ratio = 0.1, smooth = FALSE, span = 0.75) {
   
@@ -84,6 +124,7 @@ normalizeToMatrix = function(gr, center, extend = 5000, w = NULL, value_column =
 	return(mat)
 }
 
+# 
 # -gr input regions
 # -reference the upstream part or body part
 # -window absolute size (100) or relative size(0.1)
@@ -163,20 +204,34 @@ makeMatrix = function(gr, reference, w = NULL, k = NULL, value_column = NULL, em
 }
 
 # == title
-# split regions by window
+# Split regions into windows
 #
 # == param
-# -gr input `GenomicRanges::GRanges` object
-# -w window size, a value larger than 1 means the absolute bp and a value between 0 and 1
-#    is the percent to the current region
-# -k number of partitions for each region
-# -direction where to start the splitting
+# -gr a `GenomicRanges::GRanges` object. Regions in the object will be splitted into windows
+# -w window size, a value larger than 1 means the number of base pairs and a value between 0 and 1
+#    is the percent to the current region.
+# -k number of partitions for each region. If it is set, all other arguments are ignored.
+# -direction where to start the splitting. See 'Details' section.
 # -short.keep if the the region can not be splitted equally under the window size, 
-#             whether to keep the window that are smaller than the window size
+#             whether to keep the windows that are smaller than the window size. See 'Details' section.
 #
 # == details
-# there is an additional column ``.orow`` which the correspondance between small windows
-# and original rows in ``gr``
+# Following illustrates the meaning of ``direction`` and ``short.keep``:
+#
+#     ----------  a region
+#     aaabbbccc   direction = "normal",  short.keep = FALSE
+#     aaabbbcccd  direction = "normal",  short.keep = TRUE
+#      aaabbbccc  direction = "reverse", short.keep = FALSE
+#     abbbcccddd  direction = "reverse", short.keep = TRUE
+#     
+# There is an additional column ``.orow`` attached which contains the correspondance between small windows
+# and original regions in ``gr``
+#
+# == value
+# A `GenomicRanges::GRanges` object.
+#
+# == author
+# Zuguang gu <z.gu@dkfz.de>
 #
 # == example
 # gr = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 11, 21), end = c(10, 20, 30)))
@@ -196,7 +251,8 @@ makeMatrix = function(gr, reference, w = NULL, k = NULL, value_column = NULL, em
 # makeWindows(gr, w = 2)
 # makeWindows(gr, w = 0.2)
 #
-makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"), short.keep = FALSE) {
+makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"), 
+	short.keep = FALSE) {
 
 	direction = match.arg(direction)[1]
   

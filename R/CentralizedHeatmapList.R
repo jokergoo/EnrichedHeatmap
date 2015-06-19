@@ -4,17 +4,12 @@
 #
 # == details
 # The structure of `CentralizedHeatmapList-class` is the same as
-# `HeatmapList-class` and the class is inherited from `HeatmapList-class`.
-# Then it allows to support all features that are provided by `HeatmapList-class`.
-# Also some functions for `HeatmapList-class` are overwitten to provide adjustment
-# specifically for centralized heatmaps.
+# `ComplexHeatmap::HeatmapList-class` and the class is inherited from `ComplexHeatmap::HeatmapList-class`.
 #
 # == methods
 # The `CentralizedHeatmapList-class` provides following methods:
 #
-# - `Heatmap`: constructor method.
-# - `draw,Heatmap-method`: draw a single heatmap.
-# - `add_heatmap,Heatmap-method` append heatmaps and row annotations to a list of heatmaps.
+# - `draw,CentralizedHeatmapList-method`: draw a list of heatmaps.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -42,7 +37,21 @@ CentralizedHeatmapList = function(...) {
 }
 
 # == title
-# 
+# Add heatmaps or row annotations to a heatmap list
+#
+# == param
+# -x a `CentralizedHeatmap-class` object, a `Heatmap-class` object, a `HeatmapAnnotation-class` object or a `HeatmapList-class` object.
+# -y a `CentralizedHeatmap-class` object, a `Heatmap-class` object, a `HeatmapAnnotation-class` object or a `HeatmapList-class` object.
+#
+# == detail
+# It overwrites `ComplexHeatmap::+.AdditiveUnit`.
+#
+# == value
+# A `ComplexHeatmap::HeatmapList-class` object or a `CentralizedHeatmapList-class` object
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
 "+.AdditiveUnit" = function(x, y) {
     if(inherits(x, "CentralizedHeatmap") || 
        inherits(x, "CentralizedHeatmapList") ||
@@ -57,6 +66,19 @@ CentralizedHeatmapList = function(...) {
     }
 }
 
+# == title
+# Draw a list of heatmaps with default parameters
+#
+# == param
+# -object a `CentralizedHeatmapList-class` object.
+#
+# == details
+# Actually it calls `draw,CentralizedHeatmapList-method`, but only with default parameters. If users want to customize the heatmap,
+# they can pass parameters directly to `draw,CentralizedHeatmapList-method`.
+#
+# == value
+# This function returns no value.
+#
 setMethod(f = "show",
 	signature = "CentralizedHeatmapList",
 	definition = function(object) {
@@ -66,7 +88,24 @@ setMethod(f = "show",
 
 })
 
-# overwrite the `draw` method for `HeatmapList` class
+# == title
+# Draw a list of heatmaps
+#
+# == param
+# -object a `CentralizedHeatmapList-class` object
+# -padding padding of the plot. Elements correspond to bottom, left, top, right paddings.
+# -... pass to `ComplexHeatmap::make_layout,HeatmapList-method`
+# -newpage whether to create a new page
+#
+# == detail
+# It calls `ComplexHeatmap::draw,HeatmapList-method` to make the plot but with some adjustment.
+#
+# == value
+# No value is returned.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
 setMethod(f = "draw",
     signature = "CentralizedHeatmapList",
     definition = function(object, padding = unit(c(2, 2, 2, 2), "mm"), ..., newpage= TRUE) {
