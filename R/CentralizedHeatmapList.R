@@ -1,35 +1,48 @@
 
+# == title
+# Class for a list of heatmaps
+#
+# == details
+# The structure of `CentralizedHeatmapList-class` is the same as
+# `HeatmapList-class` and the class is inherited from `HeatmapList-class`.
+# Then it allows to support all features that are provided by `HeatmapList-class`.
+# Also some functions for `HeatmapList-class` are overwitten to provide adjustment
+# specifically for centralized heatmaps.
+#
+# == methods
+# The `CentralizedHeatmapList-class` provides following methods:
+#
+# - `Heatmap`: constructor method.
+# - `draw,Heatmap-method`: draw a single heatmap.
+# - `add_heatmap,Heatmap-method` append heatmaps and row annotations to a list of heatmaps.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
 CentralizedHeatmapList = setClass("CentralizedHeatmapList",
 	slots = getClass("HeatmapList")@slots,
 	contains = "HeatmapList")
 
+# == title
+# Constructor method for CentralizedHeatmapList class
+#
+# == param
+# -... arguments
+#
+# == details
+# There is no public constructor method for the `CentralizedHeatmapList-class`.
+#
+# == value
+# No value is returned.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+CentralizedHeatmapList = function(...) {
+    new("CentralizedHeatmapList", ...)
+}
 
-setMethod(f = "add_heatmap",
-    signature = "CentralizedHeatmapList",
-    definition = function(object, x) {
-
-    if(inherits(x, "CentralizedHeatmap")) {
-    	object@HeatmapList = object@HeatmapList + x@HeatmapList
-    } else if(inherits(x, "CentralizedHeatmapList")) {
-    	object@HeatmapList = object@HeatmapList + x@HeatmapList
-    } else {
-    	object@HeatmapList = object@HeatmapList + x
-    }
-
-})
-
-setMethod(f = "draw",
-	signature = "CentralizedHeatmapList",
-	definition = function(object, gap = unit(3, "mm"), ...) {
-
-	# set proper gaps
-	
-	draw(object@HeatmapList, ...)
-
-})
-
-
-# overwrite `+.AdditiveUnit` to extend the classes on both sides ?
+# == title
+# 
 "+.AdditiveUnit" = function(x, y) {
     if(inherits(x, "CentralizedHeatmap") || 
        inherits(x, "CentralizedHeatmapList") ||
@@ -37,26 +50,11 @@ setMethod(f = "draw",
        inherits(y, "CentralizedHeatmapList")) {
     	
     	# should return a `CentralizedHeatmapList` object
-    	add_to_CentralizedHeatmapList(x, y)
+    	ht_list = add_heatmap(x, y)
+        changeClassName(ht_list, "CentralizedHeatmapList")
     } else {
     	ComplexHeatmap::`+.AdditiveUnit`(x, y)
     }
-}
-
-add_to_CentralizedHeatmapList = function(x, y) {
-
-	ht_list = add_heatmap(x, y)
-
-	return(changeClassName(ht_list, "CentralizedHeatmapList"))
-}
-
-# `object` and `new_class` should have the same classes
-changeClassName = function(object, new_class) {
-	new_object = new(new_class)
-	for(sn in slotNames(object)) {
-		slot(new_object, sn) = slot(object, sn)
-	}
-	return(new_object)
 }
 
 setMethod(f = "show",
@@ -180,9 +178,3 @@ setMethod(f = "draw",
     }
 })
 
-
-compare_unit = function(u1, u2) {
-	x1 = convertUnit(u1, "mm", valueOnly = TRUE)
-	x2 = convertUnit(u2, "mm", valueOnly = TRUE)
-	ifelse(x1 > x2, 1, ifelse(x1 < x2, -1, 0))
-}
