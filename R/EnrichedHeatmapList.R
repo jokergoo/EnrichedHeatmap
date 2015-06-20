@@ -3,28 +3,28 @@
 # Class for a list of heatmaps
 #
 # == details
-# The structure of `CentralizedHeatmapList-class` is the same as
+# The structure of `EnrichedHeatmapList-class` is the same as
 # `ComplexHeatmap::HeatmapList-class` and the class is inherited from `ComplexHeatmap::HeatmapList-class`.
 #
 # == methods
-# The `CentralizedHeatmapList-class` provides following methods:
+# The `EnrichedHeatmapList-class` provides following methods:
 #
-# - `draw,CentralizedHeatmapList-method`: draw a list of heatmaps.
+# - `draw,EnrichedHeatmapList-method`: draw a list of heatmaps.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
-CentralizedHeatmapList = setClass("CentralizedHeatmapList",
+EnrichedHeatmapList = setClass("EnrichedHeatmapList",
 	slots = getClass("HeatmapList")@slots,
 	contains = "HeatmapList")
 
 # == title
-# Constructor method for CentralizedHeatmapList class
+# Constructor method for EnrichedHeatmapList class
 #
 # == param
 # -... arguments
 #
 # == details
-# There is no public constructor method for the `CentralizedHeatmapList-class`.
+# There is no public constructor method for the `EnrichedHeatmapList-class`.
 #
 # == value
 # No value is returned.
@@ -32,35 +32,35 @@ CentralizedHeatmapList = setClass("CentralizedHeatmapList",
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
-CentralizedHeatmapList = function(...) {
-    new("CentralizedHeatmapList", ...)
+EnrichedHeatmapList = function(...) {
+    new("EnrichedHeatmapList", ...)
 }
 
 # == title
 # Add heatmaps or row annotations to a heatmap list
 #
 # == param
-# -x a `CentralizedHeatmap-class` object, a `Heatmap-class` object, a `HeatmapAnnotation-class` object or a `HeatmapList-class` object.
-# -y a `CentralizedHeatmap-class` object, a `Heatmap-class` object, a `HeatmapAnnotation-class` object or a `HeatmapList-class` object.
+# -x a `EnrichedHeatmap-class` object, a `Heatmap-class` object, a `HeatmapAnnotation-class` object or a `HeatmapList-class` object.
+# -y a `EnrichedHeatmap-class` object, a `Heatmap-class` object, a `HeatmapAnnotation-class` object or a `HeatmapList-class` object.
 #
 # == detail
 # It overwrites `ComplexHeatmap::+.AdditiveUnit`.
 #
 # == value
-# A `ComplexHeatmap::HeatmapList-class` object or a `CentralizedHeatmapList-class` object
+# A `ComplexHeatmap::HeatmapList-class` object or a `EnrichedHeatmapList-class` object
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
 "+.AdditiveUnit" = function(x, y) {
-    if(inherits(x, "CentralizedHeatmap") || 
-       inherits(x, "CentralizedHeatmapList") ||
-       inherits(y, "CentralizedHeatmap") ||
-       inherits(y, "CentralizedHeatmapList")) {
+    if(inherits(x, "EnrichedHeatmap") || 
+       inherits(x, "EnrichedHeatmapList") ||
+       inherits(y, "EnrichedHeatmap") ||
+       inherits(y, "EnrichedHeatmapList")) {
     	
-    	# should return a `CentralizedHeatmapList` object
+    	# should return a `EnrichedHeatmapList` object
     	ht_list = add_heatmap(x, y)
-        changeClassName(ht_list, "CentralizedHeatmapList")
+        changeClassName(ht_list, "EnrichedHeatmapList")
     } else {
     	ComplexHeatmap::`+.AdditiveUnit`(x, y)
     }
@@ -70,17 +70,17 @@ CentralizedHeatmapList = function(...) {
 # Draw a list of heatmaps with default parameters
 #
 # == param
-# -object a `CentralizedHeatmapList-class` object.
+# -object a `EnrichedHeatmapList-class` object.
 #
 # == details
-# Actually it calls `draw,CentralizedHeatmapList-method`, but only with default parameters. If users want to customize the heatmap,
-# they can pass parameters directly to `draw,CentralizedHeatmapList-method`.
+# Actually it calls `draw,EnrichedHeatmapList-method`, but only with default parameters. If users want to customize the heatmap,
+# they can pass parameters directly to `draw,EnrichedHeatmapList-method`.
 #
 # == value
 # This function returns no value.
 #
 setMethod(f = "show",
-	signature = "CentralizedHeatmapList",
+	signature = "EnrichedHeatmapList",
 	definition = function(object) {
 
 	# re-define `draw` for HeatmapList
@@ -92,7 +92,7 @@ setMethod(f = "show",
 # Draw a list of heatmaps
 #
 # == param
-# -object a `CentralizedHeatmapList-class` object
+# -object a `EnrichedHeatmapList-class` object
 # -padding padding of the plot. Elements correspond to bottom, left, top, right paddings.
 # -... pass to `ComplexHeatmap::make_layout,HeatmapList-method`
 # -newpage whether to create a new page
@@ -107,7 +107,7 @@ setMethod(f = "show",
 # Zuguang Gu <z.gu@dkfz.de>
 #
 setMethod(f = "draw",
-    signature = "CentralizedHeatmapList",
+    signature = "EnrichedHeatmapList",
     definition = function(object, padding = unit(c(2, 2, 2, 2), "mm"), ..., newpage= TRUE) {
 
     if(newpage) {
@@ -116,23 +116,23 @@ setMethod(f = "draw",
 
     object = make_layout(object, ...)
 
-    # which heatmap are CentralizedHeatmap
-	centralized_heatmap_index = which(sapply(object@ht_list, function(ht) {
-		inherits(ht, "CentralizedHeatmap")
+    # which heatmap are EnrichedHeatmap
+	Enriched_heatmap_index = which(sapply(object@ht_list, function(ht) {
+		inherits(ht, "EnrichedHeatmap")
 	}))
 
-	max_axis_height = max(do.call("unit.c", lapply(object@ht_list[centralized_heatmap_index], function(ht) {
+	max_axis_height = max(do.call("unit.c", lapply(object@ht_list[Enriched_heatmap_index], function(ht) {
 		ht@heatmap_param$axis_height
 	})))
     
     normal_heatmap_index = which(sapply(object@ht_list, function(ht) {
-		inherits(ht, "Heatmap") & !inherits(ht, "CentralizedHeatmap")
+		inherits(ht, "Heatmap") & !inherits(ht, "EnrichedHeatmap")
 	}))
     
     if(length(normal_heatmap_index) == 0) {
-    	# if all heatmaps are centralized heatmaps, the just put the
+    	# if all heatmaps are Enriched heatmaps, the just put the
     	# axis in the bottom annotation component
-    	for(i in centralized_heatmap_index) {
+    	for(i in Enriched_heatmap_index) {
     		ht = object@ht_list[[i]]
 
     		# change the size of bottom_annotation
@@ -147,7 +147,7 @@ setMethod(f = "draw",
     	# bottom_height are all fixed length
     	bottom_height = component_height(object@ht_list[[i]], 6:9) # column_names, annotation, dendrogram and title
 
-    	# assume nothing is allowed to plotted below the centralized heatmap
+    	# assume nothing is allowed to plotted below the Enriched heatmap
     	if(compare_unit(bottom_height, max_axis_height) == -1) {
 
     		for(i in normal_heatmap_index) {
@@ -157,7 +157,7 @@ setMethod(f = "draw",
     		}
 
     		# add in column rownames component
-    		for(i in centralized_heatmap_index) {
+    		for(i in Enriched_heatmap_index) {
     			ht = object@ht_list[[i]]
     			ht@layout$layout_index = rbind(ht@layout$layout_index, c(6, 4))
             	ht@layout$graphic_fun_list = c(ht@layout$graphic_fun_list, function(object) {
@@ -195,15 +195,15 @@ setMethod(f = "draw",
 
     upViewport()
 
-    for(i in centralized_heatmap_index) {
+    for(i in Enriched_heatmap_index) {
     	
     	ht = object@ht_list[[i]]
     	heatmap_name = ht@name
     	upstream_index = attr(ht@matrix, "upstream_index")
 		downstream_index = attr(ht@matrix, "downstream_index")
-		body_index = attr(ht@matrix, "body_index")
+		target_index = attr(ht@matrix, "target_index")
 		n1 = length(upstream_index)
-		n2 = length(body_index)
+		n2 = length(target_index)
 		n3 = length(downstream_index)
 		n = n1 + n2 + n3
 

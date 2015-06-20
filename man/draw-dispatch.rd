@@ -8,7 +8,11 @@ Method dispatch page for \code{draw}.}
 \code{draw} can be dispatched on following classes:
 
 \itemize{
-\item \code{\link{draw,CentralizedHeatmapList-method}}, \code{\link{CentralizedHeatmapList-class}} class method
-\item \code{\link{draw,CentralizedHeatmap-method}}, \code{\link{CentralizedHeatmap-class}} class method
+\item \code{\link{draw,EnrichedHeatmapList-method}}, \code{\link{EnrichedHeatmapList-class}} class method
+\item \code{\link{draw,EnrichedHeatmap-method}}, \code{\link{EnrichedHeatmap-class}} class method
 }
+}
+\section{Example}{
+# no example
+NULL
 }

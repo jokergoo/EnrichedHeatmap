@@ -1,27 +1,34 @@
 
 
 # == title
-# Normalize regions to a matrix
+# Normalize associations between genomic regions and target regions into a matrix
 #
 # == param
 # -gr a `GenomicRanges::GRanges` object
-# -center a `GenomicRanges::GRanges` object
-# -extend extension to the upstream and downstream of ``center``. It can be a vector of length one or two.
-# -w window size for splitting upstream and downstream
-# -value_column index for column in ``gr`` that map to colors. If the value is ``NULL``, an internal column
+# -target a `GenomicRanges::GRanges` object
+# -extend extended base pairs to the upstream and downstream of ``target``. It can be a vector of length one or two.
+# -w window size for splitting upstream and downstream in ``target``.
+# -value_column index for column in ``gr`` that will be mapped to colors. If it is ``NULL``, an internal column
 #         which contains 1 will be attached.
 # -empty_value values for windows that don't overlap with ``gr``
 # -mean_mode when a window overlaps with more than one regions in ``gr``, how to calculate 
-#       the mean values in this window.
-# -show_body  whether show ``center``
-# -body_ratio  the ratio of width of ``center`` in the heatmap
-# -smooth whether apply smoothing in every row in the matrix. The smoothing is applied by `stats::loess`
+#       the mean values in this window. See 'Details' section for a detailed explanation.
+# -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
+#               is enforced to ``FALSE``.
+# -target_ratio  the ratio of width of ``target`` compared to 'upstream + target + downstream' in the heatmap
+# -smooth whether apply smoothing in every row in the matrix. The smoothing is applied by `stats::loess`. Please
+#         note the data range will change, you need to adjust values in the new matrix afterwards.
 # -span degree of smoothing, pass to `stats::loess`.
+# -s `GenomicRanges::findOverlaps` sometimes uses a lot of memory. ``target`` is splitted into ``s`` parts and each
+#     part is processed serialized.
 #
 # == details
+# In order to visualize associations between ``gr`` and ``target``, the data is transformed into a matrix
+# and visualized as a heatmap.
+# 
 # Following illustrates different settings for ``mean_mode``:
 #
-#        4      5      2     values
+#        4      5      2     values in gr
 #     ++++++   +++   +++++   gr
 #       ================     window (16bp)
 #
@@ -32,10 +39,11 @@
 # == value
 # A matrix with following additional attributes:
 #
-# -upstream_index column index corresponding to upstream
-# -body_index column index corresponding to body
-# -downstream_index column index corresponding to downstream
+# -upstream_index column index corresponding to upstream of ``target``
+# -target_index column index corresponding to ``target``
+# -downstream_index column index corresponding to downstream of ``target``
 # -extend extension on upstream and downstream
+# -smooth whether smoothing was applied on the matrix
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -43,12 +51,53 @@
 # == example
 # gr = GRanges(seqnames = "chr1", 
 # 	  ranges = IRanges(start = c(1, 4, 7, 11, 14, 17, 21, 24, 27),
-#                      end = c(2, 5, 8, 12, 15, 18, 22, 25, 28)))
-# center = GRanges(seqnames = "chr1", ranges = IRanges(start = 10, end = 20))
-# normalizeToMatrix(gr, center, extend = 10, w = 2)
-normalizeToMatrix = function(gr, center, extend = 5000, w = extend/50, value_column = NULL,
-    empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), show_body = any(width(center) > 1),
-    body_ratio = 0.1, smooth = FALSE, span = 0.75) {
+#                      end = c(2, 5, 8, 12, 15, 18, 22, 25, 28)),
+#     score = c(1, 2, 3, 1, 2, 3, 1, 2, 3))
+# target = GRanges(seqnames = "chr1", ranges = IRanges(start = 10, end = 20))
+# normalizeToMatrix(gr, target, extend = 10, w = 2)
+# normalizeToMatrix(gr, target, extend = 10, w = 2, include_target = TRUE)
+# normalizeToMatrix(gr, target, extend = 10, w = 2, value_column = "score")
+#
+normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_column = NULL, mapping_column = NULL,
+    empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), include_target = any(width(target) > 1),
+    target_ratio = 0.1, smooth = FALSE, span = 0.5, s = 1) {
+
+	if(s > 1) {
+		n = length(target)
+		if(s > n) s = n
+		x = seq(1, n, by = s)
+		if(x < n) x = c(x, n)
+		start_index = x[-length(x)]
+		end_index = x[-1] - 1
+		end_index[length(end_index)] = x[length(x)]
+
+		lt = lapply(seq_along(start_index), function(i) {
+			normalizeToMatrix(gr, target[ start_index[i]:end_index[i] ], extend = extend, w = w, value_column = value_column, mapping_column = mapping_column,
+				empty_value = empty_value, mean_mode = mean_mode, include_target = include_target,
+				target_ratio = target_ratio, smooth = smooth, span = span)
+		})
+
+		upstream_index = attr(lt[[1]], "upstream_index")
+		target_index = attr(lt[[1]], "target_index")
+		downstream_index = attr(lt[[1]], "downstream_index")
+		extend = attr(lt[[1]], "extend")
+		smooth = attr(lt[[1]], "smooth")
+
+		mat = do.call("rbind", lt)
+
+		attr(mat, "upstream_index") = upstream_index
+		attr(mat, "target_index") = target_index
+		attr(mat, "downstream_index") = downstream_index
+		attr(mat, "extend") = extend
+		attr(mat, "smooth") = smooth
+
+		return(mat)
+		
+	}
+
+	if(all(width(target) == 1)) {
+		include_target = FALSE
+	}
   
 	if(any(extend %% w > 0)) {
 		stop("`extend` should be divisible by `w`.\n")
@@ -56,12 +105,12 @@ normalizeToMatrix = function(gr, center, extend = 5000, w = extend/50, value_col
   
 	if(length(extend) == 1) extend = c(extend, extend)
   	
-  	if(all(width(center) <= 1)) {
+  	if(all(width(target) <= 1)) {
   		# do not need to separate upstream and downstream
-  		suppressWarnings(both <- promoters(center, upstream = extend[1], downstream = extend[2]))
+  		suppressWarnings(both <- promoters(target, upstream = extend[1], downstream = extend[2]))
 		strand(both) = "*"
 
-		mat_both = makeMatrix(gr, both, w = w, value_column = value_column, empty_value = empty_value, mean_mode = mean_mode)
+		mat_both = makeMatrix(gr, both, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
 		i = round(extend[1]/(extend[1] + extend[2]) * ncol(mat_both))  # assume
 		if(i < 2 | ncol(mat_both) - i < 2) {
 			stop("Maybe `w` is too large or one of `extend` is too small.")
@@ -71,74 +120,73 @@ normalizeToMatrix = function(gr, center, extend = 5000, w = extend/50, value_col
 	  
   	} else {
 		# extend and normalize in upstream 
-		suppressWarnings(upstream <- promoters(center, upstream = extend[1], downstream = 0))
+		suppressWarnings(upstream <- promoters(target, upstream = extend[1], downstream = 0))
 		strand(upstream) = "*"
 	  
-		mat_upstream = makeMatrix(gr, upstream, w = w, value_column = value_column, empty_value = empty_value, mean_mode = mean_mode)
+		mat_upstream = makeMatrix(gr, upstream, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
 	  
 		# extend and normalize in downstream
-		if(all(width(center) == 1) && !show_body) {
-			e = ifelse(strand(center) == "-", start(center), end(center))
+		if(all(width(target) == 1) && !include_target) {
+			e = ifelse(strand(target) == "-", start(target), end(target))
 		} else {
-			e = ifelse(strand(center) == "-", start(center) - 1, end(center) + 1)
+			e = ifelse(strand(target) == "-", start(target) - 1, end(target) + 1)
 		}
-		end_center = GRanges(seqnames = seqnames(center),
+		end_target = GRanges(seqnames = seqnames(target),
 	                         ranges = IRanges(start = e, end = e),
-	                         strand = strand(center))
-		suppressWarnings(downstream <- promoters(end_center, upstream = 0, downstream = extend[2]))
+	                         strand = strand(target))
+		suppressWarnings(downstream <- promoters(end_target, upstream = 0, downstream = extend[2]))
 		strand(downstream) = "*"
 	  
-		mat_downstream = makeMatrix(gr, downstream, w = w, value_column = value_column, empty_value = empty_value,
+		mat_downstream = makeMatrix(gr, downstream, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value,
 	                              mean_mode = mean_mode)
 	}
 
-	if(show_body) {
-		k = (ncol(mat_upstream) + ncol(mat_downstream)) * body_ratio/(1-body_ratio)
-		mat_body = makeMatrix(gr, center, k = k, value_column = value_column, empty_value = empty_value, mean_mode = mean_mode)
+	if(include_target) {
+		k = (ncol(mat_upstream) + ncol(mat_downstream)) * target_ratio/(1-target_ratio)
+		mat_target = makeMatrix(gr, target, k = k, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
 	} else {
-		mat_body = matrix(0, nrow = length(center), ncol = 0)
+		mat_target = matrix(0, nrow = length(target), ncol = 0)
 	}
 
-	if(show_body) {
-		mat = cbind(mat_upstream, mat_downstream)
-		# apply smoothing on rows in mat
-		if(smooth) mat = t(apply(mat, 1, function(x) loess(x ~ seq_along(x), span = span)$fitted))
-
-		attr(mat, "upstream_index") = seq_len(ncol(mat_upstream))
-		attr(mat, "body_index") = seq_len(ncol(mat_body)) + ncol(mat_upstream)
-		attr(mat, "downstream_index") = seq_len(ncol(mat_downstream)) + ncol(mat_upstream)
-		attr(mat, "extend") = extend
-	} else {
-  		mat = cbind(mat_upstream, mat_body, mat_downstream)
-	  	# apply smoothing on rows in mat
-		if(smooth) mat = t(apply(mat, 1, function(x) loess(x ~ seq_along(x), span = span)$fitted))
-		
-		attr(mat, "upstream_index") = seq_len(ncol(mat_upstream))
-		attr(mat, "body_index") = numeric(0)
-		attr(mat, "downstream_index") = seq_len(ncol(mat_downstream)) + ncol(mat_upstream) + ncol(mat_body)		
-		attr(mat, "extend") = extend
-	}
+  	mat = cbind(mat_upstream, mat_target, mat_downstream)
+  	# apply smoothing on rows in mat
+	if(smooth) mat = t(apply(mat, 1, function(x) loess(x ~ seq_along(x), span = span)$fitted))
 
 	
+	upstream_index = seq_len(ncol(mat_upstream))
+	target_index = seq_len(ncol(mat_target)) + ncol(mat_upstream)	
+	downstream_index = seq_len(ncol(mat_downstream)) + ncol(mat_upstream) + ncol(mat_target)
+
+	attr(mat, "upstream_index") = upstream_index
+	attr(mat, "target_index") = target_index
+	attr(mat, "downstream_index") = downstream_index
+	attr(mat, "extend") = extend
+	attr(mat, "smooth") = smooth
+
+  	rownames(mat) = names(target)
+  	if(ncol(mat_target)) {
+  		colnames(mat) = c(paste0("u", seq_along(upstream_index)), paste0("t", seq_along(target_index)), paste0("d", seq_along(downstream_index)))
+  	} else {
+  		colnames(mat) = c(paste0("u", seq_along(upstream_index)), paste0("d", seq_along(downstream_index)))
+  	}
 
 	return(mat)
 }
 
 # 
 # -gr input regions
-# -reference the upstream part or body part
+# -target the upstream part or body part
 # -window absolute size (100) or relative size(0.1)
 # -value_column
 # -mean_mode how to calculate mean value in a window
 #
 # == example
 # gr = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 4, 7), end = c(2, 5, 8)))
-# reference = GRanges(seqnames = "chr1", ranges =IRanges(start = 1, end = 10))
-# makeMatrix(gr, reference, w = 2)
+# target = GRanges(seqnames = "chr1", ranges =IRanges(start = 1, end = 10))
+# makeMatrix(gr, target, w = 2)
 #
-makeMatrix = function(gr, reference, w = NULL, k = NULL, value_column = NULL, empty_value = 0,
-                      mean_mode = c("absolute", "weighted", "w0"), 
-                      direction = c("normal", "reverse")) {
+makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mapping_column = mapping_column, empty_value = 0,
+    mean_mode = c("absolute", "weighted", "w0"), direction = c("normal", "reverse")) {
   
 	if(is.null(value_column)) {
 		mcols(gr) = NULL
@@ -146,50 +194,68 @@ makeMatrix = function(gr, reference, w = NULL, k = NULL, value_column = NULL, em
 		value_column = ".value"
 	}
   
-	# split `reference` into small windows
-	reference_windows = makeWindows(reference, w = w, k = k, direction = direction)
+	# split `target` into small windows
+	target_windows = makeWindows(target, w = w, k = k, direction = direction)
   
-	# overlap `gr` to `reference_windows`
-	mtch = findOverlaps(gr, reference_windows)
+	# overlap `gr` to `target_windows`
+	mtch = findOverlaps(gr, target_windows)
 	mtch = as.matrix(mtch)
-
-	# add a `value` column in `reference_windows` which is the mean value for intersected gr
-	# in `reference_window`
+	
+	# add a `value` column in `target_window` which is the mean value for intersected gr
+	# in `target_window`
 	m_gr = gr[ mtch[, 1] ]
-	m_reference_windows = reference_windows[ mtch[, 2] ]
+	m_target_windows = target_window[ mtch[, 2] ]
+
+	if(!is.null(mapping_column)) {
+		
+		mapping = m_gr[[mapping_column]]
+		if(is.numeric(mapping)) {
+			l = mapping == m_target_windows$.orow
+		} else {
+			if(is.null(names(target))) {
+				stop("`mapping_column` in `gr` is mapped to the names of `target`, which means `target` should have names.")
+			} else {
+				l = mapping == names(target)[m_target_windows$.orow]
+			}
+		}
+
+		m_gr = m_gr[l]
+		m_target_windows = m_target_windows[l]
+	}
+
 	v = mcols(m_gr)[[value_column]]
   
 	mean_mode = match.arg(mean_mode)[1]
   
 	if(mean_mode == "w0") {
-		mintersect = pintersect(m_gr, m_reference_windows)
-		p = width(mintersect)/width(m_reference_windows)
+		mintersect = pintersect(m_gr, m_target_windows)
+		p = width(mintersect)/width(m_target_windows)
 		x = tapply(p*v, mtch[, 2], sum)
 	} else if(mean_mode == "absolute") {
 		x = tapply(v, mtch[, 2], mean)
 	} else {
-		mintersect = pintersect(m_gr, m_reference_windows)
+		mintersect = pintersect(m_gr, m_target_windows)
 		w = width(mintersect)
 		x = tapply(w*v, mtch[, 2], sum) / tapply(w, mtch[, 2], sum)
 	}
   
-	v2 = rep(empty_value, length(reference_windows))
+	v2 = rep(empty_value, length(target_windows))
 	v2[ as.numeric(names(x)) ] = x
   
-	reference_windows$.value = v2
+	target_windows$.value = v2
   
 	# transform into a matrix
-	tb = table(reference_windows$.orow)
-	reference_strand = strand(reference)
+	tb = table(target_windows$.orow)
+	target_strand = strand(target)
 	column_index = mapply(as.numeric(names(tb)), tb, FUN = function(i, n) {
-		if(as.vector(reference_strand[i] == "-")) {
+		if(as.vector(target_strand[i] == "-")) {
 			rev(seq_len(n))
 		} else {
 			seq_len(n)
 		}
 	})
   
-	# is column_index has the same length for all regions in reference?
+	# is column_index has the same length for all regions in target?
 	# if extension of upstream are the same or split body into k pieces,
 	# then all column index has the same length
 	# if it is not the same, throw error!
@@ -197,9 +263,13 @@ makeMatrix = function(gr, reference, w = NULL, k = NULL, value_column = NULL, em
 		stop("numbers of columns are not the same.")
 	}
   
-	mat = matrix(empty_value, nrow = length(reference), ncol = dim(column_index)[1])
-	mat[ reference_windows$.orow + (as.vector(column_index) - 1)* nrow(mat) ] = reference_windows$.value
-  
+	mat = matrix(empty_value, nrow = length(target), ncol = dim(column_index)[1])
+	mat[ target_windows$.orow + (as.vector(column_index) - 1)* nrow(mat) ] = target_windows$.value
+
+	# findOverlaps may use a lot of memory
+	rm(list = setdiff(ls(), "mat"))
+	gc(verbose = FALSE)
+
 	return(mat)
 }
 
@@ -207,7 +277,7 @@ makeMatrix = function(gr, reference, w = NULL, k = NULL, value_column = NULL, em
 # Split regions into windows
 #
 # == param
-# -gr a `GenomicRanges::GRanges` object. Regions in the object will be splitted into windows
+# -gr a `GenomicRanges::GRanges` object.
 # -w window size, a value larger than 1 means the number of base pairs and a value between 0 and 1
 #    is the percent to the current region.
 # -k number of partitions for each region. If it is set, all other arguments are ignored.

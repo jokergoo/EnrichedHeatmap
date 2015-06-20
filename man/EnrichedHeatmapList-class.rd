@@ -1,6 +1,6 @@
-\name{CentralizedHeatmapList-class}
+\name{EnrichedHeatmapList-class}
 \docType{class}
-\alias{CentralizedHeatmapList-class}
+\alias{EnrichedHeatmapList-class}
 \title{
 Class for a list of heatmaps
 
@@ -10,15 +10,15 @@ Class for a list of heatmaps
 
 }
 \details{
-The structure of \code{\link{CentralizedHeatmapList-class}} is the same as
+The structure of \code{\link{EnrichedHeatmapList-class}} is the same as
 \code{\link[ComplexHeatmap]{HeatmapList-class}} and the class is inherited from \code{\link[ComplexHeatmap]{HeatmapList-class}}.
 
 }
 \section{Methods}{
-The \code{\link{CentralizedHeatmapList-class}} provides following methods:
+The \code{\link{EnrichedHeatmapList-class}} provides following methods:
 
 \itemize{
-  \item \code{\link{draw,CentralizedHeatmapList-method}}: draw a list of heatmaps.
+  \item \code{\link{draw,EnrichedHeatmapList-method}}: draw a list of heatmaps.
 }
 
 }

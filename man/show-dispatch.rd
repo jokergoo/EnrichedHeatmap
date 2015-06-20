@@ -8,7 +8,11 @@ Method dispatch page for \code{show}.}
 \code{show} can be dispatched on following classes:
 
 \itemize{
-\item \code{\link{show,CentralizedHeatmapList-method}}, \code{\link{CentralizedHeatmapList-class}} class method
-\item \code{\link{show,CentralizedHeatmap-method}}, \code{\link{CentralizedHeatmap-class}} class method
+\item \code{\link{show,EnrichedHeatmapList-method}}, \code{\link{EnrichedHeatmapList-class}} class method
+\item \code{\link{show,EnrichedHeatmap-method}}, \code{\link{EnrichedHeatmap-class}} class method
 }
+}
+\section{Example}{
+# no example
+NULL
 }

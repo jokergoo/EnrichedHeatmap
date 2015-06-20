@@ -13,7 +13,7 @@ makeWindows(gr, w = NULL, k = NULL, direction = c("normal", "reverse"),
     short.keep = FALSE)}
 \arguments{
 
-  \item{gr}{a \code{\link[GenomicRanges]{GRanges}} object. Regions in the object will be splitted into windows}
+  \item{gr}{a \code{\link[GenomicRanges]{GRanges}} object.}
   \item{w}{window size, a value larger than 1 means the number of base pairs and a value between 0 and 1is the percent to the current region.}
   \item{k}{number of partitions for each region. If it is set, all other arguments are ignored.}
   \item{direction}{where to start the splitting. See 'Details' section.}
@@ -24,8 +24,8 @@ Following illustrates the meaning of \code{direction} and \code{short.keep}:
 
   \preformatted{
     ----------  a region
-    aaabbbccc   direction = "normal", short.keep = FALSE
-    aaabbbcccd  direction = "normal", short.keep = TRUE
+    aaabbbccc   direction = "normal",  short.keep = FALSE
+    aaabbbcccd  direction = "normal",  short.keep = TRUE
      aaabbbccc  direction = "reverse", short.keep = FALSE
     abbbcccddd  direction = "reverse", short.keep = TRUE
   }

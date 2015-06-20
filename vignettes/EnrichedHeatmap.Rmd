@@ -1,0 +1,77 @@
+<!--
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{Make Enriched Heatmaps}
+-->
+
+Make enriched heatmaps
+========================================
+
+**Author**: Zuguang Gu ( z.gu@dkfz.de )
+
+**Date**: `r Sys.Date()`
+
+-------------------------------------------------------------
+
+```{r, echo = FALSE, message = FALSE}
+library(markdown)
+options(markdown.HTML.options = c(options('markdown.HTML.options')[[1]], "toc"))
+
+library(knitr)
+knitr::opts_chunk$set(
+    error = FALSE,
+    tidy  = FALSE,
+    message = FALSE,
+    fig.align = "center")
+options(markdown.HTML.stylesheet = "custom.css")
+
+options(width = 100)
+```
+
+```{r, echo = FALSE, message = FALSE}
+suppressPackageStartupMessages(library(EnrichedHeatmap))
+```
+
+```{r, eval = FALSE}
+library(EnrichedHeatmap)
+```
+
+Heatmap for the enrichment of H3K4me3 histone mark on TSS:
+
+```{r h3k4me3}
+tss = promoters(genes, upstream = 0, downstream = 1)
+mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", extend = 5000, mean_mode = "w0", w = 50)
+EnrichedHeatmap(mat1, name = "H3K4me3")
+```
+
+```
+# code not run
+con = pipe("bedtools genomecov -ibam path-of-bam-file -bg")
+tb = read.table(con)
+gr = GRanges(seqnames = tb[[1]], 
+    ranges = IRanges(start = tb[[2]],
+                     end = tb[[3]]),
+    coverage = tb[[4]])
+close(con)
+```
+
+Heatmap for the enrichment of low methylated regions on TSS:
+
+```{r meth}
+mat2 = normalizeToMatrix(meth, tss, value_column = "meth", extend = 5000, w = 50, empty_value = 0.5)
+EnrichedHeatmap(mat2, name = "methylation")
+```
+
+Heatmap for the enrichment of low methylation on CGI:
+
+```{r cgi}
+mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", extend = 5000, w = 50, empty_value = 0.5)
+EnrichedHeatmap(mat3, name = "methylation", axis_name_rot = -90)
+```
+
+```{r list}
+EnrichedHeatmap(mat1, name = "H3K4me3") + 
+  EnrichedHeatmap(mat2, name = "methylation") +
+  
+```
+
+

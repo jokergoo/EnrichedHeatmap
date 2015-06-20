@@ -1,6 +1,6 @@
-Package: CentralizedHeatmap
+Package: EnrichedHeatmap
 Type: Package
-Title: Making Centralized Heatmaps
+Title: Making Enriched Heatmaps
 Version: 0.99.0
 Date: 2015-6-17
 Author: Zuguang Gu
@@ -9,9 +9,9 @@ Depends: R (>= 3.1.0), grid, ComplexHeatmap (>= 1.2.0), GenomicRanges, IRanges
 Imports: methods
 Suggests: testthat (>= 0.3), knitr, markdown
 VignetteBuilder: knitr
-Description: makeing complex centralized heatmaps
+Description: makeing complex Enriched heatmaps
 biocViews: Software, Visualization, Sequencing
-URL: https://github.com/jokergoo/CentralizedHeatmap
+URL: https://github.com/jokergoo/EnrichedHeatmap
 License: GPL (>= 2)
 Packaged: 2015-6-17 00:00:00 UTC; Administrator
 Repository: Bioconductor

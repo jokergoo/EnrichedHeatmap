@@ -1,36 +1,40 @@
 \name{normalizeToMatrix}
 \alias{normalizeToMatrix}
 \title{
-Normalize regions to a matrix
+Normalize associations between genomic regions and target regions into a matrix
 
 }
 \description{
-Normalize regions to a matrix
+Normalize associations between genomic regions and target regions into a matrix
 
 }
 \usage{
-normalizeToMatrix(gr, center, extend = 5000, w = extend/50, value_column = NULL,
-    empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), show_body = any(width(center) > 1),
-    body_ratio = 0.1, smooth = FALSE, span = 0.75)}
+normalizeToMatrix(gr, target, extend = 5000, w = extend/50, value_column = NULL,
+    empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), include_target = any(width(target) > 1),
+    target_ratio = 0.1, smooth = FALSE, span = 0.5, s = 1)}
 \arguments{
 
   \item{gr}{a \code{\link[GenomicRanges]{GRanges}} object}
-  \item{center}{a \code{\link[GenomicRanges]{GRanges}} object}
-  \item{extend}{extension to the upstream and downstream of \code{center}. It can be a vector of length one or two.}
-  \item{w}{window size for splitting upstream and downstream}
-  \item{value_column}{index for column in \code{gr} that map to colors. If the value is \code{NULL}, an internal columnwhich contains 1 will be attached.}
+  \item{target}{a \code{\link[GenomicRanges]{GRanges}} object}
+  \item{extend}{extended base pairs to the upstream and downstream of \code{target}. It can be a vector of length one or two.}
+  \item{w}{window size for splitting upstream and downstream in \code{target}.}
+  \item{value_column}{index for column in \code{gr} that will be mapped to colors. If it is \code{NULL}, an internal columnwhich contains 1 will be attached.}
   \item{empty_value}{values for windows that don't overlap with \code{gr}}
-  \item{mean_mode}{when a window overlaps with more than one regions in \code{gr}, how to calculate the mean values in this window.}
-  \item{show_body}{whether show \code{center}}
-  \item{body_ratio}{the ratio of width of \code{center} in the heatmap}
-  \item{smooth}{whether apply smoothing in every row in the matrix. The smoothing is applied by \code{\link[stats]{loess}}}
+  \item{mean_mode}{when a window overlaps with more than one regions in \code{gr}, how to calculate the mean values in this window. See 'Details' section for a detailed explanation.}
+  \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target}is enforced to \code{FALSE}.}
+  \item{target_ratio}{the ratio of width of \code{target} compared to 'upstream + target + downstream' in the heatmap}
+  \item{smooth}{whether apply smoothing in every row in the matrix. The smoothing is applied by \code{\link[stats]{loess}}. Pleasenote the data range will change, you need to adjust values in the new matrix afterwards.}
   \item{span}{degree of smoothing, pass to \code{\link[stats]{loess}}.}
+  \item{s}{\code{\link[GenomicRanges]{findOverlaps}} sometimes uses a lot of memory. \code{target} is splitted into \code{s} parts and eachpart is processed serialized.}
 }
 \details{
+In order to visualize associations between \code{gr} and \code{target}, the data is transformed into a matrix
+and visualized as a heatmap.
+
 Following illustrates different settings for \code{mean_mode}:
 
   \preformatted{
-       4      5      2     values
+       4      5      2     values in gr
     ++++++   +++   +++++   gr
       ================     window (16bp)
 
@@ -44,10 +48,11 @@ Following illustrates different settings for \code{mean_mode}:
 A matrix with following additional attributes:
 
 \describe{
-  \item{upstream_index}{column index corresponding to upstream}
-  \item{body_index}{column index corresponding to body}
-  \item{downstream_index}{column index corresponding to downstream}
+  \item{upstream_index}{column index corresponding to upstream of \code{target}}
+  \item{target_index}{column index corresponding to \code{target}}
+  \item{downstream_index}{column index corresponding to downstream of \code{target}}
   \item{extend}{extension on upstream and downstream}
+  \item{smooth}{whether smoothing was applied on the matrix}
 }
 
 }
@@ -58,8 +63,11 @@ Zuguang Gu <z.gu@dkfz.de>
 \examples{
 gr = GRanges(seqnames = "chr1", 
 	  ranges = IRanges(start = c(1, 4, 7, 11, 14, 17, 21, 24, 27),
-                     end = c(2, 5, 8, 12, 15, 18, 22, 25, 28)))
-center = GRanges(seqnames = "chr1", ranges = IRanges(start = 10, end = 20))
-normalizeToMatrix(gr, center, extend = 10, w = 2)
+                     end = c(2, 5, 8, 12, 15, 18, 22, 25, 28)),
+    score = c(1, 2, 3, 1, 2, 3, 1, 2, 3))
+target = GRanges(seqnames = "chr1", ranges = IRanges(start = 10, end = 20))
+normalizeToMatrix(gr, target, extend = 10, w = 2)
+normalizeToMatrix(gr, target, extend = 10, w = 2, include_target = TRUE)
+normalizeToMatrix(gr, target, extend = 10, w = 2, value_column = "score")
 
 }
