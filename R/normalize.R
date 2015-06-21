@@ -10,6 +10,7 @@
 # -w window size for splitting upstream and downstream in ``target``.
 # -value_column index for column in ``gr`` that will be mapped to colors. If it is ``NULL``, an internal column
 #         which contains 1 will be attached.
+# -mapping_column mapping column to restrict overlapping between ``gr`` and ``target``
 # -empty_value values for windows that don't overlap with ``gr``
 # -mean_mode when a window overlaps with more than one regions in ``gr``, how to calculate 
 #       the mean values in this window. See 'Details' section for a detailed explanation.
@@ -21,6 +22,7 @@
 # -span degree of smoothing, pass to `stats::loess`.
 # -s `GenomicRanges::findOverlaps` sometimes uses a lot of memory. ``target`` is splitted into ``s`` parts and each
 #     part is processed serialized.
+# -trim percent of extreme values to remove
 #
 # == details
 # In order to visualize associations between ``gr`` and ``target``, the data is transformed into a matrix
@@ -60,7 +62,7 @@
 #
 normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_column = NULL, mapping_column = NULL,
     empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), include_target = any(width(target) > 1),
-    target_ratio = 0.1, smooth = FALSE, span = 0.5, s = 1) {
+    target_ratio = 0.1, smooth = FALSE, span = 0.5, s = 1, trim = 0.01) {
 
 	if(s > 1) {
 		n = length(target)
@@ -74,7 +76,7 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
 		lt = lapply(seq_along(start_index), function(i) {
 			normalizeToMatrix(gr, target[ start_index[i]:end_index[i] ], extend = extend, w = w, value_column = value_column, mapping_column = mapping_column,
 				empty_value = empty_value, mean_mode = mean_mode, include_target = include_target,
-				target_ratio = target_ratio, smooth = smooth, span = span)
+				target_ratio = target_ratio, smooth = smooth, span = span, trim = 0)
 		})
 
 		upstream_index = attr(lt[[1]], "upstream_index")
@@ -90,6 +92,13 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
 		attr(mat, "downstream_index") = downstream_index
 		attr(mat, "extend") = extend
 		attr(mat, "smooth") = smooth
+
+		if(trim > 0) {
+	  		q1 = quantile(mat, trim/2, na.rm = TRUE)
+	  		q2 = quantile(mat, 1 - trim/2, na.rm = TRUE)
+	  		mat[mat <= q1] = q1
+	  		mat[mat >= q2] = q2
+	  	}
 
 		return(mat)
 		
@@ -108,7 +117,6 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
   	if(all(width(target) <= 1)) {
   		# do not need to separate upstream and downstream
   		suppressWarnings(both <- promoters(target, upstream = extend[1], downstream = extend[2]))
-		strand(both) = "*"
 
 		mat_both = makeMatrix(gr, both, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
 		i = round(extend[1]/(extend[1] + extend[2]) * ncol(mat_both))  # assume
@@ -121,7 +129,6 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
   	} else {
 		# extend and normalize in upstream 
 		suppressWarnings(upstream <- promoters(target, upstream = extend[1], downstream = 0))
-		strand(upstream) = "*"
 	  
 		mat_upstream = makeMatrix(gr, upstream, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
 	  
@@ -135,7 +142,6 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
 	                         ranges = IRanges(start = e, end = e),
 	                         strand = strand(target))
 		suppressWarnings(downstream <- promoters(end_target, upstream = 0, downstream = extend[2]))
-		strand(downstream) = "*"
 	  
 		mat_downstream = makeMatrix(gr, downstream, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value,
 	                              mean_mode = mean_mode)
@@ -170,6 +176,13 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
   		colnames(mat) = c(paste0("u", seq_along(upstream_index)), paste0("d", seq_along(downstream_index)))
   	}
 
+  	if(trim > 0) {
+  		q1 = quantile(mat, trim/2, na.rm = TRUE)
+  		q2 = quantile(mat, 1 - trim/2, na.rm = TRUE)
+  		mat[mat <= q1] = q1
+  		mat[mat >= q2] = q2
+  	}
+
 	return(mat)
 }
 
@@ -189,14 +202,14 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
     mean_mode = c("absolute", "weighted", "w0"), direction = c("normal", "reverse")) {
   
 	if(is.null(value_column)) {
-		mcols(gr) = NULL
-		mcols(gr)$.value = rep(1, length(gr))
-		value_column = ".value"
+		gr$..value = rep(1, length(gr))
+		value_column = "..value"
 	}
   
 	# split `target` into small windows
 	target_windows = makeWindows(target, w = w, k = k, direction = direction)
-  
+ 	strand(target_windows) = "*"
+ 	
 	# overlap `gr` to `target_windows`
 	mtch = findOverlaps(gr, target_windows)
 	mtch = as.matrix(mtch)
@@ -204,23 +217,24 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 	# add a `value` column in `target_window` which is the mean value for intersected gr
 	# in `target_window`
 	m_gr = gr[ mtch[, 1] ]
-	m_target_windows = target_window[ mtch[, 2] ]
+	m_target_windows = target_windows[ mtch[, 2] ]
 
 	if(!is.null(mapping_column)) {
 		
-		mapping = m_gr[[mapping_column]]
+		mapping = mcols(m_gr)[[mapping_column]]
 		if(is.numeric(mapping)) {
-			l = mapping == m_target_windows$.orow
+			l = mapping == m_target_windows$.row
 		} else {
 			if(is.null(names(target))) {
 				stop("`mapping_column` in `gr` is mapped to the names of `target`, which means `target` should have names.")
 			} else {
-				l = mapping == names(target)[m_target_windows$.orow]
+				l = mapping == names(target)[m_target_windows$.row]
 			}
 		}
 
 		m_gr = m_gr[l]
 		m_target_windows = m_target_windows[l]
+		mtch = mtch[l , , drop = FALSE]
 	}
 
 	v = mcols(m_gr)[[value_column]]
@@ -242,10 +256,10 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 	v2 = rep(empty_value, length(target_windows))
 	v2[ as.numeric(names(x)) ] = x
   
-	target_windows$.value = v2
-  
+	target_windows$..value = v2
+
 	# transform into a matrix
-	tb = table(target_windows$.orow)
+	tb = table(target_windows$.row)
 	target_strand = strand(target)
 	column_index = mapply(as.numeric(names(tb)), tb, FUN = function(i, n) {
 		if(as.vector(target_strand[i] == "-")) {
@@ -264,7 +278,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 	}
   
 	mat = matrix(empty_value, nrow = length(target), ncol = dim(column_index)[1])
-	mat[ target_windows$.orow + (as.vector(column_index) - 1)* nrow(mat) ] = target_windows$.value
+	mat[ target_windows$.row + (as.vector(column_index) - 1)* nrow(mat) ] = target_windows$..value
 
 	# findOverlaps may use a lot of memory
 	rm(list = setdiff(ls(), "mat"))
@@ -294,7 +308,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 #      aaabbbccc  direction = "reverse", short.keep = FALSE
 #     abbbcccddd  direction = "reverse", short.keep = TRUE
 #     
-# There is an additional column ``.orow`` attached which contains the correspondance between small windows
+# There is an additional column ``.row`` attached which contains the correspondance between small windows
 # and original regions in ``gr``
 #
 # == value
@@ -410,6 +424,7 @@ makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"
 	start = unlist(pos[1, ])
 	end = unlist(pos[2, ])
 	orow = rep(seq_len(ncol(pos)), times = sapply(pos[1, ], length))
+	ncol = unlist(lapply(pos[1, ], seq_along))  # which window from left to right
 	chr = seqnames(gr)[orow]
 	strand = strand(gr)[orow]
 
@@ -417,7 +432,8 @@ makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"
 		         ranges = IRanges(start = start,
 		         	              end = end),
 		         strand = strand,
-		         .orow = orow)
+		         .row = orow,
+		         .column = ncol)
 	return(gr)
 
 }

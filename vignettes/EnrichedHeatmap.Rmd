@@ -3,7 +3,7 @@
 %\VignetteIndexEntry{Make Enriched Heatmaps}
 -->
 
-Make enriched heatmaps
+Make Enriched Heatmaps
 ========================================
 
 **Author**: Zuguang Gu ( z.gu@dkfz.de )
@@ -27,6 +27,11 @@ options(markdown.HTML.stylesheet = "custom.css")
 options(width = 100)
 ```
 
+Enriched heatmap is a kind of heatmap with special type. It is broadly used to
+visualize e.g. how histone markers are enriched to specific sites.
+
+Here we implement Enriched heatmap by **ComplexHeatmap** package.
+
 ```{r, echo = FALSE, message = FALSE}
 suppressPackageStartupMessages(library(EnrichedHeatmap))
 ```
@@ -35,43 +40,171 @@ suppressPackageStartupMessages(library(EnrichedHeatmap))
 library(EnrichedHeatmap)
 ```
 
+Load data:
+
+```{r}
+load(paste0(system.file("/extdata/chr21_test_data.RData", package = "EnrichedHeatmap")))
+ls()
+```
+
+The example data we are going to used are all `GRanges` objects:
+
+- `H3K4me3`: coverage for H3K4me3 histone marks
+- `cgi`: CpG islands
+- `genes`: genes
+- `meth`: methylation
+- `rpkm`: gene expression
+
+To build the vignette fast, the data only include chromosome 21.
+
+## Single heatmap for histone marks
+
 Heatmap for the enrichment of H3K4me3 histone mark on TSS:
 
-```{r h3k4me3}
+```{r h3k4me3, fig.width = 3}
 tss = promoters(genes, upstream = 0, downstream = 1)
-mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", extend = 5000, mean_mode = "w0", w = 50)
+mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
+    extend = 5000, mean_mode = "w0", w = 50)
 EnrichedHeatmap(mat1, name = "H3K4me3")
 ```
 
-```
-# code not run
-con = pipe("bedtools genomecov -ibam path-of-bam-file -bg")
-tb = read.table(con)
-gr = GRanges(seqnames = tb[[1]], 
-    ranges = IRanges(start = tb[[2]],
-                     end = tb[[3]]),
-    coverage = tb[[4]])
-close(con)
-```
+`EnrichedHeatmap()` returns a `EnrichedHeatmap` class instance which is inherited from `Heatmap` class,
+so parameters and methods for `Heatmap` class can also be applied to `EnrichedHeatmap` class.
 
-Heatmap for the enrichment of low methylated regions on TSS:
+There is a special column annotation function which shows mean values of corresponding columns in 
+the normalized matrix:
 
-```{r meth}
-mat2 = normalizeToMatrix(meth, tss, value_column = "meth", extend = 5000, w = 50, empty_value = 0.5)
-EnrichedHeatmap(mat2, name = "methylation")
+```{r anno, fig.width = 3}
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3",
+    top_annotation = HeatmapAnnotation(lines = anno_enriched(mat1)), 
+    top_annotation_height = unit(2, "cm"))
 ```
 
-Heatmap for the enrichment of low methylation on CGI:
+Rows can be smoothed by setting `smooth` to `TRUE`. But since data range will change after smoothing,
+you need to manully set the color mapping to make figures comparable.
 
-```{r cgi}
-mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", extend = 5000, w = 50, empty_value = 0.5)
-EnrichedHeatmap(mat3, name = "methylation", axis_name_rot = -90)
+```{r smooth, fig.width = 3}
+mat11 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
+    extend = 5000, mean_mode = "w0", w = 50, smooth = TRUE)
+EnrichedHeatmap(mat11, col = circlize::colorRamp2(range(mat1), c("white", "red")), 
+    name = "H3K4me3")
 ```
 
-```{r list}
-EnrichedHeatmap(mat1, name = "H3K4me3") + 
-  EnrichedHeatmap(mat2, name = "methylation") +
-  
+Since `EnrichedHeatmap` class is inherited from `Heatmap` class, it is easy to customize
+the heatmap, e.g. split rows, make clustering on rows, add titles, ...
+
+Split rows by a vector or a data frame:
+
+```{r split, fig.width = 3}
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", 
+    split = sample(c("A", "B"), length(genes), replace = TRUE),
+    column_title = "Enrichment of H3K4me3") 
 ```
 
+Split rows by k-means clustering:
+
+```{r kmeans, fig.width = 3}
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 2,
+    column_title = "Enrichment of H3K4me3")
+```
+
+Cluster on rows:
+
+```{r, cluster, fig.width = 3}
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", 
+    cluster_rows = TRUE, show_row_hclust = FALSE, column_title = "Enrichment of H3K4me3")     
+```
+
+Customize axis:
+
+```{r aixs, fig.width = 3}
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3",
+    axis_name = c("-5kb", "TSS", "5kb"), axis_name_rot = -45)
+```
+
+Extension to upstream and downstream can be controled by `extend` either by a single value
+or a vector of length 2.
+
+```{r extend, fig.width = 3}
+# upstream 1kb, downstream 2kb
+mat12 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
+    extend = c(1000, 2000), mean_mode = "w0", w = 50)
+EnrichedHeatmap(mat12, name = "H3K4me3", col = c("white", "red"))
+```
+
+## Single heatmap for methylation
+
+Also such Enriched heatmap can also visualize other genomic events.
+
+Following heatmap visualizes the enrichment of low methylated regions on TSS:
+
+```{r meth, fig.width = 3}
+mat2 = normalizeToMatrix(meth, tss, value_column = "meth", mean_mode = "absolute",
+    extend = 5000, w = 50, empty_value = 0.5)
+EnrichedHeatmap(mat2, name = "methylation", column_title = "methylation near TSS")
+```
+
+The target of the enrichment can be region with width larger than 1.
+Following heatmap visualizes the enrichment of low methylation on CGI:
+
+```{r cgi, fig.width = 3}
+mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", 
+    extend = 5000, w = 50, empty_value = 0.5)
+EnrichedHeatmap(mat3, name = "methylation", axis_name_rot = 90,
+    column_title = "methylation near CGI")
+```
+
+Width of the target regions can be controled by `target_ratio` which corresponds to
+the width of the complete heatmap.
+
+```{r fat_cgi, fig.width = 3}
+mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", 
+    extend = 5000, w = 50, empty_value = 0.5, target_ratio = 0.3)
+EnrichedHeatmap(mat3, name = "methylation", axis_name_rot = 90,
+    column_title = "methylation near CGI")
+```
+
+## Restrict overlapping by providing mapping
+
+By default every regions in `gr` tries to overlap to every regions in `target`, but if mapping is
+provided, only regions in `gr` that map to the regions in `target` will be kept.
+
+```{r neg_cr, fig.width = 3}
+load(paste0(system.file("/extdata/neg_cr.RData", package = "EnrichedHeatmap")))
+all_tss = promoters(all_genes, upstream = 0, downstream = 1)
+all_tss = all_tss[unique(neg_cr$gene)]
+
+mat4 = normalizeToMatrix(neg_cr, all_tss, mapping_column = "gene", w = 50,
+    mean_mode = "w0")
+EnrichedHeatmap(mat4, col = c("white", "green"), name = "neg_cr",
+    top_annotation = HeatmapAnnotation(lines = anno_enriched(mat4)), 
+    top_annotation_height = unit(2, "cm"))
+```
+
+## Multiple heatmaps
+
+Just like heatmaps under **ComplexHeatmap** package, heatmaps can be concatenated
+by `+` operator. `EnrichedHeatmap` and `Heatmap` instances can be mixed.
+
+Following heatmaps visualizes correspondance between H3K4me3 mark, methylation and
+gene expression. It is quite straightforward to see high expression correlates
+with low methylation and high promoter activity around TSS.
+
+```{r list, fig.width = 6}
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", width = 1) + 
+    EnrichedHeatmap(mat2, name = "methylation", width = 1) +
+    Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
+        show_row_names = FALSE, width = unit(5, "mm"))
+```
+
+Of course you can split the list of heatmaps by splitting the main heatmap:
+
+```{r list_split, fig.width = 6}
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 2, width = 1) + 
+    EnrichedHeatmap(mat2, name = "methylation", width = 1) +
+    Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
+        show_row_names = FALSE, width = unit(5, "mm"))
+```
+
+## Example with larger data sets
 

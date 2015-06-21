@@ -18,3 +18,7 @@ x = normalizeToMatrix(meth, cgi, value_column = "meth", extend = 5000, w = 100, 
 
 EnrichedHeatmap(x2, name = "methylation", column_title = "methylation", axis_name_rot = -90)
 
+
+kmeans(mat1)$clusters
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", 
+	split = kmeans(mat1, centers =2)$cluster)

@@ -9,9 +9,9 @@ Normalize associations between genomic regions and target regions into a matrix
 
 }
 \usage{
-normalizeToMatrix(gr, target, extend = 5000, w = extend/50, value_column = NULL,
+normalizeToMatrix(gr, target, extend = 5000, w = extend/50, value_column = NULL, mapping_column = NULL,
     empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), include_target = any(width(target) > 1),
-    target_ratio = 0.1, smooth = FALSE, span = 0.5, s = 1)}
+    target_ratio = 0.1, smooth = FALSE, span = 0.5, s = 1, trim = 0.01)}
 \arguments{
 
   \item{gr}{a \code{\link[GenomicRanges]{GRanges}} object}
@@ -19,6 +19,7 @@ normalizeToMatrix(gr, target, extend = 5000, w = extend/50, value_column = NULL,
   \item{extend}{extended base pairs to the upstream and downstream of \code{target}. It can be a vector of length one or two.}
   \item{w}{window size for splitting upstream and downstream in \code{target}.}
   \item{value_column}{index for column in \code{gr} that will be mapped to colors. If it is \code{NULL}, an internal columnwhich contains 1 will be attached.}
+  \item{mapping_column}{mapping column}
   \item{empty_value}{values for windows that don't overlap with \code{gr}}
   \item{mean_mode}{when a window overlaps with more than one regions in \code{gr}, how to calculate the mean values in this window. See 'Details' section for a detailed explanation.}
   \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target}is enforced to \code{FALSE}.}
@@ -26,6 +27,7 @@ normalizeToMatrix(gr, target, extend = 5000, w = extend/50, value_column = NULL,
   \item{smooth}{whether apply smoothing in every row in the matrix. The smoothing is applied by \code{\link[stats]{loess}}. Pleasenote the data range will change, you need to adjust values in the new matrix afterwards.}
   \item{span}{degree of smoothing, pass to \code{\link[stats]{loess}}.}
   \item{s}{\code{\link[GenomicRanges]{findOverlaps}} sometimes uses a lot of memory. \code{target} is splitted into \code{s} parts and eachpart is processed serialized.}
+  \item{trim}{percent of extreme values to remove}
 }
 \details{
 In order to visualize associations between \code{gr} and \code{target}, the data is transformed into a matrix

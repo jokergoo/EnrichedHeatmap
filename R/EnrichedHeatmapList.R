@@ -131,7 +131,7 @@ setMethod(f = "draw",
     
     if(length(normal_heatmap_index) == 0) {
     	# if all heatmaps are Enriched heatmaps, the just put the
-    	# axis in the bottom annotation component
+    	# axis in the bottom colnames component
     	for(i in Enriched_heatmap_index) {
     		ht = object@ht_list[[i]]
 
@@ -145,7 +145,7 @@ setMethod(f = "draw",
     } else {
     	i = normal_heatmap_index[1]
     	# bottom_height are all fixed length
-    	bottom_height = component_height(object@ht_list[[i]], 6:9) # column_names, annotation, dendrogram and title
+    	bottom_height = sum(component_height(object@ht_list[[i]], 6:9)) # column_names, annotation, dendrogram and title
 
     	# assume nothing is allowed to plotted below the Enriched heatmap
     	if(compare_unit(bottom_height, max_axis_height) == -1) {
@@ -156,19 +156,20 @@ setMethod(f = "draw",
     			object@ht_list[[i]] = ht
     		}
 
-    		# add in column rownames component
-    		for(i in Enriched_heatmap_index) {
-    			ht = object@ht_list[[i]]
-    			ht@layout$layout_index = rbind(ht@layout$layout_index, c(6, 4))
-            	ht@layout$graphic_fun_list = c(ht@layout$graphic_fun_list, function(object) {
-	    			pushViewport(viewport(name = paste0(ht@name, "_axis"), y = unit(1, "npc"), 
-	    				height = ht@heatmap_param$axis_height, just = "top"))
-	    			ht@heatmap_param$axis_fun()
-	    			upViewport()
-	    		})
-	    		object@ht_list[[i]] = ht
-    		}
     	}
+
+        # axis is in the bottom colnames component
+        for(i in Enriched_heatmap_index) {
+            ht = object@ht_list[[i]]
+            ht@layout$layout_index = rbind(ht@layout$layout_index, c(6, 4))
+            ht@layout$graphic_fun_list = c(ht@layout$graphic_fun_list, function(object) {
+                pushViewport(viewport(name = paste0(ht@name, "_axis"), y = unit(1, "npc"), 
+                    height = ht@heatmap_param$axis_height, just = "top"))
+                ht@heatmap_param$axis_fun()
+                upViewport()
+            })
+            object@ht_list[[i]] = ht
+        }
     }
 
     if(length(padding) == 1) {
@@ -210,8 +211,9 @@ setMethod(f = "draw",
 		if(ht@heatmap_param$pos_line) {
 	    	for(j in seq_along(ht@row_order_list)) {
 	    		seekViewport(paste0(heatmap_name, "_heatmap_body_", j))
-	    		grid.lines(rep(n1/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
-	    		if(n2) grid.lines(rep((n1+n2)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
+                if(ht@heatmap_param$border) grid.rect(gp = gpar(col = "black", fill = NA))
+	    		grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
+	    		if(n2) grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
 	    	}
 	    }
     }

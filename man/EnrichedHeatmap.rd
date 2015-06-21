@@ -11,7 +11,7 @@ Constructor method for EnrichedHeatmap class
 \usage{
 EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
     pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = 0,
-    axis_name_gp = gpar(fontsize = 10), ...)}
+    axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, ...)}
 \arguments{
 
   \item{mat}{a matrix which is returned by \code{\link{normalizeToMatrix}}}
@@ -21,6 +21,8 @@ EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
   \item{axis_name}{names for axis}
   \item{axis_name_rot}{rotation for axis names}
   \item{axis_name_gp}{graphical parameters for axis names}
+  \item{border}{whether show border of the heatmap}
+  \item{cluster_rows}{clustering on rows are turned off by default}
   \item{...}{pass to \code{\link[ComplexHeatmap]{Heatmap}}}
 }
 \details{
