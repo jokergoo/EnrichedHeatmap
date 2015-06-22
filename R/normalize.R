@@ -209,6 +209,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 	# split `target` into small windows
 	target_windows = makeWindows(target, w = w, k = k, direction = direction)
  	strand(target_windows) = "*"
+ 	strand(gr) = "*"
  	
 	# overlap `gr` to `target_windows`
 	mtch = findOverlaps(gr, target_windows)

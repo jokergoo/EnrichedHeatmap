@@ -32,6 +32,9 @@ EnrichedHeatmapList = setClass("EnrichedHeatmapList",
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
+# == example
+# # no example
+# NULL
 EnrichedHeatmapList = function(...) {
     new("EnrichedHeatmapList", ...)
 }
@@ -52,6 +55,9 @@ EnrichedHeatmapList = function(...) {
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
+# == example
+# # users should not use it directly
+# NULL
 "+.AdditiveUnit" = function(x, y) {
     if(inherits(x, "EnrichedHeatmap") || 
        inherits(x, "EnrichedHeatmapList") ||
@@ -79,6 +85,9 @@ EnrichedHeatmapList = function(...) {
 # == value
 # This function returns no value.
 #
+# == example
+# # see documentation of `EnrichedHeatmap`
+# NULL
 setMethod(f = "show",
 	signature = "EnrichedHeatmapList",
 	definition = function(object) {
@@ -106,6 +115,8 @@ setMethod(f = "show",
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
+# # see documentation of `EnrichedHeatmap`
+# NULL
 setMethod(f = "draw",
     signature = "EnrichedHeatmapList",
     definition = function(object, padding = unit(c(2, 2, 2, 2), "mm"), ..., newpage= TRUE) {
