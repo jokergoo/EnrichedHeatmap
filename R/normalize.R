@@ -328,10 +328,8 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 # makeWindows(gr, w = 3, direction = "reverse", short.keep = TRUE)
 # makeWindows(gr, w = 12)
 # makeWindows(gr, w = 12, short.keep = TRUE)
-#
 # makeWindows(gr, k = 2)
 # makeWindows(gr, k = 3)
-# 
 # gr = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 11, 31), end = c(10, 30, 70)))
 # makeWindows(gr, w = 2)
 # makeWindows(gr, w = 0.2)

@@ -1,5 +1,4 @@
 export(EnrichedHeatmapList)
-exportMethods(show)
 export(enriched_score)
 exportMethods(draw)
 export(anno_enriched)

@@ -86,7 +86,7 @@ EnrichedHeatmapList = function(...) {
 # This function returns no value.
 #
 # == example
-# # see documentation of `EnrichedHeatmap`
+# # see documentation of EnrichedHeatmap
 # NULL
 setMethod(f = "show",
 	signature = "EnrichedHeatmapList",
@@ -115,7 +115,8 @@ setMethod(f = "show",
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
-# # see documentation of `EnrichedHeatmap`
+# == example
+# # see documentation of EnrichedHeatmap
 # NULL
 setMethod(f = "draw",
     signature = "EnrichedHeatmapList",
