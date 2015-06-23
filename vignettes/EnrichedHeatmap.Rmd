@@ -121,7 +121,7 @@ Split rows by k-means clustering:
 
 ```{r kmeans, fig.width = 3}
 EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3,
-    column_title = "Enrichment of H3K4me3")
+    column_title = "Enrichment of H3K4me3", row_title_rot = 0)
 ```
 
 Cluster on rows:
@@ -211,18 +211,19 @@ with low methylation and high promoter activity around TSS.
 
 ```{r list, fig.width = 6}
 EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", width = 1) + 
-    EnrichedHeatmap(mat2, name = "methylation", width = 1) +
-    Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
-        show_row_names = FALSE, width = unit(5, "mm"))
+EnrichedHeatmap(mat2, name = "methylation", width = 1) +
+Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
+    show_row_names = FALSE, width = unit(5, "mm"))
 ```
 
 Of course you can split rows by splitting the main heatmap:
 
 ```{r list_split, fig.width = 6}
-EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3, width = 1) + 
-    EnrichedHeatmap(mat2, name = "methylation", width = 1) +
-    Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
-        show_row_names = FALSE, width = unit(5, "mm"))
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3, width = 1,
+    row_title_rot = 0) + 
+EnrichedHeatmap(mat2, name = "methylation", width = 1) +
+Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
+    show_row_names = FALSE, width = unit(5, "mm"))
 ```
 
 
