@@ -1,40 +1,34 @@
 \name{show-EnrichedHeatmap-method}
 \alias{show,EnrichedHeatmap-method}
 \title{
-Draw the single heatmap with default parameters  
-
+Draw the single heatmap with default parameters
 
 }
 \description{
-Draw the single heatmap with default parameters  
-
+Draw the single heatmap with default parameters
 
 }
 \usage{
-\S4method{show}{EnrichedHeatmap}(object)
-}
+\S4method{show}{EnrichedHeatmap}(object)}
 \arguments{
 
   \item{object}{a \code{\link{EnrichedHeatmap-class}} object.}
-
 }
 \details{
-Actually it calls \code{\link{draw,EnrichedHeatmap-method}}, but only with default parameters. If users want to customize the heatmap, they can pass parameters directly to \code{\link{draw,EnrichedHeatmap-method}}.  
-
+Actually it calls \code{\link{draw,EnrichedHeatmap-method}}, but only with default parameters. If users want to customize the heatmap,
+they can pass parameters directly to \code{\link{draw,EnrichedHeatmap-method}}.
 
 }
 \value{
-This function returns no value.  
-
+This function returns no value.
 
 }
 \author{
-Zuguang Gu <z.gu@dkfz.de>  
-
+Zuguang Gu <z.gu@dkfz.de>
 
 }
-\section{Example}{
-# see documentation of \code{\link{EnrichedHeatmap}} NULL 
-
+\examples{
+# see documentation of EnrichedHeatmap
+NULL
 
 }

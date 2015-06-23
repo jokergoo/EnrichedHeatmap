@@ -47,6 +47,7 @@ library(EnrichedHeatmap)
 Load the example data that we will use for demostration:
 
 ```{r}
+set.seed(123)
 load(paste0(system.file("/extdata/chr21_test_data.RData", package = "EnrichedHeatmap")))
 ls()
 ```
@@ -88,7 +89,7 @@ the normalized matrix.
 
 ```{r anno, fig.width = 3}
 EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3",
-    top_annotation = HeatmapAnnotation(lines = anno_enriched(mat1)), 
+    top_annotation = HeatmapAnnotation(lines = anno_enriched()), 
     top_annotation_height = unit(2, "cm"))
 ```
 
@@ -100,9 +101,10 @@ In following example, we use `colorRamp2()` from **circlize** package to define
 a color mapping function with break values.
 
 ```{r smooth, fig.width = 3}
+library(circlize)
 mat11 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
     extend = 5000, mean_mode = "w0", w = 50, smooth = TRUE)
-EnrichedHeatmap(mat11, col = circlize::colorRamp2(range(mat1), c("white", "red")), 
+EnrichedHeatmap(mat11, col = colorRamp2(range(mat1), c("white", "red")), 
     name = "H3K4me3")
 ```
 
@@ -122,6 +124,15 @@ Split rows by k-means clustering:
 ```{r kmeans, fig.width = 3}
 EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3,
     column_title = "Enrichment of H3K4me3", row_title_rot = 0)
+```
+
+Split rows and add column annotation as well:
+
+```{r, kmeans_anno, fig.width = 3}
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3",
+    top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
+    top_annotation_height = unit(2, "cm"),
+    km = 3, row_title_rot = 0)
 ```
 
 Cluster on rows:
@@ -257,7 +268,7 @@ correlated regions to the right genes.
 ```{r neg_cr, fig.width = 3}
 mat4 = normalizeToMatrix(neg_cr, all_tss, mapping_column = "gene", w = 50, mean_mode = "w0")
 EnrichedHeatmap(mat4, col = c("white", "green"), name = "neg_cr",
-    top_annotation = HeatmapAnnotation(lines = anno_enriched(mat4, gp = gpar(col = "green"))), 
+    top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = "green"))), 
     top_annotation_height = unit(2, "cm"))
 ```
 
@@ -272,10 +283,10 @@ we can see there is a perfect fitting for the peaks of negative correlated regio
 ```{r neg_cr_with_tx, fig.width = 6}
 mat5 = normalizeToMatrix(tx, all_tss, mapping_column="gene", w = 50, mean_mode = "w0")
 ht_list = EnrichedHeatmap(mat4, col = c("white", "green"), name = "neg_cr",
-              top_annotation = HeatmapAnnotation(lines1 = anno_enriched(mat4, gp = gpar(col = "green"))), 
+              top_annotation = HeatmapAnnotation(lines1 = anno_enriched(gp = gpar(col = "green"))), 
               top_annotation_height = unit(2, "cm")) +
           EnrichedHeatmap(mat5, col = c("white", "black"), name = "tx",
-              top_annotation = HeatmapAnnotation(lines2 = anno_enriched(mat5, gp = gpar(col = "black"))), 
+              top_annotation = HeatmapAnnotation(lines2 = anno_enriched(gp = gpar(col = "black"))), 
               top_annotation_height = unit(2, "cm"))
 draw(ht_list, gap = unit(1, "cm"))
 ```
