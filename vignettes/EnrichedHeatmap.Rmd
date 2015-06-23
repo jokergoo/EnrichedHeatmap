@@ -121,14 +121,14 @@ EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3",
 
 Split rows by k-means clustering:
 
-```{r kmeans, fig.width = 3}
+```{r kmeans, fig.width = 4}
 EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3,
     column_title = "Enrichment of H3K4me3", row_title_rot = 0)
 ```
 
 Split rows and add column annotation as well:
 
-```{r, kmeans_anno, fig.width = 3}
+```{r, kmeans_anno, fig.width = 4}
 EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3",
     top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
     top_annotation_height = unit(2, "cm"),
@@ -229,10 +229,13 @@ Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)",
 
 Of course you can split rows by splitting the main heatmap:
 
-```{r list_split, fig.width = 6}
+```{r list_split, fig.width = 7}
 EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3, width = 1,
-    row_title_rot = 0) + 
-EnrichedHeatmap(mat2, name = "methylation", width = 1) +
+    top_annotation = HeatmapAnnotation(lines = anno_enriched()), 
+    top_annotation_height = unit(2, "cm"), row_title_rot = 0,
+    column_title = "H3K4me3") + 
+EnrichedHeatmap(mat2, name = "methylation", width = 1,
+    column_title = "Methylation") +
 Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
     show_row_names = FALSE, width = unit(5, "mm"))
 ```

@@ -16,7 +16,7 @@ Description: Enriched heatmap is a special type of heatmap which
   with the functionality of **ComplexHeatmap**, it would be much easier
   to customize the heatmap as well as concatenating a list of heatmaps to 
   show correspondance between differnet data sources.
-biocViews: Software, Visualization, Sequencing
+biocViews: Software, Visualization, Sequencing, GenomeAnnotation
 URL: https://github.com/jokergoo/EnrichedHeatmap
 License: GPL (>= 2)
 Packaged: 2015-6-17 00:00:00 UTC; Administrator

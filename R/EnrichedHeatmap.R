@@ -358,7 +358,6 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 		grid.rect(gp = gpar(col = "black", fill = NA))
 		for(i in seq_len(ncol(y))) {
 			if(show_error) {
-				browser()
 				grid.polygon(c(seq_len(n)-0.5, rev(seq_len(n)-0.5)), c(y[,i]+y_sd[,i], rev(y[,i]-y_sd[,i])), default.units = "native", gp = gpar(col = NA, fill = "#00000040"))
 			}
 			grid.lines(seq_len(n)-0.5, y[,i], default.units = "native", gp = subset_gp(gp, i))
