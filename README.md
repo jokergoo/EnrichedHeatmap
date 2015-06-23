@@ -4,7 +4,19 @@ Enriched heatmap is a special type of heatmap which visualizes the enrichment of
 
 There are several tools that can make such heatmap (e.g. [ngs.plot](https://github.com/shenlab-sinai/ngsplot) or [deepTools](https://github.com/fidelram/deepTools)). Here we implement Enriched heatmap by [ComplexHeatmap](https://github.com/jokergoo/ComplexHeatmap) package. Since this type of heatmap is just a normal heatmap but with some fixed settings, with the functionality of ComplexHeatmap, it would be much easier to customize the heatmap as well as concatenating a list of heatmaps to show correspondance between differnet data sources.
 
-Examples:
+## Example
+
+Like other tools, the task involves two steps:
+
+1. Normalize the accosiations between genomic signals and target regions to a matrix.
+2. Implement the heatmap by **ComplexHeatmap** package.
+
+```{r}
+mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
+    extend = 5000, mean_mode = "w0", w = 50)
+mat2 = normalizeToMatrix(meth, tss, value_column = "meth", mean_mode = "absolute",
+    extend = 5000, w = 50, empty_value = 0.5)
+```
 
 ```{r}
 EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3, width = 1,
