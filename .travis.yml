@@ -1,0 +1,22 @@
+language: r
+
+sudo: required
+
+# Be strict when checking our package
+warnings_are_errors: true
+
+r-packages:
+- testthat
+- matrixStats
+- knitr
+- markdown
+
+bioc_packages:
+- GenomicRanges
+
+r_github_packages:
+- jokergoo/ComplexHeatmap
+
+bioc_required: true
+
+r_check_args: --no-build-vignettes --no-vignettes
