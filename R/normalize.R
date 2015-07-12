@@ -12,7 +12,7 @@
 #         which contains 1 will be attached.
 # -mapping_column mapping column to restrict overlapping between ``gr`` and ``target``
 # -empty_value values for windows that don't overlap with ``gr``
-# -mean_mode when a window overlaps with more than one regions in ``gr``, how to calculate 
+# -mean_mode when a window is not perfectkt matched to one region in ``gr``, how to calculate 
 #       the mean values in this window. See 'Details' section for a detailed explanation.
 # -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
 #               is enforced to ``FALSE``.

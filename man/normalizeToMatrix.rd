@@ -21,7 +21,7 @@ normalizeToMatrix(gr, target, extend = 5000, w = extend/50, value_column = NULL,
   \item{value_column}{index for column in \code{gr} that will be mapped to colors. If it is \code{NULL}, an internal columnwhich contains 1 will be attached.}
   \item{mapping_column}{mapping column to restrict overlapping between \code{gr} and \code{target}}
   \item{empty_value}{values for windows that don't overlap with \code{gr}}
-  \item{mean_mode}{when a window overlaps with more than one regions in \code{gr}, how to calculate the mean values in this window. See 'Details' section for a detailed explanation.}
+  \item{mean_mode}{when a window is not perfectkt matched to one region in \code{gr}, how to calculate the mean values in this window. See 'Details' section for a detailed explanation.}
   \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target}is enforced to \code{FALSE}.}
   \item{target_ratio}{the ratio of width of \code{target} compared to 'upstream + target + downstream' in the heatmap}
   \item{smooth}{whether apply smoothing in every row in the matrix. The smoothing is applied by \code{\link[stats]{loess}}. Pleasenote the data range will change, you need to adjust values in the new matrix afterwards.}
