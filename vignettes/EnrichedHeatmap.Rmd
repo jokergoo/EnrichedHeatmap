@@ -29,7 +29,7 @@ options(width = 100)
 
 Enriched heatmap is a special type of heatmap which visualizes the enrichment of genomic signals
 on specific target regions. It is broadly used to 
-visualize e.g. how histone marks are enriched to specific sites.
+visualize e.g. how histone marks are enriched to transcription start sites.
 
 There are several tools that can make such heatmap (e.g. [ngs.plot](https://github.com/shenlab-sinai/ngsplot) or [deepTools](https://github.com/fidelram/deepTools)).
 Here we implement Enriched heatmap by **ComplexHeatmap** package. Since this type of heatmap is just a
@@ -74,8 +74,8 @@ EnrichedHeatmap(mat1, name = "H3K4me3")
 ```
 
 `normalizeToMatrix()` converts the association between genomic signals (`H3K4me3`) and tarets(`tss`) in to a matrix. 
-It first splits the extended targets regions ( extend to upstream and downstream controlled by `extend` argumetn)
-into a list of small windows (controlled by `w`), then overlaps genomic signals to these small windows and calculates
+It first splits the extended targets regions ( the extension to upstream and downstream is controlled by `extend` argument)
+into a list of small windows (the width of the windows is controlled by `w`), then overlaps genomic signals to these small windows and calculates
 the value for every small window which is the mean value of genomic signals that intersects with the window (the value
 corresponds to genomic signals are controlled by `value_column` and how to calcualte the mean value is controlled by `mean_mode`).
 
@@ -95,16 +95,16 @@ EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3",
 
 Rows can be smoothed by setting `smooth` to `TRUE` when generating the matrix. 
 But since data range will change after smoothing,
-you need to manully set the color mapping if you want to make figures comparable.
+you need to manually set the color mapping if you want to make figures comparable.
 
 In following example, we use `colorRamp2()` from **circlize** package to define
 a color mapping function with break values.
 
 ```{r smooth, fig.width = 3}
 library(circlize)
-mat11 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
+mat1_smoothed = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
     extend = 5000, mean_mode = "w0", w = 50, smooth = TRUE)
-EnrichedHeatmap(mat11, col = colorRamp2(range(mat1), c("white", "red")), 
+EnrichedHeatmap(mat1_smoothed, col = colorRamp2(range(mat1), c("white", "red")), 
     name = "H3K4me3")
 ```
 
@@ -180,6 +180,7 @@ Here we set `mean_mode` to `absolute`. Following illustrates different settings 
         4      5      2     values in gr
      ++++++   +++   +++++   gr
        ================     window (16bp)
+        4      3     3      overlap
 
   value for this window:
      absolute: (4 + 5 + 2)/3
@@ -203,6 +204,9 @@ EnrichedHeatmap(mat3, name = "methylation", column_title = "methylation near CGI
 Width of the target regions can be controlled by `target_ratio` which is relative to
 the width of the complete heatmap.
 
+Target regions are also splitted into windows, but since width of the target regions are different from each other, 
+they are splitted by percent to their full width (the percent value is calculated automatically).
+
 ```{r fat_cgi, fig.width = 3}
 mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
     extend = 5000, w = 50, empty_value = 0.5, target_ratio = 0.3)
@@ -213,8 +217,8 @@ EnrichedHeatmap(mat3, name = "methylation", axis_name_rot = 90,
 
 ## Multiple heatmaps
 
-Thanks for the functionality of **ComplexHeatmap** package, heatmaps can be concatenated
-by `+` operator. `EnrichedHeatmap` and `Heatmap` can be mixed.
+Thanks to the functionality of **ComplexHeatmap** package, heatmaps can be concatenated
+by `+` operator. `EnrichedHeatmap` objects and `Heatmap` objects can be mixed.
 
 Following heatmaps visualizes correspondance between H3K4me3 mark, methylation and
 gene expression. It is quite straightforward to see high expression correlates
@@ -262,11 +266,11 @@ and expression for the genes. The negative correlated regions are detected as:
 
 1. extend genes to upstream 5kb and downtream 5kb
 2. for every gene, use a sliding window to go through from left to right
-    and find correlated regions by looking at the correlation for every gene
+    and find correlated regions by looking at the correlation between methylation in the window and expression for the gene
 
-Since genes may be close to each other, it may be the case that one corrlated region for gene A
+Since genes may be close to each other, it is possible that one corrlated region for gene A
 overlaps with gene B. This is not what we want and by specifying the mapping, we can correspond 
-correlated regions to the right genes.
+correlated regions to the correct genes.
 
 ```{r neg_cr, fig.width = 3}
 mat4 = normalizeToMatrix(neg_cr, all_tss, mapping_column = "gene", w = 50, mean_mode = "w0")
@@ -277,7 +281,7 @@ EnrichedHeatmap(mat4, col = c("white", "green"), name = "neg_cr",
 
 Above heatmap shows negative correlated regions are enriched at some distance after the TSS.
 We guess it is because genes have alternative transcripts and negative correlated regions are
-actually enriched at the TSS of transcripts.
+actually enriched at the start sites of transcripts.
 
 Next we add another heatmap showing how transcripts are distributed to gene TSS. Maybe here the heatmap
 is not a nice way for showing transcripts, but according to the annotation graphs on the both top, 
@@ -297,7 +301,8 @@ draw(ht_list, gap = unit(1, "cm"))
 ## Notice
 
 Due to `findOverlaps()` in **GenomicRanges** package, `normalizeToMatrix()` may eat 
-huge amout of memory if your `GRanges` object contains too many regions. 
+huge amout of memory if your `GRanges` object contains too many regions. `s` argument in normalizeToMatrix()`
+can split the data into `s` parts but it will increase the running time a lot.
 
 ## Session info
 

@@ -5,18 +5,18 @@ Version: 0.99.0
 Date: 2015-7-6
 Author: Zuguang Gu
 Maintainer: Zuguang Gu <z.gu@dkfz.de>
-Depends: R (>= 3.1.2), grid, ComplexHeatmap (>= 1.2.3), GenomicRanges, IRanges
-Imports: methods, matrixStats
+Depends: R (>= 3.2), grid, ComplexHeatmap (>= 1.2.5), GenomicRanges, IRanges
+Imports: methods, matrixStats, stats
 Suggests: testthat (>= 0.3), knitr, markdown, circlize
 VignetteBuilder: knitr
 Description: Enriched heatmap is a special type of heatmap which 
   visualizes the enrichment of genomic signals on specific target regions.
-  Here we implement Enriched heatmap by **ComplexHeatmap** package. 
+  Here we implement Enriched heatmap by ComplexHeatmap package. 
   Since this type of heatmap is just a normal heatmap but with some fixed settings, 
-  with the functionality of **ComplexHeatmap**, it would be much easier
+  with the functionality of ComplexHeatmap, it would be much easier
   to customize the heatmap as well as concatenating a list of heatmaps to 
   show correspondance between differnet data sources.
-biocViews: Software, Visualization, Sequencing, GenomeAnnotation
+biocViews: Software, Visualization, Sequencing, GenomeAnnotation, Coverage
 URL: https://github.com/jokergoo/EnrichedHeatmap
 License: GPL (>= 2)
 Packaged: 2015-7-6 00:00:00 UTC; Administrator

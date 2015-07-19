@@ -1,17 +1,18 @@
 \name{normalizeToMatrix}
 \alias{normalizeToMatrix}
 \title{
-Normalize associations between genomic regions and target regions into a matrix
+Normalize associations between genomic signals and target regions into a matrix
 
 }
 \description{
-Normalize associations between genomic regions and target regions into a matrix
+Normalize associations between genomic signals and target regions into a matrix
 
 }
 \usage{
-normalizeToMatrix(gr, target, extend = 5000, w = extend/50, value_column = NULL, mapping_column = NULL,
-    empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), include_target = any(width(target) > 1),
-    target_ratio = 0.1, smooth = FALSE, span = 0.5, s = 1, trim = 0.01)}
+normalizeToMatrix(gr, target, extend = 5000, w = extend/50, value_column = NULL,
+    mapping_column = NULL, empty_value = 0, mean_mode = c("absolute", "weighted", "w0"),
+    include_target = any(width(target) > 1), target_ratio = 0.1, smooth = FALSE,
+    span = 0.5, s = 1, trim = 0.01)}
 \arguments{
 
   \item{gr}{a \code{\link[GenomicRanges]{GRanges}} object}
@@ -33,12 +34,16 @@ normalizeToMatrix(gr, target, extend = 5000, w = extend/50, value_column = NULL,
 In order to visualize associations between \code{gr} and \code{target}, the data is transformed into a matrix
 and visualized as a heatmap.
 
+Upstream and downstream also with the target body are splitted into a list of small windows and overlap
+to \code{gr}. Since regions in \code{gr} and small windows do not always 100 percent overlap, averaging should be applied.
+
 Following illustrates different settings for \code{mean_mode}:
 
   \preformatted{
        4      5      2     values in gr
     ++++++   +++   +++++   gr
       ================     window (16bp)
+        4     3     3      overlap
 
     absolute: (4 + 5 + 2)/3
     weighted: (4*4 + 5*3 + 2*3)/(4 + 3 + 3)

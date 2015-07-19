@@ -23,7 +23,7 @@ makeWindows(gr, w = NULL, k = NULL, direction = c("normal", "reverse"),
 Following illustrates the meaning of \code{direction} and \code{short.keep}:
 
   \preformatted{
-    ----------  a region
+    ----------  a region, split by 3bp window
     aaabbbccc   direction = "normal",  short.keep = FALSE
     aaabbbcccd  direction = "normal",  short.keep = TRUE
      aaabbbccc  direction = "reverse", short.keep = FALSE

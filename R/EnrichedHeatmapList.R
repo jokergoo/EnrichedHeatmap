@@ -43,14 +43,14 @@ EnrichedHeatmapList = function(...) {
 # Add heatmaps or row annotations to a heatmap list
 #
 # == param
-# -x a `EnrichedHeatmap-class` object, a `Heatmap-class` object, a `HeatmapAnnotation-class` object or a `HeatmapList-class` object.
-# -y a `EnrichedHeatmap-class` object, a `Heatmap-class` object, a `HeatmapAnnotation-class` object or a `HeatmapList-class` object.
+# -x an `EnrichedHeatmap-class` object, a `Heatmap-class` object, a `HeatmapAnnotation-class` object or a `HeatmapList-class` object.
+# -y an `EnrichedHeatmap-class` object, a `Heatmap-class` object, a `HeatmapAnnotation-class` object or a `HeatmapList-class` object.
 #
 # == detail
-# It overwrites `ComplexHeatmap::+.AdditiveUnit`.
+# It overwrites `ComplexHeatmap::+.AdditiveUnit` in the ComplexHeatmap package.
 #
 # == value
-# A `ComplexHeatmap::HeatmapList-class` object or a `EnrichedHeatmapList-class` object
+# A `ComplexHeatmap::HeatmapList-class` object or an `EnrichedHeatmapList-class` object
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -76,7 +76,7 @@ EnrichedHeatmapList = function(...) {
 # Draw a list of heatmaps with default parameters
 #
 # == param
-# -object a `EnrichedHeatmapList-class` object.
+# -object an `EnrichedHeatmapList-class` object.
 #
 # == details
 # Actually it calls `draw,EnrichedHeatmapList-method`, but only with default parameters. If users want to customize the heatmap,
@@ -101,7 +101,7 @@ setMethod(f = "show",
 # Draw a list of heatmaps
 #
 # == param
-# -object a `EnrichedHeatmapList-class` object
+# -object an `EnrichedHeatmapList-class` object
 # -padding padding of the plot. Elements correspond to bottom, left, top, right paddings.
 # -... pass to `ComplexHeatmap::make_layout,HeatmapList-method`
 # -newpage whether to create a new page

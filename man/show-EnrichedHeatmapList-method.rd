@@ -12,7 +12,7 @@ Draw a list of heatmaps with default parameters
 \S4method{show}{EnrichedHeatmapList}(object)}
 \arguments{
 
-  \item{object}{a \code{\link{EnrichedHeatmapList-class}} object.}
+  \item{object}{an \code{\link{EnrichedHeatmapList-class}} object.}
 }
 \details{
 Actually it calls \code{\link{draw,EnrichedHeatmapList-method}}, but only with default parameters. If users want to customize the heatmap,

@@ -1,38 +1,43 @@
 
 
 # == title
-# Normalize associations between genomic regions and target regions into a matrix
+# Normalize associations between genomic signals and target regions into a matrix
 #
 # == param
-# -gr a `GenomicRanges::GRanges` object
-# -target a `GenomicRanges::GRanges` object
+# -gr a `GenomicRanges::GRanges` object which is the genomic signals.
+# -target a `GenomicRanges::GRanges` object.
 # -extend extended base pairs to the upstream and downstream of ``target``. It can be a vector of length one or two.
 # -w window size for splitting upstream and downstream in ``target``.
 # -value_column index for column in ``gr`` that will be mapped to colors. If it is ``NULL``, an internal column
 #         which contains 1 will be attached.
-# -mapping_column mapping column to restrict overlapping between ``gr`` and ``target``
-# -empty_value values for windows that don't overlap with ``gr``
-# -mean_mode when a window is not perfectkt matched to one region in ``gr``, how to calculate 
+# -mapping_column mapping column to restrict overlapping between ``gr`` and ``target``. By default it tries to look for
+#           all regions in ``gr`` that overlap with every target.
+# -empty_value values for windows that don't overlap with ``gr``. 
+# -mean_mode when a window is not perfectly matched to ``gr``, how to calculate 
 #       the mean values in this window. See 'Details' section for a detailed explanation.
 # -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
 #               is enforced to ``FALSE``.
 # -target_ratio  the ratio of width of ``target`` compared to 'upstream + target + downstream' in the heatmap
-# -smooth whether apply smoothing in every row in the matrix. The smoothing is applied by `stats::loess`. Please
+# -smooth whether apply smoothing in rows in the matrix. The smoothing is applied by `stats::loess`. Please
 #         note the data range will change, you need to adjust values in the new matrix afterwards.
 # -span degree of smoothing, pass to `stats::loess`.
 # -s `GenomicRanges::findOverlaps` sometimes uses a lot of memory. ``target`` is splitted into ``s`` parts and each
-#     part is processed serialized.
+#     part is processed serialized (it will be slow!).
 # -trim percent of extreme values to remove
 #
 # == details
 # In order to visualize associations between ``gr`` and ``target``, the data is transformed into a matrix
 # and visualized as a heatmap.
+#
+# Upstream and downstream also with the target body are splitted into a list of small windows and overlap
+# to ``gr``. Since regions in ``gr`` and small windows do not always 100 percent overlap, averaging should be applied.
 # 
 # Following illustrates different settings for ``mean_mode``:
 #
 #        4      5      2     values in gr
 #     ++++++   +++   +++++   gr
 #       ================     window (16bp)
+#         4     3     3      overlap
 #
 #     absolute: (4 + 5 + 2)/3
 #     weighted: (4*4 + 5*3 + 2*3)/(4 + 3 + 3)
@@ -60,9 +65,10 @@
 # normalizeToMatrix(gr, target, extend = 10, w = 2, include_target = TRUE)
 # normalizeToMatrix(gr, target, extend = 10, w = 2, value_column = "score")
 #
-normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_column = NULL, mapping_column = NULL,
-    empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), include_target = any(width(target) > 1),
-    target_ratio = 0.1, smooth = FALSE, span = 0.5, s = 1, trim = 0.01) {
+normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_column = NULL, 
+	mapping_column = NULL, empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), 
+	include_target = any(width(target) > 1), target_ratio = 0.1, smooth = FALSE, 
+	span = 0.5, s = 1, trim = 0.01) {
 
 	if(s > 1) {
 		n = length(target)
@@ -303,7 +309,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 # == details
 # Following illustrates the meaning of ``direction`` and ``short.keep``:
 #
-#     ----------  a region
+#     ----------  a region, split by 3bp window
 #     aaabbbccc   direction = "normal",  short.keep = FALSE
 #     aaabbbcccd  direction = "normal",  short.keep = TRUE
 #      aaabbbccc  direction = "reverse", short.keep = FALSE

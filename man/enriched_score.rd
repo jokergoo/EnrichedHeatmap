@@ -1,11 +1,11 @@
 \name{enriched_score}
 \alias{enriched_score}
 \title{
-Enriched scores for matrix rows
+Enriched scores
 
 }
 \description{
-Enriched scores for matrix rows
+Enriched scores
 
 }
 \usage{
@@ -17,12 +17,11 @@ enriched_score(x1, x2, x3)}
   \item{x3}{a vector corresponding to values in downstream windows}
 }
 \details{
-After obtaining a matrix from \code{\link{normalizeToMatrix}}, enrichment scores
-are calculated to order rows in the matrix.
+The function calculates how the signal is enriched in the targets.
 
 }
 \value{
-a numeric value.
+A numeric value.
 
 }
 \author{
@@ -30,6 +29,7 @@ Zuguang Gu <z.gu@dkfz.de>
 
 }
 \examples{
-NULL
+enriched_score(c(1, 2, 3), c(1, 2, 1), c(3, 2, 1))
+enriched_score(c(3, 2, 1), c(2, 1, 2), c(1, 2, 3))
 
 }

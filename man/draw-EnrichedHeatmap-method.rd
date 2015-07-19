@@ -12,12 +12,12 @@ Draw a single heatmap
 \S4method{draw}{EnrichedHeatmap}(object, internal = FALSE, ...)}
 \arguments{
 
-  \item{object}{a \code{\link{EnrichedHeatmap-class}} object.}
+  \item{object}{an \code{\link{EnrichedHeatmap-class}} object.}
   \item{internal}{only used inside the calling of \code{\link{draw,EnrichedHeatmapList-method}}.}
   \item{...}{pass to \code{\link[ComplexHeatmap]{draw,HeatmapList-method}}.}
 }
 \details{
-The function creates a \code{\link{EnrichedHeatmapList-class}} object which only contains a single heatmap
+The function creates an \code{\link{EnrichedHeatmapList-class}} object which only contains a single heatmap
 and call \code{\link{draw,EnrichedHeatmapList-method}} to make the final heatmap.
 
 }

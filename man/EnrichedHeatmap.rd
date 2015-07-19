@@ -15,10 +15,10 @@ EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
 \arguments{
 
   \item{mat}{a matrix which is returned by \code{\link{normalizeToMatrix}}}
-  \item{score_fun}{score function which calcualte enriched scores for rows in \code{mat}}
+  \item{score_fun}{a function which calculates enriched scores for rows in \code{mat}}
   \item{pos_line}{whether draw vertical lines which represent the position of \code{target}}
   \item{pos_line_gp}{graphical parameters for lines}
-  \item{axis_name}{names for axis}
+  \item{axis_name}{names for axis which is below the heatmap. If the targets are single points, \code{axis_name} is a vectorof length three which corresponds to upstream, target itself and downstream. If thetargets are regions with some width, \code{axis_name} is a vector of length four which corresponds to upstream, start of targets, end of targets and downstream.}
   \item{axis_name_rot}{rotation for axis names}
   \item{axis_name_gp}{graphical parameters for axis names}
   \item{border}{whether show border of the heatmap}
@@ -30,7 +30,7 @@ EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
 set with pre-defined values:
 
 \describe{
-  \item{row_order}{the rows are sorted by the enriched score which is calcualted by \code{score_fun} argument.The sorting is applied decreasingly.}
+  \item{row_order}{the rows are sorted by the enriched score which is calcualted by \code{score_fun}.The sorting is applied decreasingly.}
   \item{cluster_columns}{enforced to be \code{FALSE}}
   \item{show_row_names}{enforced to be \code{FALSE}}
   \item{show_column_names}{enforced to be \code{FALSE}}
@@ -43,11 +43,11 @@ below the heatmap is used to add a new graph which contains the axis. A (or two)
 the position of \code{target} will be added to the heatmap body as well.
 
 Same as the \code{\link[ComplexHeatmap]{Heatmap-class}}, users can make controls on the heatmap such as
-apply clustering on rows (this will ignore the \code{row_order}), split rows by data frame or k-means clustering.
+apply clustering on rows, or split rows by data frame or k-means clustering.
 
 }
 \value{
-A \code{\link{EnrichedHeatmap-class}} object which is inherited from \code{\link[ComplexHeatmap]{Heatmap-class}}
+An \code{\link{EnrichedHeatmap-class}} object which is inherited from \code{\link[ComplexHeatmap]{Heatmap-class}}.
 
 }
 \author{

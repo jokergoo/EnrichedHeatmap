@@ -12,7 +12,7 @@ Draw the single heatmap with default parameters
 \S4method{show}{EnrichedHeatmap}(object)}
 \arguments{
 
-  \item{object}{a \code{\link{EnrichedHeatmap-class}} object.}
+  \item{object}{an \code{\link{EnrichedHeatmap-class}} object.}
 }
 \details{
 Actually it calls \code{\link{draw,EnrichedHeatmap-method}}, but only with default parameters. If users want to customize the heatmap,
