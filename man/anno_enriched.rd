@@ -10,7 +10,7 @@ Annotation function to show the enrichment
 }
 \usage{
 anno_enriched(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
-    yaxis = TRUE, ylim = NULL, value = c("sum", "mean"), yaxis_side = "right",
+    yaxis = TRUE, ylim = NULL, value = c("mean", "sum"), yaxis_side = "right",
     yaxis_gp = gpar(fontsize = 8), show_error = FALSE)}
 \arguments{
 
