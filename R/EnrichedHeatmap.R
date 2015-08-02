@@ -331,7 +331,7 @@ setMethod(f = "draw",
 #     km = 3, row_title_rot = 0)
 #
 anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
-	yaxis = TRUE, ylim = NULL, value = c("sum", "mean"), yaxis_side = "right", 
+	yaxis = TRUE, ylim = NULL, value = c("mean", "sum"), yaxis_side = "right", 
 	yaxis_gp = gpar(fontsize = 8), show_error = FALSE) {
 
 	value = match.arg(value)[1]
