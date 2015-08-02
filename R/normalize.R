@@ -153,6 +153,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value
 	                         ranges = IRanges(start = e, end = e),
 	                         strand = strand(target))
 		suppressWarnings(downstream <- promoters(end_target, upstream = 0, downstream = extend[2]))
+		names(downstream) = names(target)
 	  
 		mat_downstream = makeMatrix(signal, downstream, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value,
 	                              mean_mode = mean_mode)

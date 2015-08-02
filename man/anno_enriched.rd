@@ -10,7 +10,8 @@ Annotation function to show the enrichment
 }
 \usage{
 anno_enriched(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
-    yaxis = TRUE, ylim = NULL, yaxis_side = "right", yaxis_gp = gpar(fontsize = 8), show_error = FALSE)}
+    yaxis = TRUE, ylim = NULL, value = c("sum", "mean"), yaxis_side = "right",
+    yaxis_gp = gpar(fontsize = 8), show_error = FALSE)}
 \arguments{
 
   \item{gp}{graphical parameters for the line}
@@ -18,6 +19,7 @@ anno_enriched(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 
   \item{pos_line_gp}{graphical parameters for lines}
   \item{yaxis}{whether show yaxis}
   \item{ylim}{ranges on y-axis}
+  \item{value}{what type of value corresponds to the y-axis}
   \item{yaxis_side}{side of y-axis}
   \item{yaxis_gp}{graphical parameters for yaxis}
   \item{show_error}{whether show error regions which are +-1 sd to the mean value}
