@@ -523,6 +523,7 @@ copyAttr = function(x, y) {
 	for(bb in names(attr)) {
 		attr(y, bb) = attr[[bb]]
 	}
+	attr(y, "signal_name") = "\b"
 	return(y)
 }
 
