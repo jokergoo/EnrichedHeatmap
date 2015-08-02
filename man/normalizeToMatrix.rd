@@ -9,39 +9,39 @@ Normalize associations between genomic signals and target regions into a matrix
 
 }
 \usage{
-normalizeToMatrix(gr, target, extend = 5000, w = extend/50, value_column = NULL,
+normalizeToMatrix(signal, target, extend = 5000, w = extend/50, value_column = NULL,
     mapping_column = NULL, empty_value = 0, mean_mode = c("absolute", "weighted", "w0"),
     include_target = any(width(target) > 1), target_ratio = 0.1, smooth = FALSE,
     span = 0.5, s = 1, trim = 0.01)}
 \arguments{
 
-  \item{gr}{a \code{\link[GenomicRanges]{GRanges}} object}
-  \item{target}{a \code{\link[GenomicRanges]{GRanges}} object}
+  \item{signal}{a \code{\link[GenomicRanges]{GRanges}} object which is the genomic signals.}
+  \item{target}{a \code{\link[GenomicRanges]{GRanges}} object.}
   \item{extend}{extended base pairs to the upstream and downstream of \code{target}. It can be a vector of length one or two.}
   \item{w}{window size for splitting upstream and downstream in \code{target}.}
-  \item{value_column}{index for column in \code{gr} that will be mapped to colors. If it is \code{NULL}, an internal columnwhich contains 1 will be attached.}
-  \item{mapping_column}{mapping column to restrict overlapping between \code{gr} and \code{target}}
-  \item{empty_value}{values for windows that don't overlap with \code{gr}}
-  \item{mean_mode}{when a window is not perfectkt matched to one region in \code{gr}, how to calculate the mean values in this window. See 'Details' section for a detailed explanation.}
+  \item{value_column}{index for column in \code{signal} that will be mapped to colors. If it is \code{NULL}, an internal columnwhich contains 1 will be attached.}
+  \item{mapping_column}{mapping column to restrict overlapping between \code{signal} and \code{target}. By default it tries to look forall regions in \code{signal} that overlap with every target.}
+  \item{empty_value}{values for windows that don't overlap with \code{signal}. }
+  \item{mean_mode}{when a window is not perfectly matched to \code{signal}, how to calculate the mean values in this window. See 'Details' section for a detailed explanation.}
   \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target}is enforced to \code{FALSE}.}
   \item{target_ratio}{the ratio of width of \code{target} compared to 'upstream + target + downstream' in the heatmap}
-  \item{smooth}{whether apply smoothing in every row in the matrix. The smoothing is applied by \code{\link[stats]{loess}}. Pleasenote the data range will change, you need to adjust values in the new matrix afterwards.}
+  \item{smooth}{whether apply smoothing in rows in the matrix. The smoothing is applied by \code{\link[stats]{loess}}. Pleasenote the data range will change, you need to adjust values in the new matrix afterwards.}
   \item{span}{degree of smoothing, pass to \code{\link[stats]{loess}}.}
-  \item{s}{\code{\link[GenomicRanges]{findOverlaps}} sometimes uses a lot of memory. \code{target} is splitted into \code{s} parts and eachpart is processed serialized.}
+  \item{s}{\code{\link[GenomicRanges]{findOverlaps}} sometimes uses a lot of memory. \code{target} is splitted into \code{s} parts and eachpart is processed serialized (it will be slow!).}
   \item{trim}{percent of extreme values to remove}
 }
 \details{
-In order to visualize associations between \code{gr} and \code{target}, the data is transformed into a matrix
+In order to visualize associations between \code{signal} and \code{target}, the data is transformed into a matrix
 and visualized as a heatmap.
 
 Upstream and downstream also with the target body are splitted into a list of small windows and overlap
-to \code{gr}. Since regions in \code{gr} and small windows do not always 100 percent overlap, averaging should be applied.
+to \code{signal}. Since regions in \code{signal} and small windows do not always 100 percent overlap, averaging should be applied.
 
 Following illustrates different settings for \code{mean_mode}:
 
   \preformatted{
-       4      5      2     values in gr
-    ++++++   +++   +++++   gr
+       4      5      2     values in signal
+    ++++++   +++   +++++   signal
       ================     window (16bp)
         4     3     3      overlap
 
@@ -68,13 +68,13 @@ Zuguang Gu <z.gu@dkfz.de>
 
 }
 \examples{
-gr = GRanges(seqnames = "chr1", 
+signal = GRanges(seqnames = "chr1", 
 	  ranges = IRanges(start = c(1, 4, 7, 11, 14, 17, 21, 24, 27),
                      end = c(2, 5, 8, 12, 15, 18, 22, 25, 28)),
     score = c(1, 2, 3, 1, 2, 3, 1, 2, 3))
 target = GRanges(seqnames = "chr1", ranges = IRanges(start = 10, end = 20))
-normalizeToMatrix(gr, target, extend = 10, w = 2)
-normalizeToMatrix(gr, target, extend = 10, w = 2, include_target = TRUE)
-normalizeToMatrix(gr, target, extend = 10, w = 2, value_column = "score")
+normalizeToMatrix(signal, target, extend = 10, w = 2)
+normalizeToMatrix(signal, target, extend = 10, w = 2, include_target = TRUE)
+normalizeToMatrix(signal, target, extend = 10, w = 2, value_column = "score")
 
 }

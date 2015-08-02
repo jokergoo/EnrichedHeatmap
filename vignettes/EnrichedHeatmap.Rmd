@@ -70,6 +70,7 @@ Heatmap for the enrichment of H3K4me3 histone mark on TSS:
 tss = promoters(genes, upstream = 0, downstream = 1)
 mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
     extend = 5000, mean_mode = "w0", w = 50)
+mat1
 EnrichedHeatmap(mat1, name = "H3K4me3")
 ```
 
@@ -177,8 +178,8 @@ and low methylation are the major methylation types in the genome, we set the em
 Here we set `mean_mode` to `absolute`. Following illustrates different settings for ``mean_mode``:
 
 ```
-        4      5      2     values in gr
-     ++++++   +++   +++++   gr
+        4      5      2     values in signal
+     ++++++   +++   +++++   signal
        ================     window (16bp)
         4      3     3      overlap
 

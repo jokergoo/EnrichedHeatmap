@@ -4,16 +4,16 @@
 # Normalize associations between genomic signals and target regions into a matrix
 #
 # == param
-# -gr a `GenomicRanges::GRanges` object which is the genomic signals.
+# -signal a `GenomicRanges::GRanges` object which is the genomic signals.
 # -target a `GenomicRanges::GRanges` object.
 # -extend extended base pairs to the upstream and downstream of ``target``. It can be a vector of length one or two.
 # -w window size for splitting upstream and downstream in ``target``.
-# -value_column index for column in ``gr`` that will be mapped to colors. If it is ``NULL``, an internal column
+# -value_column index for column in ``signal`` that will be mapped to colors. If it is ``NULL``, an internal column
 #         which contains 1 will be attached.
-# -mapping_column mapping column to restrict overlapping between ``gr`` and ``target``. By default it tries to look for
-#           all regions in ``gr`` that overlap with every target.
-# -empty_value values for windows that don't overlap with ``gr``. 
-# -mean_mode when a window is not perfectly matched to ``gr``, how to calculate 
+# -mapping_column mapping column to restrict overlapping between ``signal`` and ``target``. By default it tries to look for
+#           all regions in ``signal`` that overlap with every target.
+# -empty_value values for windows that don't overlap with ``signal``. 
+# -mean_mode when a window is not perfectly matched to ``signal``, how to calculate 
 #       the mean values in this window. See 'Details' section for a detailed explanation.
 # -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
 #               is enforced to ``FALSE``.
@@ -26,16 +26,16 @@
 # -trim percent of extreme values to remove
 #
 # == details
-# In order to visualize associations between ``gr`` and ``target``, the data is transformed into a matrix
+# In order to visualize associations between ``signal`` and ``target``, the data is transformed into a matrix
 # and visualized as a heatmap.
 #
 # Upstream and downstream also with the target body are splitted into a list of small windows and overlap
-# to ``gr``. Since regions in ``gr`` and small windows do not always 100 percent overlap, averaging should be applied.
+# to ``signal``. Since regions in ``signal`` and small windows do not always 100 percent overlap, averaging should be applied.
 # 
 # Following illustrates different settings for ``mean_mode``:
 #
-#        4      5      2     values in gr
-#     ++++++   +++   +++++   gr
+#        4      5      2     values in signal
+#     ++++++   +++   +++++   signal
 #       ================     window (16bp)
 #         4     3     3      overlap
 #
@@ -56,19 +56,22 @@
 # Zuguang Gu <z.gu@dkfz.de>
 #
 # == example
-# gr = GRanges(seqnames = "chr1", 
+# signal = GRanges(seqnames = "chr1", 
 # 	  ranges = IRanges(start = c(1, 4, 7, 11, 14, 17, 21, 24, 27),
 #                      end = c(2, 5, 8, 12, 15, 18, 22, 25, 28)),
 #     score = c(1, 2, 3, 1, 2, 3, 1, 2, 3))
 # target = GRanges(seqnames = "chr1", ranges = IRanges(start = 10, end = 20))
-# normalizeToMatrix(gr, target, extend = 10, w = 2)
-# normalizeToMatrix(gr, target, extend = 10, w = 2, include_target = TRUE)
-# normalizeToMatrix(gr, target, extend = 10, w = 2, value_column = "score")
+# normalizeToMatrix(signal, target, extend = 10, w = 2)
+# normalizeToMatrix(signal, target, extend = 10, w = 2, include_target = TRUE)
+# normalizeToMatrix(signal, target, extend = 10, w = 2, value_column = "score")
 #
-normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_column = NULL, 
+normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value_column = NULL, 
 	mapping_column = NULL, empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), 
 	include_target = any(width(target) > 1), target_ratio = 0.1, smooth = FALSE, 
 	span = 0.5, s = 1, trim = 0.01) {
+
+	signal_name = as.character(substitute(signal))
+	target_name = as.character(substitute(target))
 
 	if(s > 1) {
 		n = length(target)
@@ -80,7 +83,7 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
 		end_index[length(end_index)] = x[length(x)]
 
 		lt = lapply(seq_along(start_index), function(i) {
-			normalizeToMatrix(gr, target[ start_index[i]:end_index[i] ], extend = extend, w = w, value_column = value_column, mapping_column = mapping_column,
+			normalizeToMatrix(signal, target[ start_index[i]:end_index[i] ], extend = extend, w = w, value_column = value_column, mapping_column = mapping_column,
 				empty_value = empty_value, mean_mode = mean_mode, include_target = include_target,
 				target_ratio = target_ratio, smooth = smooth, span = span, trim = 0)
 		})
@@ -98,6 +101,8 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
 		attr(mat, "downstream_index") = downstream_index
 		attr(mat, "extend") = extend
 		attr(mat, "smooth") = smooth
+		attr(mat, "signal_name") = signal_name
+		attr(mat, "target_name") = target_name
 
 		if(trim > 0) {
 	  		q1 = quantile(mat, trim/2, na.rm = TRUE)
@@ -105,7 +110,7 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
 	  		mat[mat <= q1] = q1
 	  		mat[mat >= q2] = q2
 	  	}
-
+	  	class(mat) = c("normalizeToMatrix", "matrix")
 		return(mat)
 		
 	}
@@ -124,7 +129,7 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
   		# do not need to separate upstream and downstream
   		suppressWarnings(both <- promoters(target, upstream = extend[1], downstream = extend[2]))
 
-		mat_both = makeMatrix(gr, both, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
+		mat_both = makeMatrix(signal, both, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
 		i = round(extend[1]/(extend[1] + extend[2]) * ncol(mat_both))  # assume
 		if(i < 2 | ncol(mat_both) - i < 2) {
 			stop("Maybe `w` is too large or one of `extend` is too small.")
@@ -136,7 +141,7 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
 		# extend and normalize in upstream 
 		suppressWarnings(upstream <- promoters(target, upstream = extend[1], downstream = 0))
 	  
-		mat_upstream = makeMatrix(gr, upstream, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
+		mat_upstream = makeMatrix(signal, upstream, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
 	  
 		# extend and normalize in downstream
 		if(all(width(target) == 1) && !include_target) {
@@ -149,13 +154,13 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
 	                         strand = strand(target))
 		suppressWarnings(downstream <- promoters(end_target, upstream = 0, downstream = extend[2]))
 	  
-		mat_downstream = makeMatrix(gr, downstream, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value,
+		mat_downstream = makeMatrix(signal, downstream, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value,
 	                              mean_mode = mean_mode)
 	}
 
 	if(include_target) {
 		k = (ncol(mat_upstream) + ncol(mat_downstream)) * target_ratio/(1-target_ratio)
-		mat_target = makeMatrix(gr, target, k = k, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
+		mat_target = makeMatrix(signal, target, k = k, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
 	} else {
 		mat_target = matrix(0, nrow = length(target), ncol = 0)
 	}
@@ -174,6 +179,8 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
 	attr(mat, "downstream_index") = downstream_index
 	attr(mat, "extend") = extend
 	attr(mat, "smooth") = smooth
+	attr(mat, "signal_name") = signal_name
+	attr(mat, "target_name") = target_name
 
   	rownames(mat) = names(target)
   	if(ncol(mat_target)) {
@@ -188,7 +195,7 @@ normalizeToMatrix = function(gr, target, extend = 5000, w = extend/50, value_col
   		mat[mat <= q1] = q1
   		mat[mat >= q2] = q2
   	}
-
+	class(mat) = c("normalizeToMatrix", "matrix")
 	return(mat)
 }
 
@@ -441,5 +448,81 @@ makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"
 		         .column = ncol)
 	return(gr)
 
+}
+
+# == title
+# Subset normalized matrix by rows
+#
+# == param
+# -x the normalized matrix returned by `normalizeToMatrix`
+# -i row index
+# -j column index, disabled
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+"[.normalizeToMatrix" = function(x, i, j) {
+
+	if(!missing(j)) {
+		stop("You can only subset row index.")
+	}
+	attr = attributes(x)
+	attributes(x) = NULL
+	for(bb in intersect(names(attr), c("dim", "dimnames"))) {
+		attr(x, bb) = attr[[bb]]
+	}
+	x = x[i, j, drop = FALSE]
+	for(bb in setdiff(names(attr), c("dim", "dimnames"))) {
+		attr(x, bb) = attr[[bb]]
+	}
+	return(x)
+}
+
+# == title
+# Print normalized matrix
+#
+# == param
+# -x the normalized matrix returned by `normalizeToMatrix`
+# -... other arguments
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+print.normalizeToMatrix = function(x, ...) {
+	upstream_index = attr(x, "upstream_index")
+	target_index = attr(x, "target_index")
+	downstream_index = attr(x, "downstream_index")
+	extend = attr(x, "extend")
+	smooth = attr(x, "smooth")
+	signal_name = attr(x, "signal_name")
+	target_name = attr(x, "target_name")
+
+	cat("Normalize ", signal_name, " to ", target_name, ":\n", sep = "")
+	cat("  Upstream:", extend[1], "bp\n", sep = "")
+	cat("  Downstream:", extend[2], "bp\n", sep = "")
+	if(length(target_index) == 0) {
+		cat("  Not show target regions\n", sep = "")
+	} else {
+		cat("  Show target regions.\n", sep = "")
+	}
+	cat("  ", nrow(x), " signal regions\n", sep = "")
+}
+
+# == title
+# Copy attributes of a normalized matrix to another
+#
+# == param
+# -x x
+# -y y
+#
+copyAttr = function(x, y) {
+	if(!identical(dim(x), dim(y))) {
+		stop("x and y should have same dimension.\n")
+	}
+	attr = attributes(x)
+	for(bb in names(attr)) {
+		attr(y, bb) = attr[[bb]]
+	}
+	return(y)
 }
 

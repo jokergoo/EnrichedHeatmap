@@ -212,6 +212,8 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, pos_line = TRUE,
 	 	axis_height = max(grobWidth(textGrob(axis_name, gp = gpar(axis_name_gp))))*abs(sin(axis_name_rot/180*pi)) + unit(4, "mm")
 	}
 
+	class(mat) = NULL
+
 	ht = Heatmap(mat, row_order = od, cluster_columns = FALSE, cluster_rows = cluster_rows,
 			show_row_names = FALSE, show_column_names = FALSE, bottom_annotation = NULL, 
 			column_title_side = "top", ...)
