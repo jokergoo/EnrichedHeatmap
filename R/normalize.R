@@ -458,21 +458,31 @@ makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"
 # -x the normalized matrix returned by `normalizeToMatrix`
 # -i row index
 # -j column index, disabled
+# -drop disabled
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
-"[.normalizeToMatrix" = function(x, i, j) {
-
-	if(!missing(j)) {
-		stop("You can only subset row index.")
-	}
+"[.normalizeToMatrix" = function(x, i, j, drop = FALSE) {
+	
 	attr = attributes(x)
 	attributes(x) = NULL
 	for(bb in intersect(names(attr), c("dim", "dimnames"))) {
 		attr(x, bb) = attr[[bb]]
 	}
-	x = x[i, j, drop = FALSE]
+	if(!missing(i) && !missing(j)) {
+		return(x[i, j, drop = FALSE])
+	}
+	if(nargs() == 2) {
+		return(x[i])
+	}
+	if(nargs() == 3 && missing(i)) {
+		return(x[, j])
+	}
+	if(missing(i)) {
+		return(x[i, j, drop = drop])
+	}
+	x = x[i, , drop = FALSE]
 	for(bb in setdiff(names(attr), c("dim", "dimnames"))) {
 		attr(x, bb) = attr[[bb]]
 	}
@@ -499,8 +509,8 @@ print.normalizeToMatrix = function(x, ...) {
 	target_name = attr(x, "target_name")
 
 	cat("Normalize ", signal_name, " to ", target_name, ":\n", sep = "")
-	cat("  Upstream:", extend[1], "bp\n", sep = "")
-	cat("  Downstream:", extend[2], "bp\n", sep = "")
+	cat("  Upstream ", extend[1], "bp\n", sep = "")
+	cat("  Downstream ", extend[2], "bp\n", sep = "")
 	if(length(target_index) == 0) {
 		cat("  Not show target regions\n", sep = "")
 	} else {
