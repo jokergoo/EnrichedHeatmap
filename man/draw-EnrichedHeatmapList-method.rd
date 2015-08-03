@@ -22,7 +22,7 @@ It calls \code{\link[ComplexHeatmap]{draw,HeatmapList-method}} to make the plot 
 
 }
 \value{
-No value is returned.
+Orders of rows
 
 }
 \author{

@@ -110,7 +110,7 @@ setMethod(f = "show",
 # It calls `ComplexHeatmap::draw,HeatmapList-method` to make the plot but with some adjustment.
 #
 # == value
-# No value is returned.
+# Orders of rows
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -229,5 +229,6 @@ setMethod(f = "draw",
 	    	}
 	    }
     }
+    return(invisible(ht@row_order_list))
 })
 
