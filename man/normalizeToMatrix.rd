@@ -2,17 +2,16 @@
 \alias{normalizeToMatrix}
 \title{
 Normalize associations between genomic signals and target regions into a matrix
-
 }
 \description{
 Normalize associations between genomic signals and target regions into a matrix
-
 }
 \usage{
 normalizeToMatrix(signal, target, extend = 5000, w = extend/50, value_column = NULL,
     mapping_column = NULL, empty_value = 0, mean_mode = c("absolute", "weighted", "w0"),
     include_target = any(width(target) > 1), target_ratio = 0.1, smooth = FALSE,
-    span = 0.5, s = 1, trim = 0.01)}
+    span = 0.5, s = 1, trim = 0.01)
+}
 \arguments{
 
   \item{signal}{a \code{\link[GenomicRanges]{GRanges}} object which is the genomic signals.}
@@ -29,6 +28,7 @@ normalizeToMatrix(signal, target, extend = 5000, w = extend/50, value_column = N
   \item{span}{degree of smoothing, pass to \code{\link[stats]{loess}}.}
   \item{s}{\code{\link[GenomicRanges]{findOverlaps}} sometimes uses a lot of memory. \code{target} is splitted into \code{s} parts and eachpart is processed serialized (it will be slow!).}
   \item{trim}{percent of extreme values to remove}
+
 }
 \details{
 In order to visualize associations between \code{signal} and \code{target}, the data is transformed into a matrix
@@ -40,16 +40,14 @@ to \code{signal}. Since regions in \code{signal} and small windows do not always
 Following illustrates different settings for \code{mean_mode}:
 
   \preformatted{
-       4      5      2     values in signal
+4      5      2     values in signal
     ++++++   +++   +++++   signal
       ================     window (16bp)
         4     3     3      overlap
 
     absolute: (4 + 5 + 2)/3
     weighted: (4*4 + 5*3 + 2*3)/(4 + 3 + 3)
-    w0:       (4*4 + 5*3 + 2*3)/16
-  }
-
+    w0:       (4*4 + 5*3 + 2*3)/16  }
 }
 \value{
 A matrix with following additional attributes:
@@ -61,11 +59,9 @@ A matrix with following additional attributes:
   \item{extend}{extension on upstream and downstream}
   \item{smooth}{whether smoothing was applied on the matrix}
 }
-
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>
-
 }
 \examples{
 signal = GRanges(seqnames = "chr1", 
@@ -76,5 +72,4 @@ target = GRanges(seqnames = "chr1", ranges = IRanges(start = 10, end = 20))
 normalizeToMatrix(signal, target, extend = 10, w = 2)
 normalizeToMatrix(signal, target, extend = 10, w = 2, include_target = TRUE)
 normalizeToMatrix(signal, target, extend = 10, w = 2, value_column = "score")
-
 }

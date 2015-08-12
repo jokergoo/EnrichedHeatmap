@@ -2,16 +2,15 @@
 \alias{EnrichedHeatmap}
 \title{
 Constructor method for EnrichedHeatmap class
-
 }
 \description{
 Constructor method for EnrichedHeatmap class
-
 }
 \usage{
 EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
     pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = NULL,
-    axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, ...)}
+    axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, ...)
+}
 \arguments{
 
   \item{mat}{a matrix which is returned by \code{\link{normalizeToMatrix}}}
@@ -24,6 +23,7 @@ EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
   \item{border}{whether show border of the heatmap}
   \item{cluster_rows}{clustering on rows are turned off by default}
   \item{...}{pass to \code{\link[ComplexHeatmap]{Heatmap}}}
+
 }
 \details{
 \code{EnrichedHeatmap-class} is inherited from \code{Heatmap-class}. Following parameters are 
@@ -44,15 +44,12 @@ the position of \code{target} will be added to the heatmap body as well.
 
 Same as the \code{\link[ComplexHeatmap]{Heatmap-class}}, users can make controls on the heatmap such as
 apply clustering on rows, or split rows by data frame or k-means clustering.
-
 }
 \value{
 An \code{\link{EnrichedHeatmap-class}} object which is inherited from \code{\link[ComplexHeatmap]{Heatmap-class}}.
-
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>
-
 }
 \examples{
 load(paste0(system.file("/extdata/chr21_test_data.RData", 
@@ -62,5 +59,4 @@ mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute
 EnrichedHeatmap(mat3, name = "methylation", column_title = "methylation near CGI")
 EnrichedHeatmap(mat3, name = "meth1") + EnrichedHeatmap(mat3, name = "meth2")
 # for more examples, please go to the vignette
-
 }

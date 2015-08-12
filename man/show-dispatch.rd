@@ -1,9 +1,11 @@
 \name{show-dispatch}
 \alias{show}
 \title{
-Method dispatch page for show}
+Method dispatch page for show
+}
 \description{
-Method dispatch page for \code{show}.}
+Method dispatch page for \code{show}.
+}
 \section{Dispatch}{
 \code{show} can be dispatched on following classes:
 
@@ -15,5 +17,6 @@ Method dispatch page for \code{show}.}
 \examples{
 # no example
 NULL
+
 
 }
