@@ -16,6 +16,7 @@ bioc_packages:
 
 r_github_packages:
 - jokergoo/ComplexHeatmap
+- jokergoo/circlize
 
 bioc_required: true
 
