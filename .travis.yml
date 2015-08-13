@@ -15,8 +15,8 @@ bioc_packages:
 - GenomicRanges
 
 r_github_packages:
-- jokergoo/ComplexHeatmap
 - jokergoo/circlize
+- jokergoo/ComplexHeatmap
 
 bioc_required: true
 
