@@ -25,3 +25,7 @@ The \code{\link{EnrichedHeatmap-class}} provides following methods:
 \author{
 Zuguang Gu <z.gu@dkfz.de>
 }
+\examples{
+# There is no example
+NULL
+}

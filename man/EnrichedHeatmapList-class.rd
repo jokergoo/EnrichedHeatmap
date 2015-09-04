@@ -20,3 +20,7 @@ The \code{\link{EnrichedHeatmapList-class}} provides following methods:
 \author{
 Zuguang Gu <z.gu@dkfz.de>
 }
+\examples{
+# There is no example
+NULL
+}

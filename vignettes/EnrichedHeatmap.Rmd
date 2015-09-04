@@ -306,7 +306,7 @@ used directly for **EnrichedHeatmap**. As shown before, heatmaps can be split ei
 
 The order of rows can be retrieved by `row_order()`.
 
-```{r}
+```{r, eval = FALSE}
 ht_list = draw(ht_list)
 row_order(ht_list)
 ```
@@ -315,7 +315,7 @@ If you are interested in a small cluster which is maybe located close to TSS, un
 you can use mouse to select this region by `select()` function, and it will give you the order of rows
 for these selected sub-region.
 
-```{r}
+```{r, eval = FALSE}
 draw(ht_list)
 select()
 ```

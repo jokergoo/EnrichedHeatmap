@@ -21,7 +21,7 @@ Draw a list of heatmaps
 It calls \code{\link[ComplexHeatmap]{draw,HeatmapList-method}} to make the plot but with some adjustment.
 }
 \value{
-Orders of rows
+A \code{\link{EnrichedHeatmapList}} object
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>

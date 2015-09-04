@@ -110,7 +110,7 @@ setMethod(f = "show",
 # It calls `ComplexHeatmap::draw,HeatmapList-method` to make the plot but with some adjustment.
 #
 # == value
-# Orders of rows
+# A `EnrichedHeatmapList` object
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -184,51 +184,8 @@ setMethod(f = "draw",
         }
     }
 
-    if(length(padding) == 1) {
-        padding = rep(padding, 4)
-    } else if(length(padding) == 2) {
-        padding = rep(padding, 2)
-    } else if(length(padding) != 4) {
-        stop("`padding` can only have length of 1, 2, 4")
-    }
-
-    layout = grid.layout(nrow = 7, ncol = 7, widths = component_width(object, 1:7), heights = component_height(object, 1:7))
-    pushViewport(viewport(layout = layout, name = "global", width = unit(1, "npc") - padding[2] - padding[4],
-        height = unit(1, "npc") - padding[1] - padding[3]))
-    ht_layout_index = object@layout$layout_index
-    ht_graphic_fun_list = object@layout$graphic_fun_list
-    
-    for(j in seq_len(nrow(ht_layout_index))) {
-        pushViewport(viewport(layout.pos.row = ht_layout_index[j, 1], layout.pos.col = ht_layout_index[j, 2]))
-        ht_graphic_fun_list[[j]](object)
-        upViewport()
-    }
-
-    # add decorations (axis, and lines)
-
-    upViewport()
-
-    for(i in Enriched_heatmap_index) {
-    	
-    	ht = object@ht_list[[i]]
-    	heatmap_name = ht@name
-    	upstream_index = attr(ht@matrix, "upstream_index")
-		downstream_index = attr(ht@matrix, "downstream_index")
-		target_index = attr(ht@matrix, "target_index")
-		n1 = length(upstream_index)
-		n2 = length(target_index)
-		n3 = length(downstream_index)
-		n = n1 + n2 + n3
-
-		if(ht@heatmap_param$pos_line) {
-	    	for(j in seq_along(ht@row_order_list)) {
-	    		seekViewport(paste0(heatmap_name, "_heatmap_body_", j))
-                if(ht@heatmap_param$border) grid.rect(gp = gpar(col = "black", fill = NA))
-	    		grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
-	    		if(n2) grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
-	    	}
-	    }
-    }
-    return(invisible(ht@row_order_list))
+    object = selectMethod("draw", "HeatmapList")(object, padding = padding, newpage = newpage, ...)
+    changeClassName(object, "EnrichedHeatmapList")
+    return(object)
 })
 

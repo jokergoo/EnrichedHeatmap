@@ -15,3 +15,7 @@ copyAttr(x, y)
   \item{y}{y}
 
 }
+\examples{
+# There is no example
+NULL
+}

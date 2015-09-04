@@ -40,7 +40,7 @@ to \code{signal}. Since regions in \code{signal} and small windows do not always
 Following illustrates different settings for \code{mean_mode}:
 
   \preformatted{
-4      5      2     values in signal
+       4      5      2     values in signal
     ++++++   +++   +++++   signal
       ================     window (16bp)
         4     3     3      overlap
