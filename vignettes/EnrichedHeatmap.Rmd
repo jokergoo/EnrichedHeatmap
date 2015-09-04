@@ -299,6 +299,27 @@ ht_list = EnrichedHeatmap(mat4, col = c("white", "green"), name = "neg_cr",
 draw(ht_list, gap = unit(1, "cm"))
 ```
 
+## Features coming from ComplexHeatmap package
+
+Since **EnrichedHeatmap** is built upon the **ComplexHeatmap** package, features in **ComplexHeatmap** can be
+used directly for **EnrichedHeatmap**. As shown before, heatmaps can be split either by `km` or `spilt` arguments.
+
+The order of rows can be retrieved by `row_order()`.
+
+```{r}
+ht_list = draw(ht_list)
+row_order(ht_list)
+```
+
+If you are interested in a small cluster which is maybe located close to TSS, under the interactive mode,
+you can use mouse to select this region by `select()` function, and it will give you the order of rows
+for these selected sub-region.
+
+```{r}
+draw(ht_list)
+select()
+```
+
 ## Notice
 
 Due to `findOverlaps()` in **GenomicRanges** package, `normalizeToMatrix()` may eat 
