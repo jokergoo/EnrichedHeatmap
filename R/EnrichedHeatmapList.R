@@ -188,6 +188,35 @@ setMethod(f = "draw",
 
     object = selectMethod("draw", "HeatmapList")(object, padding = padding, newpage = newpage, ...)
     changeClassName(object, "EnrichedHeatmapList")
+
+    # add borders and pos lines
+    for(i in Enriched_heatmap_index) {
+        ht = object@ht_list[[i]]
+        heatmap_name = ht@name
+
+        upstream_index = attr(ht@matrix, "upstream_index")
+        downstream_index = attr(ht@matrix, "downstream_index")
+        target_index = attr(ht@matrix, "target_index")
+        n1 = length(upstream_index)
+        n2 = length(target_index)
+        n3 = length(downstream_index)
+        n = n1 + n2 + n3
+
+        for(k in seq_along(ht@row_order_list)) {
+            if(ht@heatmap_param$border) {
+                decorate_heatmap_body(heatmap_name, {
+                    grid.rect(gp = gpar(col = "black", fill = NA))
+                }, slice = k)
+            }
+            if(ht@heatmap_param$pos_line) {
+                decorate_heatmap_body(heatmap_name, {
+                    grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
+                    if(n2) grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
+                }, slice = k)
+            }
+        }
+    }
+
     return(invisible(object))
 })
 
