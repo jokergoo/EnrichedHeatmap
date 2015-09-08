@@ -18,6 +18,7 @@ enriched_score(x1, x2, x3)
 }
 \details{
 The function calculates how the signal is enriched in the targets.
+The score is the sum of values weighted by the reciprocal of the distance to the targets.
 }
 \value{
 A numeric value.

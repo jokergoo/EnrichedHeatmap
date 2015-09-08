@@ -13,6 +13,7 @@
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
+#
 EnrichedHeatmapList = setClass("EnrichedHeatmapList",
 	slots = getClass("HeatmapList")@slots,
 	contains = "HeatmapList")
@@ -47,7 +48,7 @@ EnrichedHeatmapList = function(...) {
 # -y an `EnrichedHeatmap-class` object, a `Heatmap-class` object, a `HeatmapAnnotation-class` object or a `HeatmapList-class` object.
 #
 # == detail
-# It overwrites `ComplexHeatmap::+.AdditiveUnit` in the ComplexHeatmap package.
+# It overwrites ``+.AdditiveUnit`` in the ComplexHeatmap package.
 #
 # == value
 # A `ComplexHeatmap::HeatmapList-class` object or an `EnrichedHeatmapList-class` object
@@ -83,7 +84,7 @@ EnrichedHeatmapList = function(...) {
 # they can pass parameters directly to `draw,EnrichedHeatmapList-method`.
 #
 # == value
-# This function returns no value.
+# An `EnrichedHeatmapList-class` object.
 #
 # == example
 # # see documentation of EnrichedHeatmap
@@ -107,10 +108,11 @@ setMethod(f = "show",
 # -newpage whether to create a new page
 #
 # == detail
-# It calls `ComplexHeatmap::draw,HeatmapList-method` to make the plot but with some adjustment.
+# It calls `ComplexHeatmap::draw,HeatmapList-method` to make the plot but with some adjustment
+# specificly for enriched heatmaps.
 #
 # == value
-# A `EnrichedHeatmapList` object
+# An `EnrichedHeatmapList` object
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -160,7 +162,7 @@ setMethod(f = "draw",
     	bottom_height = sum(component_height(object@ht_list[[i]], 6:9)) # column_names, annotation, dendrogram and title
 
     	# assume nothing is allowed to plotted below the Enriched heatmap
-    	if(compare_unit(bottom_height, max_axis_height) == -1) {
+    	if(compare_height(bottom_height, max_axis_height) == -1) {
 
     		for(i in normal_heatmap_index) {
     			ht = object@ht_list[[i]]
@@ -186,6 +188,6 @@ setMethod(f = "draw",
 
     object = selectMethod("draw", "HeatmapList")(object, padding = padding, newpage = newpage, ...)
     changeClassName(object, "EnrichedHeatmapList")
-    return(object)
+    return(invisible(object))
 })
 

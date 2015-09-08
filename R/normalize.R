@@ -7,27 +7,28 @@
 # -signal a `GenomicRanges::GRanges` object which is the genomic signals.
 # -target a `GenomicRanges::GRanges` object.
 # -extend extended base pairs to the upstream and downstream of ``target``. It can be a vector of length one or two.
-# -w window size for splitting upstream and downstream in ``target``.
-# -value_column index for column in ``signal`` that will be mapped to colors. If it is ``NULL``, an internal column
-#         which contains 1 will be attached.
+#         If it is length one, it means extension to the upstream and downstream are the same.
+# -w window size for splitting upstream and downstream, and probably ``target`` itself.
+# -value_column column index in ``signal`` that will be mapped to colors. If it is ``NULL``, an internal column
+#         which all contains 1 will be attached.
 # -mapping_column mapping column to restrict overlapping between ``signal`` and ``target``. By default it tries to look for
 #           all regions in ``signal`` that overlap with every target.
-# -empty_value values for windows that don't overlap with ``signal``. 
-# -mean_mode when a window is not perfectly matched to ``signal``, how to calculate 
-#       the mean values in this window. See 'Details' section for a detailed explanation.
+# -empty_value values for small windows that don't overlap with ``signal``. 
+# -mean_mode when a window is not perfectly overlapped to ``signal``, how to correspond 
+#       the values to this window. See 'Details' section for a detailed explanation.
 # -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
 #               is enforced to ``FALSE``.
-# -target_ratio  the ratio of width of ``target`` compared to 'upstream + target + downstream' in the heatmap
-# -smooth whether apply smoothing in rows in the matrix. The smoothing is applied by `stats::loess`. Please
-#         note the data range will change, you need to adjust values in the new matrix afterwards.
+# -target_ratio  the ratio of width of ``target`` part compared to the full heatmap
+# -smooth whether apply smoothing on rows in the matrix. The smoothing is applied by `stats::loess`. Please
+#         note the data range will change, you need to adjust values in the new matrix afterward.
 # -span degree of smoothing, pass to `stats::loess`.
 # -s `GenomicRanges::findOverlaps` sometimes uses a lot of memory. ``target`` is splitted into ``s`` parts and each
-#     part is processed serialized (it will be slow!).
-# -trim percent of extreme values to remove
+#     part is processed serialized (note it will be slow!).
+# -trim percent of extreme values to remove, currently it is disabled.
 #
 # == details
 # In order to visualize associations between ``signal`` and ``target``, the data is transformed into a matrix
-# and visualized as a heatmap.
+# and visualized as a heatmap afterward.
 #
 # Upstream and downstream also with the target body are splitted into a list of small windows and overlap
 # to ``signal``. Since regions in ``signal`` and small windows do not always 100 percent overlap, averaging should be applied.
@@ -51,6 +52,8 @@
 # -downstream_index column index corresponding to downstream of ``target``
 # -extend extension on upstream and downstream
 # -smooth whether smoothing was applied on the matrix
+#
+# The matrix is wrapped into a simple ``normalizeToMatrix`` class.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -317,14 +320,15 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 # == details
 # Following illustrates the meaning of ``direction`` and ``short.keep``:
 #
-#     ----------  a region, split by 3bp window
+#     ->--->--->  one region, split by 3bp window
 #     aaabbbccc   direction = "normal",  short.keep = FALSE
 #     aaabbbcccd  direction = "normal",  short.keep = TRUE
 #      aaabbbccc  direction = "reverse", short.keep = FALSE
 #     abbbcccddd  direction = "reverse", short.keep = TRUE
 #     
-# There is an additional column ``.row`` attached which contains the correspondance between small windows
-# and original regions in ``gr``
+# There is one additional column ``.row`` attached which contains the correspondance between small windows
+# and original regions in ``gr`` and one additional column ``.column`` which contains the index of the small window
+# on the current region.
 #
 # == value
 # A `GenomicRanges::GRanges` object.
@@ -457,8 +461,11 @@ makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"
 # == param
 # -x the normalized matrix returned by `normalizeToMatrix`
 # -i row index
-# -j column index, disabled
-# -drop disabled
+# -j column index
+# -drop whether drop the dimension
+#
+# == value
+# A ``normalizeToMatrix`` class object.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -496,6 +503,9 @@ makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"
 # -x the normalized matrix returned by `normalizeToMatrix`
 # -... other arguments
 #
+# == value
+# No value is returned.
+#
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
@@ -519,13 +529,6 @@ print.normalizeToMatrix = function(x, ...) {
 	cat("  ", nrow(x), " signal regions\n", sep = "")
 }
 
-# == title
-# Copy attributes of a normalized matrix to another
-#
-# == param
-# -x x
-# -y y
-#
 copyAttr = function(x, y) {
 	if(!identical(dim(x), dim(y))) {
 		stop("x and y should have same dimension.\n")

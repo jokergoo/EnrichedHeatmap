@@ -19,7 +19,7 @@ Actually it calls \code{\link{draw,EnrichedHeatmap-method}}, but only with defau
 they can pass parameters directly to \code{\link{draw,EnrichedHeatmap-method}}.
 }
 \value{
-This function returns no value.
+An \code{\link{EnrichedHeatmapList-class}} object.
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>

@@ -18,10 +18,11 @@ Draw a list of heatmaps
 
 }
 \details{
-It calls \code{\link[ComplexHeatmap]{draw,HeatmapList-method}} to make the plot but with some adjustment.
+It calls \code{\link[ComplexHeatmap]{draw,HeatmapList-method}} to make the plot but with some adjustment
+specificly for enriched heatmaps.
 }
 \value{
-A \code{\link{EnrichedHeatmapList}} object
+An \code{\link{EnrichedHeatmapList}} object
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>

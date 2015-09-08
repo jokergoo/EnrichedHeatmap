@@ -12,7 +12,7 @@ Draw a single heatmap
 \arguments{
 
   \item{object}{an \code{\link{EnrichedHeatmap-class}} object.}
-  \item{internal}{only used inside the calling of \code{\link{draw,EnrichedHeatmapList-method}}.}
+  \item{internal}{only used internally.}
   \item{...}{pass to \code{\link[ComplexHeatmap]{draw,HeatmapList-method}}.}
 
 }
@@ -21,7 +21,7 @@ The function creates an \code{\link{EnrichedHeatmapList-class}} object which onl
 and call \code{\link{draw,EnrichedHeatmapList-method}} to make the final heatmap.
 }
 \value{
-This function returns no value.
+An \code{\link{EnrichedHeatmapList-class}} object.
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>

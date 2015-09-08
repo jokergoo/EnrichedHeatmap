@@ -9,9 +9,9 @@ changeClassName = function(object, new_class) {
 }
 
 
-compare_unit = function(u1, u2) {
-	x1 = convertUnit(u1, "mm", valueOnly = TRUE)
-	x2 = convertUnit(u2, "mm", valueOnly = TRUE)
+compare_height = function(u1, u2) {
+	x1 = convertHeight(u1, "mm", valueOnly = TRUE)
+	x2 = convertHeight(u2, "mm", valueOnly = TRUE)
 	ifelse(x1 > x2, 1, ifelse(x1 < x2, -1, 0))
 }
  

@@ -33,6 +33,7 @@ EnrichedHeatmap = setClass("EnrichedHeatmap",
 #
 # == details
 # The function calculates how the signal is enriched in the targets.
+# The score is the sum of values weighted by the reciprocal of the distance to the targets.
 #
 # == value
 # A numeric value.
@@ -62,13 +63,13 @@ enriched_score = function(x1, x2, x3) {
 # -mat a matrix which is returned by `normalizeToMatrix`
 # -score_fun a function which calculates enriched scores for rows in ``mat``
 # -pos_line whether draw vertical lines which represent the position of ``target``
-# -pos_line_gp graphical parameters for lines
+# -pos_line_gp graphic parameters for lines
 # -axis_name names for axis which is below the heatmap. If the targets are single points, ``axis_name`` is a vector
 #         of length three which corresponds to upstream, target itself and downstream. If the
-#         targets are regions with some width, ``axis_name`` is a vector of length four which 
+#         targets are regions with width larger than 1, ``axis_name`` should be a vector of length four which 
 #        corresponds to upstream, start of targets, end of targets and downstream.
 # -axis_name_rot rotation for axis names
-# -axis_name_gp graphical parameters for axis names
+# -axis_name_gp graphic parameters for axis names
 # -border whether show border of the heatmap
 # -cluster_rows clustering on rows are turned off by default
 # -... pass to `ComplexHeatmap::Heatmap`
@@ -86,11 +87,14 @@ enriched_score = function(x1, x2, x3) {
 # -column_title_side enforced to be ``top``
 #
 # With above pre-defined values, no graphics will be drawn below the heatmap, then the space
-# below the heatmap is used to add a new graph which contains the axis. A (or two) line which corresponds to 
+# below the heatmap can be used to add a new graph which contains the axis. A (or two) line which corresponds to 
 # the position of ``target`` will be added to the heatmap body as well.
 #
-# Same as the `ComplexHeatmap::Heatmap-class`, users can make controls on the heatmap such as
-# apply clustering on rows, or split rows by data frame or k-means clustering.
+# Same as the `ComplexHeatmap::Heatmap-class`, users can make more controls on the heatmap such as
+# apply clustering on rows, or split rows by data frame or k-means clustering. Users can also 
+# add more than one heatmaps by ``+`` operator.
+#
+# For a detailed demonstration, please go to the vignette.
 #
 # == value
 # An `EnrichedHeatmap-class` object which is inherited from `ComplexHeatmap::Heatmap-class`.
@@ -239,7 +243,7 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, pos_line = TRUE,
 # they can pass parameters directly to `draw,EnrichedHeatmap-method`.
 #
 # == value
-# This function returns no value.
+# An `EnrichedHeatmapList-class` object.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -261,7 +265,7 @@ setMethod(f = "show",
 #
 # == param
 # -object an `EnrichedHeatmap-class` object.
-# -internal only used inside the calling of `draw,EnrichedHeatmapList-method`.
+# -internal only used internally.
 # -... pass to `ComplexHeatmap::draw,HeatmapList-method`.
 #
 # == detail
@@ -269,7 +273,7 @@ setMethod(f = "show",
 # and call `draw,EnrichedHeatmapList-method` to make the final heatmap.
 #
 # == value
-# This function returns no value.
+# An `EnrichedHeatmapList-class` object.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -315,7 +319,7 @@ setMethod(f = "draw",
 # It should only be placed as column annotation of the Enriched Heatmap.
 #
 # == values
-# A column annotation function 
+# A column annotation function which can be set to ``top_annotation`` argument
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>

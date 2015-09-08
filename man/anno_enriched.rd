@@ -33,7 +33,7 @@ If rows are splitted, there will also be multiple lines for this annotation.
 It should only be placed as column annotation of the Enriched Heatmap.
 }
 \value{
-A column annotation function
+A column annotation function which can be set to \code{top_annotation} argument
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>

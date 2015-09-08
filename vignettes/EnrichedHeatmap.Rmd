@@ -33,8 +33,8 @@ visualize e.g. how histone marks are enriched to transcription start sites.
 
 There are several tools that can make such heatmap (e.g. [ngs.plot](https://github.com/shenlab-sinai/ngsplot) or [deepTools](https://github.com/fidelram/deepTools)).
 Here we implement Enriched heatmap by **ComplexHeatmap** package. Since this type of heatmap is just a
-normal heatmap but with some fixed settings, with the functionality of **ComplexHeatmap**, it would be much easier
-to customize the heatmap as well as concatenating a list of heatmaps to show correspondance between differnet data sources.
+normal heatmap but with some special settings, with the functionality of **ComplexHeatmap**, it would be much easier
+to customize the heatmap as well as concatenating to a list of heatmaps to show correspondance between different data sources.
 
 ```{r, echo = FALSE, message = FALSE}
 suppressPackageStartupMessages(library(EnrichedHeatmap))
@@ -140,7 +140,7 @@ Cluster on rows:
 
 ```{r, cluster, fig.width = 3}
 EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", 
-    cluster_rows = TRUE, show_row_hclust = FALSE, column_title = "Enrichment of H3K4me3")     
+    cluster_rows = TRUE, show_row_dend = FALSE, column_title = "Enrichment of H3K4me3")     
 ```
 
 Some graphical settings specific for the `EnrichedHeatmap` object:
@@ -320,10 +320,36 @@ draw(ht_list)
 select()
 ```
 
+Since `EnrichedHeatmap` and `EnrichedHeamtapList` class are inherited from `Heamtap` and `HeamtapList` class
+respectively, all advanced parameters in the latter two classes can be directly used in the former two classes.
+E.g. to change graphic settings for the heatmap title:
+
+```{r, eval = FALSE}
+EnrichedHeatmap(..., column_title_gp = ...)
+```
+
+To change graphic settings for legend:
+
+```{r, eval = FALSE}
+EnrichedHeatmap(..., heatmap_legend_param = ...)
+# or set is globally
+ht_global_opt(...)
+EnrichedHeatmap(...)
+ht_global_opt(RESET = TRUE)
+```
+
+To set the width of the heatmaps if there are more than one heatmaps:
+
+```{r, eval = FALSE}
+EnrichedHeatmap(..., width = unit(...)) + EnrichedHeatmap(...)
+```
+
+For more advanced settings, please directly go to the vignettes in the **ComplexHeamtap** package.
+
 ## Notice
 
 Due to `findOverlaps()` in **GenomicRanges** package, `normalizeToMatrix()` may eat 
-huge amout of memory if your `GRanges` object contains too many regions. `s` argument in normalizeToMatrix()`
+q lot of memory if your `GRanges` object contains too many regions. `s` argument in normalizeToMatrix()`
 can split the data into `s` parts but it will increase the running time a lot.
 
 ## Session info

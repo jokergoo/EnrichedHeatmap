@@ -16,23 +16,23 @@ normalizeToMatrix(signal, target, extend = 5000, w = extend/50, value_column = N
 
   \item{signal}{a \code{\link[GenomicRanges]{GRanges}} object which is the genomic signals.}
   \item{target}{a \code{\link[GenomicRanges]{GRanges}} object.}
-  \item{extend}{extended base pairs to the upstream and downstream of \code{target}. It can be a vector of length one or two.}
-  \item{w}{window size for splitting upstream and downstream in \code{target}.}
-  \item{value_column}{index for column in \code{signal} that will be mapped to colors. If it is \code{NULL}, an internal columnwhich contains 1 will be attached.}
+  \item{extend}{extended base pairs to the upstream and downstream of \code{target}. It can be a vector of length one or two.If it is length one, it means extension to the upstream and downstream are the same.}
+  \item{w}{window size for splitting upstream and downstream, and probably \code{target} itself.}
+  \item{value_column}{column index in \code{signal} that will be mapped to colors. If it is \code{NULL}, an internal columnwhich all contains 1 will be attached.}
   \item{mapping_column}{mapping column to restrict overlapping between \code{signal} and \code{target}. By default it tries to look forall regions in \code{signal} that overlap with every target.}
-  \item{empty_value}{values for windows that don't overlap with \code{signal}. }
-  \item{mean_mode}{when a window is not perfectly matched to \code{signal}, how to calculate the mean values in this window. See 'Details' section for a detailed explanation.}
+  \item{empty_value}{values for small windows that don't overlap with \code{signal}. }
+  \item{mean_mode}{when a window is not perfectly overlapped to \code{signal}, how to correspond the values to this window. See 'Details' section for a detailed explanation.}
   \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target}is enforced to \code{FALSE}.}
-  \item{target_ratio}{the ratio of width of \code{target} compared to 'upstream + target + downstream' in the heatmap}
-  \item{smooth}{whether apply smoothing in rows in the matrix. The smoothing is applied by \code{\link[stats]{loess}}. Pleasenote the data range will change, you need to adjust values in the new matrix afterwards.}
+  \item{target_ratio}{the ratio of width of \code{target} part compared to the full heatmap}
+  \item{smooth}{whether apply smoothing on rows in the matrix. The smoothing is applied by \code{\link[stats]{loess}}. Pleasenote the data range will change, you need to adjust values in the new matrix afterward.}
   \item{span}{degree of smoothing, pass to \code{\link[stats]{loess}}.}
-  \item{s}{\code{\link[GenomicRanges]{findOverlaps}} sometimes uses a lot of memory. \code{target} is splitted into \code{s} parts and eachpart is processed serialized (it will be slow!).}
-  \item{trim}{percent of extreme values to remove}
+  \item{s}{\code{\link[GenomicRanges]{findOverlaps}} sometimes uses a lot of memory. \code{target} is splitted into \code{s} parts and eachpart is processed serialized (note it will be slow!).}
+  \item{trim}{percent of extreme values to remove, currently it is disabled.}
 
 }
 \details{
 In order to visualize associations between \code{signal} and \code{target}, the data is transformed into a matrix
-and visualized as a heatmap.
+and visualized as a heatmap afterward.
 
 Upstream and downstream also with the target body are splitted into a list of small windows and overlap
 to \code{signal}. Since regions in \code{signal} and small windows do not always 100 percent overlap, averaging should be applied.
@@ -59,6 +59,8 @@ A matrix with following additional attributes:
   \item{extend}{extension on upstream and downstream}
   \item{smooth}{whether smoothing was applied on the matrix}
 }
+
+The matrix is wrapped into a simple \code{normalizeToMatrix} class.
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>

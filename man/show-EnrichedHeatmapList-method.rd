@@ -19,7 +19,7 @@ Actually it calls \code{\link{draw,EnrichedHeatmapList-method}}, but only with d
 they can pass parameters directly to \code{\link{draw,EnrichedHeatmapList-method}}.
 }
 \value{
-This function returns no value.
+An \code{\link{EnrichedHeatmapList-class}} object.
 }
 \examples{
 # see documentation of EnrichedHeatmap

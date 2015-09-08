@@ -16,7 +16,7 @@ Add heatmaps or row annotations to a heatmap list
 
 }
 \details{
-It overwrites \code{\link[ComplexHeatmap]{+.AdditiveUnit}} in the ComplexHeatmap package.
+It overwrites \code{+.AdditiveUnit} in the ComplexHeatmap package.
 }
 \value{
 A \code{\link[ComplexHeatmap]{HeatmapList-class}} object or an \code{\link{EnrichedHeatmapList-class}} object

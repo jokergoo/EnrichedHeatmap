@@ -13,9 +13,12 @@ Subset normalized matrix by rows
 
   \item{x}{the normalized matrix returned by \code{\link{normalizeToMatrix}}}
   \item{i}{row index}
-  \item{j}{column index, disabled}
-  \item{drop}{disabled}
+  \item{j}{column index}
+  \item{drop}{whether drop the dimension}
 
+}
+\value{
+A \code{normalizeToMatrix} class object.
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>
@@ -23,4 +26,5 @@ Zuguang Gu <z.gu@dkfz.de>
 \examples{
 # There is no example
 NULL
+
 }
