@@ -26,7 +26,7 @@ EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
 
 }
 \details{
-\code{EnrichedHeatmap-class} is inherited from \code{Heatmap-class}. Following parameters are 
+\code{\link{EnrichedHeatmap-class}} is inherited from \code{\link[ComplexHeatmap]{Heatmap-class}}. Following parameters are 
 set with pre-defined values:
 
 \describe{

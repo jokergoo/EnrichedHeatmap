@@ -75,7 +75,7 @@ enriched_score = function(x1, x2, x3) {
 # -... pass to `ComplexHeatmap::Heatmap`
 #
 # == details
-# ``EnrichedHeatmap-class`` is inherited from ``Heatmap-class``. Following parameters are 
+# `EnrichedHeatmap-class` is inherited from `ComplexHeatmap::Heatmap-class`. Following parameters are 
 # set with pre-defined values:
 #
 # -row_order the rows are sorted by the enriched score which is calcualted by ``score_fun``.
