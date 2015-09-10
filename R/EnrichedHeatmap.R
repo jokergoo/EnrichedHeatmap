@@ -103,7 +103,7 @@ enriched_score = function(x1, x2, x3) {
 # Zuguang Gu <z.gu@dkfz.de>
 #
 # == example
-# load(paste0(system.file("/extdata/chr21_test_data.RData", 
+# load(paste0(system.file("extdata", "chr21_test_data.RData", 
 #     package = "EnrichedHeatmap")))
 # mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
 #     extend = 5000, w = 50, empty_value = 0.5)
@@ -325,7 +325,7 @@ setMethod(f = "draw",
 # Zuguang Gu <z.gu@dkfz.de>
 #
 # == example
-# load(paste0(system.file("/extdata/chr21_test_data.RData", package = "EnrichedHeatmap")))
+# load(paste0(system.file("extdata", "chr21_test_data.RData", package = "EnrichedHeatmap")))
 # tss = promoters(genes, upstream = 0, downstream = 1)
 # mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
 #     extend = 5000, mean_mode = "w0", w = 50)

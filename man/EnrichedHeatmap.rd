@@ -55,7 +55,7 @@ An \code{\link{EnrichedHeatmap-class}} object which is inherited from \code{\lin
 Zuguang Gu <z.gu@dkfz.de>
 }
 \examples{
-load(paste0(system.file("/extdata/chr21_test_data.RData", 
+load(paste0(system.file("extdata", "chr21_test_data.RData", 
     package = "EnrichedHeatmap")))
 mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
     extend = 5000, w = 50, empty_value = 0.5)

@@ -48,7 +48,7 @@ Load the example data that we will use for demostration:
 
 ```{r}
 set.seed(123)
-load(paste0(system.file("/extdata/chr21_test_data.RData", package = "EnrichedHeatmap")))
+load(paste0(system.file("extdata", "chr21_test_data.RData", package = "EnrichedHeatmap")))
 ls()
 ```
 

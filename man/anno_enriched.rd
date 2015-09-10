@@ -39,7 +39,7 @@ A column annotation function which can be set to \code{top_annotation} argument
 Zuguang Gu <z.gu@dkfz.de>
 }
 \examples{
-load(paste0(system.file("/extdata/chr21_test_data.RData", package = "EnrichedHeatmap")))
+load(paste0(system.file("extdata", "chr21_test_data.RData", package = "EnrichedHeatmap")))
 tss = promoters(genes, upstream = 0, downstream = 1)
 mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
     extend = 5000, mean_mode = "w0", w = 50)
