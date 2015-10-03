@@ -66,7 +66,15 @@ EnrichedHeatmapList = function(...) {
        inherits(y, "EnrichedHeatmapList")) {
     	
     	# should return a `EnrichedHeatmapList` object
-    	ht_list = add_heatmap(x, y)
+        if(is.null(x)) {
+            ht_list = new("HeatmapList")
+            ht_list = add_heatmap(ht_list, y)
+        } else if(is.null(y)) {
+            ht_list = new("HeatmapList")
+            ht_list = add_heatmap(ht_list, x)
+        } else {
+    	   ht_list = add_heatmap(x, y)
+        }
         changeClassName(ht_list, "EnrichedHeatmapList")
     } else {
     	ComplexHeatmap::`+.AdditiveUnit`(x, y)
