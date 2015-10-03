@@ -1,27 +1,24 @@
 Package: EnrichedHeatmap
 Type: Package
 Title: Making Enriched Heatmaps
-Version: 0.99.1
-Date: 2015-9-10
+Version: 0.99.2
+Date: 2015-10-1
 Author: Zuguang Gu
 Maintainer: Zuguang Gu <z.gu@dkfz.de>
-Depends: R (>= 3.2.0), grid, ComplexHeatmap (>= 1.4.0), GenomicRanges,
-        IRanges
+Depends: R (>= 3.1.2), grid, ComplexHeatmap (>= 1.4.0), GenomicRanges, IRanges
 Imports: methods, matrixStats, stats
 Suggests: testthat (>= 0.3), knitr, markdown, circlize (>= 0.3.1)
 VignetteBuilder: knitr
-Description: Enriched heatmap is a special type of heatmap which
-        visualizes the enrichment of genomic signals on specific target
-        regions. Here we implement Enriched heatmap by ComplexHeatmap
-        package. Since this type of heatmap is just a normal heatmap
-        but with some special settings, with the functionality of
-        ComplexHeatmap, it would be much easier to customize the
-        heatmap as well as concatenating to a list of heatmaps to show
-        correspondance between different data sources.
-biocViews: Software, Visualization, Sequencing, GenomeAnnotation,
-        Coverage
+Description: Enriched heatmap is a special type of heatmap which 
+  visualizes the enrichment of genomic signals on specific target regions.
+  Here we implement Enriched heatmap by ComplexHeatmap package. 
+  Since this type of heatmap is just a normal heatmap but with some special settings, 
+  with the functionality of ComplexHeatmap, it would be much easier
+  to customize the heatmap as well as concatenating to a list of heatmaps to 
+  show correspondance between different data sources.
+biocViews: Software, Visualization, Sequencing, GenomeAnnotation, Coverage
 URL: https://github.com/jokergoo/EnrichedHeatmap
 License: GPL (>= 2)
+Packaged: 2015-10-1 00:00:00 UTC; Administrator
 Repository: Bioconductor
-Date/Publication: 2015-9-10 00:00:00
-NeedsCompilation: no
+Date/Publication: 2015-10-1 00:00:00
