@@ -1,6 +1,7 @@
 changes in version 0.99.3
 
 * `anno_enrich`: get rid of lazy loading
+* smoothing by locfit
 
 ==========================================
 
