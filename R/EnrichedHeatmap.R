@@ -338,6 +338,16 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 	yaxis = TRUE, ylim = NULL, value = c("mean", "sum"), yaxis_side = "right", 
 	yaxis_gp = gpar(fontsize = 8), show_error = FALSE) {
 
+	# in case of lazy loading
+	gp = gp
+	pos_line = pos_line
+	pos_line_gp = pos_line_gp
+	yaxis = yaxis
+	ylim = ylim
+	yaxis_side = yaxis_side
+	yaxis_gp = yaxis_gp
+	show_error = show_error
+
 	value = match.arg(value)[1]
 	function(index) {
 
