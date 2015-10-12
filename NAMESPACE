@@ -22,4 +22,5 @@ import(IRanges)
 import(ComplexHeatmap)
 importFrom("matrixStats", colSds)
 importFrom("stats", loess)
+import(locfit)
 

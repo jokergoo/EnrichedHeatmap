@@ -9,7 +9,8 @@ Constructor method for EnrichedHeatmap class
 \usage{
 EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
     pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = NULL,
-    axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, ...)
+    axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE,
+    show_row_dend = FALSE, ...)
 }
 \arguments{
 
@@ -22,6 +23,7 @@ EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
   \item{axis_name_gp}{graphic parameters for axis names}
   \item{border}{whether show border of the heatmap}
   \item{cluster_rows}{clustering on rows are turned off by default}
+  \item{show_row_dend}{whether show dendrograms on rows}
   \item{...}{pass to \code{\link[ComplexHeatmap]{Heatmap}}}
 
 }

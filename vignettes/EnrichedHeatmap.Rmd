@@ -198,12 +198,20 @@ So, according to above rules, if the genomic signals are from single base or ver
 setting `mean_mode` to `absolute` seems to be reasonable. For other case, `mean_mode` can be set to
 `weighted` or `w0`.
 
+The values for those windows which contain no CpG sites can be fitted by `locfit` method:
+
+```{r meth2, fig.width = 3}
+mat2 = normalizeToMatrix(meth, tss, value_column = "meth", mean_mode = "absolute",
+    extend = 5000, w = 50, empty_value = NA, smooth = TRUE)
+EnrichedHeatmap(mat2, name = "methylation", column_title = "methylation near TSS")
+```
+
 The target of the enrichment can not only be a single point but also can be regions with width larger than 1.
 Following heatmap visualizes the enrichment of low methylation on CpG islands:
 
 ```{r cgi, fig.width = 3}
 mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
-    extend = 5000, w = 50, empty_value = 0.5)
+    extend = 5000, w = 50, empty_value = NA, smooth = TRUE)
 EnrichedHeatmap(mat3, name = "methylation", column_title = "methylation near CGI")
 ```
 
@@ -215,7 +223,7 @@ they are splitted by percent to their full width (the percent value is calculate
 
 ```{r fat_cgi, fig.width = 3}
 mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
-    extend = 5000, w = 50, empty_value = 0.5, target_ratio = 0.3)
+    extend = 5000, w = 50, empty_value = NA, smooth = TRUE, target_ratio = 0.3)
 EnrichedHeatmap(mat3, name = "methylation", axis_name_rot = 90,
     column_title = "methylation near CGI")
 ```
@@ -280,7 +288,7 @@ correlated regions to the correct genes.
 
 ```{r neg_cr, fig.width = 3}
 mat4 = normalizeToMatrix(neg_cr, all_tss, mapping_column = "gene", w = 50, mean_mode = "w0")
-EnrichedHeatmap(mat4, col = c("white", "green"), name = "neg_cr",
+EnrichedHeatmap(mat4, col = c("white", "green"), name = "neg_cr", cluster_rows = TRUE,
     top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = "green"))), 
     top_annotation_height = unit(2, "cm"))
 ```
@@ -295,7 +303,7 @@ we can see there is a perfect fitting for the peaks of negative correlated regio
 
 ```{r neg_cr_with_tx, fig.width = 6}
 mat5 = normalizeToMatrix(tx, all_tss, mapping_column="gene", w = 50, mean_mode = "w0")
-ht_list = EnrichedHeatmap(mat4, col = c("white", "green"), name = "neg_cr",
+ht_list = EnrichedHeatmap(mat4, col = c("white", "green"), name = "neg_cr", cluster_rows = TRUE,
               top_annotation = HeatmapAnnotation(lines1 = anno_enriched(gp = gpar(col = "green"))), 
               top_annotation_height = unit(2, "cm")) +
           EnrichedHeatmap(mat5, col = c("white", "black"), name = "tx",
