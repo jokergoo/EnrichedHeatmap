@@ -19,9 +19,8 @@
 # -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
 #               is enforced to ``FALSE``.
 # -target_ratio  the ratio of width of ``target`` part compared to the full heatmap
-# -smooth whether apply smoothing on rows in the matrix. The smoothing is applied by `stats::loess`. Please
+# -smooth whether apply smoothing on rows in the matrix. The smoothing is applied by `locfit::locfit`. Please
 #         note the data range will change, you need to adjust values in the new matrix afterward.
-# -span degree of smoothing, pass to `stats::loess`.
 # -s `GenomicRanges::findOverlaps` sometimes uses a lot of memory. ``target`` is splitted into ``s`` parts and each
 #     part is processed serialized (note it will be slow!).
 # -trim percent of extreme values to remove, currently it is disabled.
@@ -71,7 +70,7 @@
 normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value_column = NULL, 
 	mapping_column = NULL, empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), 
 	include_target = any(width(target) > 1), target_ratio = 0.1, smooth = FALSE, 
-	span = 0.5, s = 1, trim = 0.01) {
+	s = 1, trim = 0.01) {
 
 	signal_name = as.character(substitute(signal))
 	target_name = as.character(substitute(target))
@@ -88,7 +87,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value
 		lt = lapply(seq_along(start_index), function(i) {
 			normalizeToMatrix(signal, target[ start_index[i]:end_index[i] ], extend = extend, w = w, value_column = value_column, mapping_column = mapping_column,
 				empty_value = empty_value, mean_mode = mean_mode, include_target = include_target,
-				target_ratio = target_ratio, smooth = smooth, span = span, trim = 0)
+				target_ratio = target_ratio, smooth = smooth, trim = 0)
 		})
 
 		upstream_index = attr(lt[[1]], "upstream_index")
@@ -171,9 +170,11 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value
 
   	mat = cbind(mat_upstream, mat_target, mat_downstream)
   	# apply smoothing on rows in mat
-	if(smooth) mat = t(apply(mat, 1, function(x) loess(x ~ seq_along(x), span = span)$fitted))
+	if(smooth) mat = t(apply(mat, 1, function(x) {
+		l = !is.na(x)
+		suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l], nn = 0.2)), seq_along(x)))
+	}))
 
-	
 	upstream_index = seq_len(ncol(mat_upstream))
 	target_index = seq_len(ncol(mat_target)) + ncol(mat_upstream)	
 	downstream_index = seq_len(ncol(mat_downstream)) + ncol(mat_upstream) + ncol(mat_target)

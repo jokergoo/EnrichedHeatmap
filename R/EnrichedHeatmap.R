@@ -72,6 +72,7 @@ enriched_score = function(x1, x2, x3) {
 # -axis_name_gp graphic parameters for axis names
 # -border whether show border of the heatmap
 # -cluster_rows clustering on rows are turned off by default
+# -show_row_dend whether show dendrograms on rows
 # -... pass to `ComplexHeatmap::Heatmap`
 #
 # == details
@@ -112,7 +113,8 @@ enriched_score = function(x1, x2, x3) {
 # # for more examples, please go to the vignette
 EnrichedHeatmap = function(mat, score_fun = enriched_score, pos_line = TRUE, 
 	pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = NULL, 
-	axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, ...) {
+	axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, 
+	show_row_dend = FALSE, ...) {
 
 	upstream_index = attr(mat, "upstream_index")
 	downstream_index = attr(mat, "downstream_index")
@@ -220,7 +222,7 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, pos_line = TRUE,
 
 	ht = Heatmap(mat, row_order = od, cluster_columns = FALSE, cluster_rows = cluster_rows,
 			show_row_names = FALSE, show_column_names = FALSE, bottom_annotation = NULL, 
-			column_title_side = "top", ...)
+			column_title_side = "top", show_row_dend = show_row_dend, ...)
 
 	# additional parameters specific for `EnrichedHeatmap` class
 	ht@heatmap_param$pos_line = pos_line
@@ -337,6 +339,16 @@ setMethod(f = "draw",
 anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
 	yaxis = TRUE, ylim = NULL, value = c("mean", "sum"), yaxis_side = "right", 
 	yaxis_gp = gpar(fontsize = 8), show_error = FALSE) {
+
+	# in case of lazy loading
+	gp = gp
+	pos_line = pos_line
+	pos_line_gp = pos_line_gp
+	yaxis = yaxis
+	ylim = ylim
+	yaxis_side = yaxis_side
+	yaxis_gp = yaxis_gp
+	show_error = show_error
 
 	value = match.arg(value)[1]
 	function(index) {
