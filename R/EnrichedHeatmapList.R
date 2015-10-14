@@ -194,7 +194,7 @@ setMethod(f = "draw",
         }
     }
 
-    object = selectMethod("draw", "HeatmapList")(object, padding = padding, newpage = newpage, ...)
+    object = selectMethod("draw", "HeatmapList")(object, padding = padding, newpage = FALSE, ...)
     changeClassName(object, "EnrichedHeatmapList")
 
     # add borders and pos lines
