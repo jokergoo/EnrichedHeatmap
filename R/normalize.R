@@ -542,3 +542,91 @@ copyAttr = function(x, y) {
 	return(y)
 }
 
+# == title
+# Get signals from a list
+#
+# == param
+# -lt a list of objects which are returned by `normalizeToMatrix`. Objects in the list should come from same settings.
+# -fun a self-defined function which summarize from the third dimension. If we assume the objects in the list correspond
+#        to different samples in a same subtype, then different regions in the targets are the first dimension, different positions
+#        upstream or downstream the targets are the second dimension, and different samples are the third dimension.
+#        This self-defined function can have one argument which is the vector containing values in different samples
+#        in a specific position to a specific target region. Or it can have a second argument which is the index for 
+#        the current target.
+#
+# == details
+# Let's assume you have a list of histone modification signals for different samples in a same subtype and you want
+# to visualize the mean pattern for this subtype. You can first normalize histone mark signal for each sample and then
+# calculate means values across all samples. In following example code, ``hm_gr_list`` is a list of ``GRanges`` objects
+# which contain positions of histone modifications, ``tss`` is a ``GRanges`` object containing positions of gene TSS.
+#
+#     mat_list = NULL
+#     for(i in seq_along(hm_gr_list)) {
+#         mat_list[[i]] = normalizeToMatrix(hm_gr_list[[i]], tss, value_column = "density")
+#     }
+#     mat = getSignalsFromList(mat_list)
+#     EnrichedHeatmap(mat)
+#
+# Next let's consider a second scenario: we want to see the correlation between histone modification and gene expression.
+# In this case, ``fun`` can have a second argument so that users can correspond histone signals to the expression of the
+# associated gene. In following code, ``expr`` is a matrix of expression, columns in ``expr`` are same as elements in ``hm_gr_list``,
+# rows in ``expr`` are same as ``tss``.
+# 
+#     mat = getSignalsFromList(mat_list, 
+#         fun = function(x, i) cor(x, expr[i, ], method = "spearman"))
+#     EnrichedHeatmap(mat)
+#
+#
+# == value
+# A `normalizeToMatrix` object which can be directly used for `EnrichedHeatmap`.
+# 
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# NULL
+getSignalsFromList = function(lt, fun = mean) {
+
+	if(!inherits(lt, "list")) {
+		stop("`lt` should be a list of objects which are returned by `normalizeToMatrix()`.")
+	}
+
+	if(!all(sapply(lt, inherits, "normalizeToMatrix"))) {
+		stop("`lt` should be a list of objects which are returned by `normalizeToMatrix()`.")
+	}
+
+	n = length(lt)
+	if(n > 1) {
+		for(i in seq_len(n-1)) {
+			attr1 = attr(lt[[i]], c("upstream_index", "target_index", "downstream_index", "extend"))
+			attr2 = attr(lt[[i+1]], c("upstream_index", "target_index", "downstream_index", "extend"))
+			if(!identical(attr1, attr2)) {
+				stop("Objects in `lt` should be from same settings.")
+			}
+		}
+	}
+
+	for(i in seq_len(n)) {
+		tm = lt[[i]]
+	    if(!exists("arr")) {
+	    	arr = array(dim = c(dim(tm), length(lt)))
+	    }
+	    arr[, , i] = tm
+	}
+
+	if(length(as.list(fun)) == 2) {
+		m = apply(arr[, , ,drop = FALSE], c(1, 2), fun)
+	} else if(length(as.list(fun)) == 3) {
+		m = matrix(nrow = nrow(lt[[1]]), ncol = ncol(lt[[1]]))
+		for(i in seq_len(nrow(m))) {
+			for(j in seq_len(ncol(m))) {
+				m[i, j] = fun(arr[i, j, ], i)
+			}
+		}
+	} else {
+		stop("`fun` can only have one or two arguments.")
+	}
+	m = copyAttr(m, lt[[1]])
+	return(m)
+}
+

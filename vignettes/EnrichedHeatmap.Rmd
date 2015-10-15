@@ -198,7 +198,7 @@ So, according to above rules, if the genomic signals are from single base or ver
 setting `mean_mode` to `absolute` seems to be reasonable. For other case, `mean_mode` can be set to
 `weighted` or `w0`.
 
-The values for those windows which contain no CpG sites can be fitted by `locfit` method:
+The values for those windows which contain no CpG sites can also be fitted by `locfit` method (set `smooth` to `TRUE`):
 
 ```{r meth2, fig.width = 3}
 mat2 = normalizeToMatrix(meth, tss, value_column = "meth", mean_mode = "absolute",
@@ -320,6 +320,7 @@ used directly for **EnrichedHeatmap**. As shown before, heatmaps can be split ei
 The order of rows can be retrieved by `row_order()`.
 
 ```{r, eval = FALSE}
+# code not run
 ht_list = draw(ht_list)
 row_order(ht_list)
 ```
@@ -329,6 +330,7 @@ you can use mouse to select this region by `select()` function, and it will give
 for the selected sub-region.
 
 ```{r, eval = FALSE}
+# code not run
 draw(ht_list)
 pos = select()
 ```
@@ -339,12 +341,14 @@ respectively, all advanced parameters in the latter two classes can be directly 
 E.g. to change graphic settings for the heatmap title:
 
 ```{r, eval = FALSE}
+# code not run
 EnrichedHeatmap(..., column_title_gp = ...)
 ```
 
 To change graphic settings for legends:
 
 ```{r, eval = FALSE}
+# code not run
 EnrichedHeatmap(..., heatmap_legend_param = ...)
 # or set is globally
 ht_global_opt(...)
@@ -355,6 +359,7 @@ ht_global_opt(RESET = TRUE)
 To set the width of the heatmaps if there are more than one heatmaps:
 
 ```{r, eval = FALSE}
+# code not run
 EnrichedHeatmap(..., width = unit(...)) + EnrichedHeatmap(...)
 ```
 
@@ -365,6 +370,34 @@ Some information is hidden because the data is not published yet, but still, you
 to correspond different sources of information.
 
 <p><img src='complex.png' /></p>
+
+## Summarize from a list of samples
+
+Let's assume you have a list of histone modification signals for different samples in a same subtype and you want
+to visualize the mean pattern for this subtype. You can first normalize histone mark signal for each sample and then
+calculate means values across all samples by `getSignalsFromList()`. In following example code, `hm_gr_list` is a list of `GRanges` objects
+which contain positions of histone modifications, `tss` is a `GRanges` object containing positions of gene TSS.
+
+```{r, eval = FALSE}
+# code not run
+mat_list = NULL
+for(i in seq_along(hm_gr_list)) {
+    mat_list[[i]] = normalizeToMatrix(hm_gr_list[[i]], tss, value_column = "density")
+}
+mat = getSignalsFromList(mat_list)
+EnrichedHeatmap(mat)
+```
+
+Next let's consider a second scenario: we want to see the correlation between histone modification and gene expression.
+In this case, `fun` can have a second argument so that users can correspond histone signals to the expression of the
+associated gene. In following code, `expr` is a matrix of expression, columns in `expr` are same as elements in `hm_gr_list`,
+rows in `expr` are same as `tss`.
+
+```{r, eval = FALSE}
+# code not run
+mat = getSignalsFromList(mat_list, fun = function(x, i) cor(x, expr[i, ], method = "spearman"))
+EnrichedHeatmap(mat)
+```
 
 ## Notice
 
