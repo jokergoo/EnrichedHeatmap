@@ -530,6 +530,22 @@ print.normalizeToMatrix = function(x, ...) {
 	cat("  ", nrow(x), " signal regions\n", sep = "")
 }
 
+# == title
+# copy attributes to another object
+#
+# == param
+# -x object 1
+# -y object 2
+#
+# == details
+# The `normalizeToMatrix` object actually is a matrix but with more additional attributes attached.
+# This function is used copy these new attributes when dealing with the matrix.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# NULL
 copyAttr = function(x, y) {
 	if(!identical(dim(x), dim(y))) {
 		stop("x and y should have same dimension.\n")
