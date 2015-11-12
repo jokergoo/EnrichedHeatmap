@@ -2,6 +2,7 @@ changes in version 1.1.1
 
 * add `getSignalsFromList()` which summarize signals from a list
   of matrix
+* export `copyAttr()`
 
 ==========================================
 
