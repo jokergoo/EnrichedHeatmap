@@ -384,12 +384,12 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 				colSds(mat[i, , drop = FALSE], na.rm = TRUE)
 			})
 			if(is.null(ylim)) {
-				ylim = range(c(y+y_sd, y-y_sd))
+				ylim = range(c(y+y_sd, y-y_sd), na.rm = TRUE)
 				ylim[2] = ylim[2] + (ylim[2] - ylim[1]) * 0.05
 			}
 		} else {
 			if(is.null(ylim)) {
-				ylim = range(y)
+				ylim = range(y, na.rm = TRUE)
 				ylim[2] = ylim[2] + (ylim[2] - ylim[1]) * 0.05
 
 			}
