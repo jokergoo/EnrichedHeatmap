@@ -12,7 +12,7 @@ getSignalsFromList(lt, fun = mean)
 \arguments{
 
   \item{lt}{a list of objects which are returned by \code{\link{normalizeToMatrix}}. Objects in the list should come from same settings.}
-  \item{fun}{a self-defined function which summarize from the third dimension. If we assume the objects in the list correspondto different samples in a same subtype, then different regions in the targets are the first dimension, different positionsupstream or downstream the targets are the second dimension, and different samples are the third dimension.This self-defined function can have one argument which is the vector containing values in different samplesin a specific position to a specific target region. Or it can have a second argument which is the index for the current target.}
+  \item{fun}{a self-defined function which summarize from the third dimension. If we assume the objects in the list correspond to different samples in a same subtype, then different regions in the targets are the first dimension, different positions upstream or downstream the targets are the second dimension, and different samples are the third dimension. This self-defined function can have one argument which is the vector containing values in different samples in a specific position to a specific target region. Or it can have a second argument which is the index for  the current target.}
 
 }
 \details{

@@ -10,23 +10,24 @@ Normalize associations between genomic signals and target regions into a matrix
 normalizeToMatrix(signal, target, extend = 5000, w = extend/50, value_column = NULL,
     mapping_column = NULL, empty_value = 0, mean_mode = c("absolute", "weighted", "w0"),
     include_target = any(width(target) > 1), target_ratio = 0.1, smooth = FALSE,
-    s = 1, trim = 0.01)
+    s = 1, trim = 0.01, ...)
 }
 \arguments{
 
   \item{signal}{a \code{\link[GenomicRanges]{GRanges}} object which is the genomic signals.}
   \item{target}{a \code{\link[GenomicRanges]{GRanges}} object.}
-  \item{extend}{extended base pairs to the upstream and downstream of \code{target}. It can be a vector of length one or two.If it is length one, it means extension to the upstream and downstream are the same.}
+  \item{extend}{extended base pairs to the upstream and downstream of \code{target}. It can be a vector of length one or two. If it is length one, it means extension to the upstream and downstream are the same.}
   \item{w}{window size for splitting upstream and downstream, and probably \code{target} itself.}
-  \item{value_column}{column index in \code{signal} that will be mapped to colors. If it is \code{NULL}, an internal columnwhich all contains 1 will be attached.}
-  \item{mapping_column}{mapping column to restrict overlapping between \code{signal} and \code{target}. By default it tries to look forall regions in \code{signal} that overlap with every target.}
+  \item{value_column}{column index in \code{signal} that will be mapped to colors. If it is \code{NULL}, an internal column which all contains 1 will be attached.}
+  \item{mapping_column}{mapping column to restrict overlapping between \code{signal} and \code{target}. By default it tries to look for all regions in \code{signal} that overlap with every target.}
   \item{empty_value}{values for small windows that don't overlap with \code{signal}. }
-  \item{mean_mode}{when a window is not perfectly overlapped to \code{signal}, how to correspond the values to this window. See 'Details' section for a detailed explanation.}
-  \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target}is enforced to \code{FALSE}.}
+  \item{mean_mode}{when a window is not perfectly overlapped to \code{signal}, how to correspond  the values to this window. See 'Details' section for a detailed explanation.}
+  \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target} is enforced to \code{FALSE}.}
   \item{target_ratio}{the ratio of width of \code{target} part compared to the full heatmap}
-  \item{smooth}{whether apply smoothing on rows in the matrix. The smoothing is applied by \code{\link[locfit]{locfit}}. Pleasenote the data range will change, you need to adjust values in the new matrix afterward.}
-  \item{s}{\code{\link[GenomicRanges]{findOverlaps}} sometimes uses a lot of memory. \code{target} is splitted into \code{s} parts and eachpart is processed serialized (note it will be slow!).}
+  \item{smooth}{whether apply smoothing on rows in the matrix. The smoothing is applied by \code{\link[locfit]{locfit}}. Please note the data range will change, you need to adjust values in the new matrix afterward.}
+  \item{s}{\code{\link[GenomicRanges]{findOverlaps}} sometimes uses a lot of memory. \code{target} is splitted into \code{s} parts and each part is processed serialized (note it will be slow!).}
   \item{trim}{percent of extreme values to remove, currently it is disabled.}
+  \item{...}{pass to \code{\link[locfit]{locfit}}}
 
 }
 \details{
