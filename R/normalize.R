@@ -87,7 +87,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value
 		lt = lapply(seq_along(start_index), function(i) {
 			normalizeToMatrix(signal, target[ start_index[i]:end_index[i] ], extend = extend, w = w, value_column = value_column, mapping_column = mapping_column,
 				empty_value = empty_value, mean_mode = mean_mode, include_target = include_target,
-				target_ratio = target_ratio, smooth = smooth, trim = 0, ...)
+				target_ratio = target_ratio, smooth = smooth, trim = 0)
 		})
 
 		upstream_index = attr(lt[[1]], "upstream_index")
@@ -174,7 +174,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value
 		l = !is.na(x)
 		oe = try(x <- suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l], nn = 0.2)), seq_along(x))))
 		if(inherits(oe, "try-error")) {
-			x = suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l])), seq_along(x)))
+			x = predict(loess(x[l] ~ seq_along(x)[l], control = loess.control(surface = "direct")), seq_along(x))
 		}
 		x
 	}))
