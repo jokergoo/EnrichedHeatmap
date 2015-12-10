@@ -174,7 +174,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value
 		l = !is.na(x)
 		oe = try(x <- suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l], nn = 0.2)), seq_along(x))))
 		if(inherits(oe, "try-error")) {
-			x = suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l])), seq_along(x)))
+			x = predict(loess(x[l] ~ seq_along(x)[l], control = loess.control(surface = "direct")), seq_along(x))
 		}
 		x
 	}))
