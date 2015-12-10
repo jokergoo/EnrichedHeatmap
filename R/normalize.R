@@ -172,7 +172,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value
   	# apply smoothing on rows in mat
 	if(smooth) mat = t(apply(mat, 1, function(x) {
 		l = !is.na(x)
-		oe = try(x <- suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l], nn = 0.2)), seq_along(x))))
+		oe = try(x <- suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l], nn = 0.2)), seq_along(x))), silent = TRUE)
 		if(inherits(oe, "try-error")) {
 			x = predict(loess(x[l] ~ seq_along(x)[l], control = loess.control(surface = "direct")), seq_along(x))
 		}
