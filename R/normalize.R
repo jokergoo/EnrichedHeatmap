@@ -24,7 +24,6 @@
 # -s `GenomicRanges::findOverlaps` sometimes uses a lot of memory. ``target`` is splitted into ``s`` parts and each
 #     part is processed serialized (note it will be slow!).
 # -trim percent of extreme values to remove, currently it is disabled.
-# -... pass to `locfit::locfit`
 #
 # == details
 # In order to visualize associations between ``signal`` and ``target``, the data is transformed into a matrix
@@ -71,7 +70,7 @@
 normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value_column = NULL, 
 	mapping_column = NULL, empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), 
 	include_target = any(width(target) > 1), target_ratio = 0.1, smooth = FALSE, 
-	s = 1, trim = 0.01, ...) {
+	s = 1, trim = 0.01) {
 
 	signal_name = as.character(substitute(signal))
 	target_name = as.character(substitute(target))
@@ -173,7 +172,11 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value
   	# apply smoothing on rows in mat
 	if(smooth) mat = t(apply(mat, 1, function(x) {
 		l = !is.na(x)
-		suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l], nn = 0.2), ...), seq_along(x)))
+		oe = try(x <- suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l], nn = 0.2)), seq_along(x))))
+		if(inherits(oe, "try-error")) {
+			x = suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l])), seq_along(x)))
+		}
+		x
 	}))
 
 	upstream_index = seq_len(ncol(mat_upstream))
