@@ -371,25 +371,25 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 
 		if(value == "sum") {
 			y = sapply(ht@row_order_list, function(i) {
-				colSums(mat[i, , drop = FALSE])
+				colSums(mat[i, , drop = FALSE], na.rm = TRUE)
 			})
 		} else {
 			y = sapply(ht@row_order_list, function(i) {
-				colMeans(mat[i, , drop = FALSE])
+				colMeans(mat[i, , drop = FALSE], na.rm = TRUE)
 			})
 		}
 
 		if(show_error) {
 			y_sd = sapply(ht@row_order_list, function(i) {
-				colSds(mat[i, , drop = FALSE])
+				colSds(mat[i, , drop = FALSE], na.rm = TRUE)
 			})
 			if(is.null(ylim)) {
-				ylim = range(c(y+y_sd, y-y_sd))
+				ylim = range(c(y+y_sd, y-y_sd), na.rm = TRUE)
 				ylim[2] = ylim[2] + (ylim[2] - ylim[1]) * 0.05
 			}
 		} else {
 			if(is.null(ylim)) {
-				ylim = range(y)
+				ylim = range(y, na.rm = TRUE)
 				ylim[2] = ylim[2] + (ylim[2] - ylim[1]) * 0.05
 
 			}

@@ -18,7 +18,7 @@ EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
   \item{score_fun}{a function which calculates enriched scores for rows in \code{mat}}
   \item{pos_line}{whether draw vertical lines which represent the position of \code{target}}
   \item{pos_line_gp}{graphic parameters for lines}
-  \item{axis_name}{names for axis which is below the heatmap. If the targets are single points, \code{axis_name} is a vectorof length three which corresponds to upstream, target itself and downstream. If thetargets are regions with width larger than 1, \code{axis_name} should be a vector of length four which corresponds to upstream, start of targets, end of targets and downstream.}
+  \item{axis_name}{names for axis which is below the heatmap. If the targets are single points, \code{axis_name} is a vector of length three which corresponds to upstream, target itself and downstream. If the targets are regions with width larger than 1, \code{axis_name} should be a vector of length four which  corresponds to upstream, start of targets, end of targets and downstream.}
   \item{axis_name_rot}{rotation for axis names}
   \item{axis_name_gp}{graphic parameters for axis names}
   \item{border}{whether show border of the heatmap}
@@ -32,7 +32,7 @@ EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
 set with pre-defined values:
 
 \describe{
-  \item{row_order}{the rows are sorted by the enriched score which is calcualted by \code{score_fun}.The sorting is applied decreasingly.}
+  \item{row_order}{the rows are sorted by the enriched score which is calcualted by \code{score_fun}. The sorting is applied decreasingly.}
   \item{cluster_columns}{enforced to be \code{FALSE}}
   \item{show_row_names}{enforced to be \code{FALSE}}
   \item{show_column_names}{enforced to be \code{FALSE}}
