@@ -62,6 +62,7 @@ enriched_score = function(x1, x2, x3) {
 # == param
 # -mat a matrix which is returned by `normalizeToMatrix`
 # -score_fun a function which calculates enriched scores for rows in ``mat``
+# -row_order row order. If it is specified, ``score_fun`` is ignored.
 # -pos_line whether draw vertical lines which represent the position of ``target``
 # -pos_line_gp graphic parameters for lines
 # -axis_name names for axis which is below the heatmap. If the targets are single points, ``axis_name`` is a vector
@@ -111,7 +112,7 @@ enriched_score = function(x1, x2, x3) {
 # EnrichedHeatmap(mat3, name = "methylation", column_title = "methylation near CGI")
 # EnrichedHeatmap(mat3, name = "meth1") + EnrichedHeatmap(mat3, name = "meth2")
 # # for more examples, please go to the vignette
-EnrichedHeatmap = function(mat, score_fun = enriched_score, pos_line = TRUE, 
+EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, pos_line = TRUE, 
 	pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = NULL, 
 	axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, 
 	show_row_dend = FALSE, ...) {
@@ -133,15 +134,19 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, pos_line = TRUE,
 	}
 
 	# in the arguments of this function, it cannot be set as `score_fun = score_fun`
-	score = apply(mat, 1, function(x) {
-			x1 = x[upstream_index]
-			x2 = x[target_index]
-			x3 = x[downstream_index]
-			
-			score_fun(x1, x2, x3)
-		})
+	if(is.null(row_order)) {
+		score = apply(mat, 1, function(x) {
+				x1 = x[upstream_index]
+				x2 = x[target_index]
+				x3 = x[downstream_index]
+				
+				score_fun(x1, x2, x3)
+			})
 
-	od = order(score, decreasing = TRUE)
+		od = order(score, decreasing = TRUE)
+	} else {
+		od = row_order
+	}
 
 	n1 = length(upstream_index)
 	n2 = length(target_index)
@@ -161,7 +166,6 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, pos_line = TRUE,
 	if(axis_name_rot > 90 && axis_name_rot < 270) axis_name_rot = (axis_name_rot + 180) %% 360
 
 	axis_fun = function() {
-		
 		grid.lines(c(0.5/n, (n-0.5)/n), c(1, 1))
 		if(n2) {
 			grid.segments(c(0.5/n, (n1-0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n), 

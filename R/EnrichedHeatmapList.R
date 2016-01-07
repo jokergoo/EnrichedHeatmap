@@ -160,7 +160,7 @@ setMethod(f = "draw",
     		# change the size of bottom_annotation
     		ht@layout$layout_column_names_bottom_height = max_axis_height
             ht@layout$layout_index = rbind(ht@layout$layout_index, c(6, 4))
-            ht@layout$graphic_fun_list = c(ht@layout$graphic_fun_list, function(object) ht@heatmap_param$axis_fun())
+            ht@layout$graphic_fun_list = c(ht@layout$graphic_fun_list, function(ht) ht@heatmap_param$axis_fun())
 
             object@ht_list[[i]] = ht
     	}
@@ -184,7 +184,7 @@ setMethod(f = "draw",
         for(i in Enriched_heatmap_index) {
             ht = object@ht_list[[i]]
             ht@layout$layout_index = rbind(ht@layout$layout_index, c(6, 4))
-            ht@layout$graphic_fun_list = c(ht@layout$graphic_fun_list, function(object) {
+            ht@layout$graphic_fun_list = c(ht@layout$graphic_fun_list, function(ht) {
                 pushViewport(viewport(name = paste0(ht@name, "_axis"), y = unit(1, "npc"), 
                     height = ht@heatmap_param$axis_height, just = "top"))
                 ht@heatmap_param$axis_fun()
