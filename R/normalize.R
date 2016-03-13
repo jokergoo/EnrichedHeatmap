@@ -19,10 +19,9 @@
 # -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
 #               is enforced to ``FALSE``.
 # -target_ratio  the ratio of width of ``target`` part compared to the full heatmap
+# -k number of windows only when ``target_ratio = 1`` or ``extend == 0`, otherwise ignored.
 # -smooth whether apply smoothing on rows in the matrix. The smoothing is applied by `locfit::locfit`. Please
 #         note the data range will change, you need to adjust values in the new matrix afterward.
-# -s `GenomicRanges::findOverlaps` sometimes uses a lot of memory. ``target`` is splitted into ``s`` parts and each
-#     part is processed serialized (note it will be slow!).
 # -trim percent of extreme values to remove, currently it is disabled.
 #
 # == details
@@ -67,117 +66,182 @@
 # normalizeToMatrix(signal, target, extend = 10, w = 2, include_target = TRUE)
 # normalizeToMatrix(signal, target, extend = 10, w = 2, value_column = "score")
 #
-normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value_column = NULL, 
-	mapping_column = NULL, empty_value = 0, mean_mode = c("absolute", "weighted", "w0"), 
-	include_target = any(width(target) > 1), target_ratio = 0.1, smooth = FALSE, 
-	s = 1, trim = 0.01) {
+normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, value_column = NULL, 
+	mapping_column = NULL, empty_value = ifelse(smooth, NA, 0), mean_mode = c("absolute", "weighted", "w0"), 
+	include_target = any(width(target) > 1), target_ratio = ifelse(all(extend == 0), 1, 0.1), 
+	k = min(20, round(min(width(target))/10)), smooth = FALSE, trim = 0.01) {
 
-	signal_name = as.character(substitute(signal))
-	target_name = as.character(substitute(target))
+	signal_name = deparse(substitute(signal))
+	target_name = deparse(substitute(target))
 
-	if(s > 1) {
-		n = length(target)
-		if(s > n) s = n
-		x = seq(1, n, by = s)
-		if(x < n) x = c(x, n)
-		start_index = x[-length(x)]
-		end_index = x[-1] - 1
-		end_index[length(end_index)] = x[length(x)]
-
-		lt = lapply(seq_along(start_index), function(i) {
-			normalizeToMatrix(signal, target[ start_index[i]:end_index[i] ], extend = extend, w = w, value_column = value_column, mapping_column = mapping_column,
-				empty_value = empty_value, mean_mode = mean_mode, include_target = include_target,
-				target_ratio = target_ratio, smooth = smooth, trim = 0)
-		})
-
-		upstream_index = attr(lt[[1]], "upstream_index")
-		target_index = attr(lt[[1]], "target_index")
-		downstream_index = attr(lt[[1]], "downstream_index")
-		extend = attr(lt[[1]], "extend")
-		smooth = attr(lt[[1]], "smooth")
-
-		mat = do.call("rbind", lt)
-
-		attr(mat, "upstream_index") = upstream_index
-		attr(mat, "target_index") = target_index
-		attr(mat, "downstream_index") = downstream_index
-		attr(mat, "extend") = extend
-		attr(mat, "smooth") = smooth
-		attr(mat, "signal_name") = signal_name
-		attr(mat, "target_name") = target_name
-
-		if(trim > 0) {
-	  		q1 = quantile(mat, trim/2, na.rm = TRUE)
-	  		q2 = quantile(mat, 1 - trim/2, na.rm = TRUE)
-	  		mat[mat <= q1] = q1
-	  		mat[mat >= q2] = q2
-	  	}
-	  	class(mat) = c("normalizeToMatrix", "matrix")
-		return(mat)
-		
+	if(abs(target_ratio - 1) < 1e-6 || abs(target_ratio) >= 1) {
+		if(!all(extend == 0)) warning("Rest `extend` 0 when `target_ratio` is larger than or euqal to 1.")
+		extend = c(0, 0)
+	} else if(all(extend == 0)) {
+		warning("Reset `target_ratio` to 1 when `extend` is 0.")
+		target_ratio = 1
 	}
+	if(abs(target_ratio) > 1) target_ratio = 1
 
-	if(all(width(target) == 1)) {
+	target_is_single_point = all(width(target) <= 1)
+
+	# if(s > 1) {
+	# 	n = length(target)
+	# 	if(s > n) s = n
+	# 	x = seq(1, n, by = s)
+	# 	if(x < n) x = c(x, n)
+	# 	start_index = x[-length(x)]
+	# 	end_index = x[-1] - 1
+	# 	end_index[length(end_index)] = x[length(x)]
+
+	# 	lt = lapply(seq_along(start_index), function(i) {
+	# 		normalizeToMatrix(signal, target[ start_index[i]:end_index[i] ], extend = extend, w = w, 
+	# 			value_column = value_column, mapping_column = mapping_column,
+	# 			empty_value = empty_value, mean_mode = mean_mode, include_target = include_target,
+	# 			target_ratio = target_ratio, smooth = smooth, s = 1, trim = 0)
+	# 	})
+
+	# 	upstream_index = attr(lt[[1]], "upstream_index")
+	# 	target_index = attr(lt[[1]], "target_index")
+	# 	downstream_index = attr(lt[[1]], "downstream_index")
+	# 	extend = attr(lt[[1]], "extend")
+	# 	smooth = attr(lt[[1]], "smooth")
+
+	# 	mat = do.call("rbind", lt)
+
+	# 	attr(mat, "upstream_index") = upstream_index
+	# 	attr(mat, "target_index") = target_index
+	# 	attr(mat, "downstream_index") = downstream_index
+	# 	attr(mat, "extend") = extend
+	# 	attr(mat, "smooth") = smooth
+	# 	attr(mat, "signal_name") = signal_name
+	# 	attr(mat, "target_name") = target_name
+	# 	attr(mat, "target_is_single_point") = target_is_single_point
+
+	# 	if(trim > 0) {
+	#   		q1 = quantile(mat, trim/2, na.rm = TRUE)
+	#   		q2 = quantile(mat, 1 - trim/2, na.rm = TRUE)
+	#   		mat[mat <= q1] = q1
+	#   		mat[mat >= q2] = q2
+	#   	}
+	#   	class(mat) = c("normalizedMatrix", "matrix")
+	# 	return(mat)
+	# }
+
+	if(target_is_single_point) {
+		if(include_target) {
+			warning("Width of `target` are all 1, `include_target` is set to `FALSE`.")
+		}
 		include_target = FALSE
 	}
   
-	if(any(extend %% w > 0)) {
-		stop("`extend` should be divisible by `w`.\n")
-	}
-  
 	if(length(extend) == 1) extend = c(extend, extend)
+	if(extend[1] > 0) {
+		if(extend[1] %% w > 0) {
+			warning("Length of upstream extension is not completely divisible by `w`.")
+			extend[1] = extend[1] - extend[1] %% w
+		}
+	}
+	if(extend[2] > 0) {
+		if(extend[2] %% w > 0) {
+			warning("Length of downstream extension is not completely divisible by `w`.")
+			extend[2] = extend[2] - extend[2] %% w
+		}
+	}
+
+	.seq = function(start, end, by = 1) {
+		if(end < start) {
+			return(integer(0))
+		} else {
+			seq(start, end, by = by)
+		}
+	}
   	
-  	if(all(width(target) <= 1)) {
+  	if(target_is_single_point) {
   		# do not need to separate upstream and downstream
+  		# and it makes the boundary between upstream and downstream smoothing
   		suppressWarnings(both <- promoters(target, upstream = extend[1], downstream = extend[2]))
 
-		mat_both = makeMatrix(signal, both, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
+		mat_both = makeMatrix(signal, both, w = w, value_column = value_column, mapping_column = mapping_column, 
+			empty_value = empty_value, mean_mode = mean_mode)
 		i = round(extend[1]/(extend[1] + extend[2]) * ncol(mat_both))  # assume
-		if(i < 2 | ncol(mat_both) - i < 2) {
-			stop("Maybe `w` is too large or one of `extend` is too small.")
-		}
-		mat_upstream = mat_both[, 1:i, drop = FALSE]
-		mat_downstream = mat_both[, (i+1):ncol(mat_both), drop = FALSE]
+		# if(i < 2 | ncol(mat_both) - i < 2) {
+		# 	stop("Maybe `w` is too large or one of `extend` is too small.")
+		# }
+		mat_upstream = mat_both[, .seq(1, i), drop = FALSE]
+		mat_downstream = mat_both[, .seq(i+1, ncol(mat_both)), drop = FALSE]
 	  
   	} else {
 		# extend and normalize in upstream 
-		suppressWarnings(upstream <- promoters(target, upstream = extend[1], downstream = 0))
-	  
-		mat_upstream = makeMatrix(signal, upstream, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
-	  
-		# extend and normalize in downstream
-		if(all(width(target) == 1) && !include_target) {
-			e = ifelse(strand(target) == "-", start(target), end(target))
+		if(extend[1] <= 0) {
+			mat_upstream = matrix(0, nrow = length(target), ncol = 0)
 		} else {
-			e = ifelse(strand(target) == "-", start(target) - 1, end(target) + 1)
+			suppressWarnings(upstream <- promoters(target, upstream = extend[1], downstream = 0))
+			mat_upstream = makeMatrix(signal, upstream, w = w, value_column = value_column, mapping_column = mapping_column, 
+				empty_value = empty_value, mean_mode = mean_mode)
 		}
+
+		# extend and normalize in downstream
+		e = ifelse(strand(target) == "-", start(target) - 1, end(target) + 1)
 		end_target = GRanges(seqnames = seqnames(target),
 	                         ranges = IRanges(start = e, end = e),
 	                         strand = strand(target))
-		suppressWarnings(downstream <- promoters(end_target, upstream = 0, downstream = extend[2]))
-		names(downstream) = names(target)
-	  
-		mat_downstream = makeMatrix(signal, downstream, w = w, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value,
-	                              mean_mode = mean_mode)
+		if(extend[2] <= 0) {
+			mat_downstream = matrix(0, nrow = length(target), ncol = 0)
+		} else {
+			suppressWarnings(downstream <- promoters(end_target, upstream = 0, downstream = extend[2]))
+			names(downstream) = names(target)
+		  
+			mat_downstream = makeMatrix(signal, downstream, w = w, value_column = value_column, mapping_column = mapping_column, 
+				empty_value = empty_value, mean_mode = mean_mode)
+		}
 	}
 
 	if(include_target) {
-		k = (ncol(mat_upstream) + ncol(mat_downstream)) * target_ratio/(1-target_ratio)
+		if(!all(extend == 0)) {
+			k = (ncol(mat_upstream) + ncol(mat_downstream)) * target_ratio/(1-target_ratio)
+		} 
 		mat_target = makeMatrix(signal, target, k = k, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
 	} else {
 		mat_target = matrix(0, nrow = length(target), ncol = 0)
 	}
 
   	mat = cbind(mat_upstream, mat_target, mat_downstream)
+
+  	max_v = max(mat, na.rm = TRUE)
+  	min_v = min(mat, na.rm = TRUE)
   	# apply smoothing on rows in mat
-	if(smooth) mat = t(apply(mat, 1, function(x) {
-		l = !is.na(x)
-		oe = try(x <- suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l], nn = 0.2)), seq_along(x))), silent = TRUE)
-		if(inherits(oe, "try-error")) {
-			x = predict(loess(x[l] ~ seq_along(x)[l], control = loess.control(surface = "direct")), seq_along(x))
+	if(smooth) {
+		i_row = 0
+		failed_rows = NULL
+		mat = t(apply(mat, 1, function(x) {
+			i_row <<- i_row + 1
+			l = !is.na(x)
+			if(sum(l) >= 2) {
+				oe = try(x <- suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l], nn = 0.2)), seq_along(x))), silent = TRUE)
+				if(inherits(oe, "try-error")) {
+					oe = try(x <-  suppressWarnings(predict(loess(x[l] ~ seq_along(x)[l], control = loess.control(surface = "direct")), seq_along(x))))
+
+					if(inherits(oe, "try-error")) {
+						failed_rows <<- c(failed_rows, i_row)
+					} else {
+						# cat(paste0("row ", i_row, " is smoothed by loess\n"))
+					}
+				} else {
+					# cat(paste0("row ", i_row, " is smoothed by locfit\n"))
+				}
+			} else {
+				failed_rows <<- c(failed_rows, i_row)
+			}
+			return(x)
+		}))
+
+		if(!is.null(failed_rows)) {
+			msg = paste(strwrap(paste0("Smoothig are failed for following rows because there are very few signals overlapped:\n", paste(failed_rows, collapse = ", "), "\n")), collapse = "\n")
+			msg = paste0(msg, "\n")
+			warning(msg)
 		}
-		x
-	}))
+	}
 
 	upstream_index = seq_len(ncol(mat_upstream))
 	target_index = seq_len(ncol(mat_target)) + ncol(mat_upstream)	
@@ -190,12 +254,22 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value
 	attr(mat, "smooth") = smooth
 	attr(mat, "signal_name") = signal_name
 	attr(mat, "target_name") = target_name
+	attr(mat, "target_is_single_point") = target_is_single_point
 
+	.paste0 = function(a, b) {
+		if(length(a) == 0 || length(b) == 0) {
+			return(NULL)
+		} else {
+			paste0(a, b)
+		}
+	}
+
+	# dimension names are mainly for debugging
   	rownames(mat) = names(target)
   	if(ncol(mat_target)) {
-  		colnames(mat) = c(paste0("u", seq_along(upstream_index)), paste0("t", seq_along(target_index)), paste0("d", seq_along(downstream_index)))
+  		colnames(mat) = c(.paste0("u", seq_along(upstream_index)), .paste0("t", seq_along(target_index)), .paste0("d", seq_along(downstream_index)))
   	} else {
-  		colnames(mat) = c(paste0("u", seq_along(upstream_index)), paste0("d", seq_along(downstream_index)))
+  		colnames(mat) = c(.paste0("u", seq_along(upstream_index)), .paste0("d", seq_along(downstream_index)))
   	}
 
   	if(trim > 0) {
@@ -204,7 +278,9 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = extend/50, value
   		mat[mat <= q1] = q1
   		mat[mat >= q2] = q2
   	}
-	class(mat) = c("normalizeToMatrix", "matrix")
+  	mat[mat <= min_v] = min_v
+  	mat[mat >= max_v] = max_v
+	class(mat) = c("normalizedMatrix", "matrix")
 	return(mat)
 }
 
@@ -242,16 +318,17 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 	m_gr = gr[ mtch[, 1] ]
 	m_target_windows = target_windows[ mtch[, 2] ]
 
+	# subset `m_gr` and `m_target_windows` based on `mapping_column`
 	if(!is.null(mapping_column)) {
 		
 		mapping = mcols(m_gr)[[mapping_column]]
 		if(is.numeric(mapping)) {
-			l = mapping == m_target_windows$.row
+			l = mapping == m_target_windows$.i_query
 		} else {
 			if(is.null(names(target))) {
 				stop("`mapping_column` in `gr` is mapped to the names of `target`, which means `target` should have names.")
 			} else {
-				l = mapping == names(target)[m_target_windows$.row]
+				l = mapping == names(target)[m_target_windows$.i_query]
 			}
 		}
 
@@ -260,6 +337,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 		mtch = mtch[l , , drop = FALSE]
 	}
 
+	# the value associated with `gr`
 	v = mcols(m_gr)[[value_column]]
   
 	mean_mode = match.arg(mean_mode)[1]
@@ -267,13 +345,13 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 	if(mean_mode == "w0") {
 		mintersect = pintersect(m_gr, m_target_windows)
 		p = width(mintersect)/width(m_target_windows)
-		x = tapply(p*v, mtch[, 2], sum)
+		x = tapply(p*v, mtch[, 2], sum, na.rm = TRUE)
 	} else if(mean_mode == "absolute") {
-		x = tapply(v, mtch[, 2], mean)
+		x = tapply(v, mtch[, 2], mean, na.rm = TRUE)
 	} else {
 		mintersect = pintersect(m_gr, m_target_windows)
 		w = width(mintersect)
-		x = tapply(w*v, mtch[, 2], sum) / tapply(w, mtch[, 2], sum)
+		x = tapply(w*v, mtch[, 2], sum, na.rm = TRUE) / tapply(w, mtch[, 2], sum, na.rm = TRUE)
 	}
   
 	v2 = rep(empty_value, length(target_windows))
@@ -282,7 +360,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 	target_windows$..value = v2
 
 	# transform into a matrix
-	tb = table(target_windows$.row)
+	tb = table(target_windows$.i_query)
 	target_strand = strand(target)
 	column_index = mapply(as.numeric(names(tb)), tb, FUN = function(i, n) {
 		if(as.vector(target_strand[i] == "-")) {
@@ -301,7 +379,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 	}
   
 	mat = matrix(empty_value, nrow = length(target), ncol = dim(column_index)[1])
-	mat[ target_windows$.row + (as.vector(column_index) - 1)* nrow(mat) ] = target_windows$..value
+	mat[ target_windows$.i_query + (as.vector(column_index) - 1)* nrow(mat) ] = target_windows$..value
 
 	# findOverlaps may use a lot of memory
 	rm(list = setdiff(ls(), "mat"))
@@ -314,7 +392,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 # Split regions into windows
 #
 # == param
-# -gr a `GenomicRanges::GRanges` object.
+# -query a `GenomicRanges::GRanges` object.
 # -w window size, a value larger than 1 means the number of base pairs and a value between 0 and 1
 #    is the percent to the current region.
 # -k number of partitions for each region. If it is set, all other arguments are ignored.
@@ -331,8 +409,8 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 #      aaabbbccc  direction = "reverse", short.keep = FALSE
 #     abbbcccddd  direction = "reverse", short.keep = TRUE
 #     
-# There is one additional column ``.row`` attached which contains the correspondance between small windows
-# and original regions in ``gr`` and one additional column ``.column`` which contains the index of the small window
+# There is one additional column ``.i_query`` attached which contains the correspondance between small windows
+# and original regions in ``query`` and one additional column ``.i_window`` which contains the index of the small window
 # on the current region.
 #
 # == value
@@ -342,22 +420,22 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 # Zuguang gu <z.gu@dkfz.de>
 #
 # == example
-# gr = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 11, 21), end = c(10, 20, 30)))
-# makeWindows(gr, w = 2)
-# makeWindows(gr, w = 0.2)
-# makeWindows(gr, w = 3)
-# makeWindows(gr, w = 3, direction = "reverse")
-# makeWindows(gr, w = 3, short.keep = TRUE)
-# makeWindows(gr, w = 3, direction = "reverse", short.keep = TRUE)
-# makeWindows(gr, w = 12)
-# makeWindows(gr, w = 12, short.keep = TRUE)
-# makeWindows(gr, k = 2)
-# makeWindows(gr, k = 3)
-# gr = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 11, 31), end = c(10, 30, 70)))
-# makeWindows(gr, w = 2)
-# makeWindows(gr, w = 0.2)
+# query = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 11, 21), end = c(10, 20, 30)))
+# makeWindows(query, w = 2)
+# makeWindows(query, w = 0.2)
+# makeWindows(query, w = 3)
+# makeWindows(query, w = 3, direction = "reverse")
+# makeWindows(query, w = 3, short.keep = TRUE)
+# makeWindows(query, w = 3, direction = "reverse", short.keep = TRUE)
+# makeWindows(query, w = 12)
+# makeWindows(query, w = 12, short.keep = TRUE)
+# makeWindows(query, k = 2)
+# makeWindows(query, k = 3)
+# query = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 11, 31), end = c(10, 30, 70)))
+# makeWindows(query, w = 2)
+# makeWindows(query, w = 0.2)
 #
-makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"), 
+makeWindows = function(query, w = NULL, k = NULL, direction = c("normal", "reverse"), 
 	short.keep = FALSE) {
 
 	direction = match.arg(direction)[1]
@@ -365,8 +443,8 @@ makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"
 	if(is.null(w) & is.null(k)) {
 		stop("You should define either `w` or `k`.")
 	}
-	ostart = start(gr)
-	oend = end(gr)
+	ostart = start(query)
+	oend = end(query)
   
 	if(!is.null(k)) {
 		pos = mapply(ostart, oend, FUN = function(s, e) {
@@ -445,17 +523,17 @@ makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"
 
 	start = unlist(pos[1, ])
 	end = unlist(pos[2, ])
-	orow = rep(seq_len(ncol(pos)), times = sapply(pos[1, ], length))
-	ncol = unlist(lapply(pos[1, ], seq_along))  # which window from left to right
-	chr = seqnames(gr)[orow]
-	strand = strand(gr)[orow]
+	i_query = rep(seq_len(ncol(pos)), times = sapply(pos[1, ], length))
+	i_window = unlist(lapply(pos[1, ], seq_along))  # which window from left to right
+	chr = seqnames(query)[i_query]
+	strand = strand(query)[i_query]
 
 	gr = GRanges(seqnames = chr,
 		         ranges = IRanges(start = start,
 		         	              end = end),
 		         strand = strand,
-		         .row = orow,
-		         .column = ncol)
+		         .i_query = i_query,
+		         .i_window = i_window)
 	return(gr)
 
 }
@@ -475,7 +553,7 @@ makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
-"[.normalizeToMatrix" = function(x, i, j, drop = FALSE) {
+"[.normalizedMatrix" = function(x, i, j, drop = FALSE) {
 	
 	attr = attributes(x)
 	attributes(x) = NULL
@@ -514,7 +592,8 @@ makeWindows = function(gr, w = NULL, k = NULL, direction = c("normal", "reverse"
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
-print.normalizeToMatrix = function(x, ...) {
+print.normalizedMatrix = function(x, ...) {
+
 	upstream_index = attr(x, "upstream_index")
 	target_index = attr(x, "target_index")
 	downstream_index = attr(x, "downstream_index")
@@ -522,16 +601,25 @@ print.normalizeToMatrix = function(x, ...) {
 	smooth = attr(x, "smooth")
 	signal_name = attr(x, "signal_name")
 	target_name = attr(x, "target_name")
+	target_is_single_point = attr(x, "target_is_single_point")
 
-	cat("Normalize ", signal_name, " to ", target_name, ":\n", sep = "")
-	cat("  Upstream ", extend[1], "bp\n", sep = "")
-	cat("  Downstream ", extend[2], "bp\n", sep = "")
+	op = qq.options(READ.ONLY = FALSE)
+    on.exit(qq.options(op))
+    qq.options(code.pattern = "@\\{CODE\\}")
+
+	qqcat("Normalize @{signal_name} to @{target_name}:\n")
+	qqcat("  Upstream @{extend[1]} bp (@{length(upstream_index)} window@{ifelse(length(upstream_index) > 1, 's', '')})\n")
+	qqcat("  Downstream @{extend[2]} bp (@{length(downstream_index)} window@{ifelse(length(upstream_index) > 1, 's', '')})\n")
 	if(length(target_index) == 0) {
-		cat("  Not show target regions\n", sep = "")
+		qqcat("  Not include target regions\n")
 	} else {
-		cat("  Show target regions.\n", sep = "")
+		if(target_is_single_point) {
+			qqcat("  Include target regions (width = 1)\n")
+		} else {
+			qqcat("  Include target regions (@{length(target_index)} window@{ifelse(length(target_index) > 1, 's', '')})\n")
+		}
 	}
-	cat("  ", nrow(x), " signal regions\n", sep = "")
+	qqcat("  @{nrow(x)} signal region@{ifelse(nrow(x) > 1, 's', '')}\n")
 }
 
 # == title
@@ -611,7 +699,7 @@ getSignalsFromList = function(lt, fun = mean) {
 		stop("`lt` should be a list of objects which are returned by `normalizeToMatrix()`.")
 	}
 
-	if(!all(sapply(lt, inherits, "normalizeToMatrix"))) {
+	if(!all(sapply(lt, inherits, "normalizedMatrix"))) {
 		stop("`lt` should be a list of objects which are returned by `normalizeToMatrix()`.")
 	}
 

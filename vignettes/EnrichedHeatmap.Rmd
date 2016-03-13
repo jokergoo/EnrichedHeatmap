@@ -401,10 +401,6 @@ EnrichedHeatmap(mat)
 
 ## Notice
 
-Due to `findOverlaps()` in **GenomicRanges** package, `normalizeToMatrix()` may use 
-a lot of memory if your `GRanges` object contains too many regions. `s` argument in `normalizeToMatrix()`
-can split the data into `s` parts but it will increase the running time a lot.
-
 If you generate the plot for the whole genome, I suggest you first save the figure as pdf format and then
 convert to png by [`convert`](http://www.imagemagick.org/script/convert.php) software, instead of directly saving as png format.
 

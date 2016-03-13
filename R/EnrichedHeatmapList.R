@@ -218,8 +218,16 @@ setMethod(f = "draw",
             }
             if(ht@heatmap_param$pos_line) {
                 decorate_heatmap_body(heatmap_name, {
-                    grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
-                    if(n2) grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
+                    if(n1 && n2 && n3) {
+                        grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
+                        grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
+                    } else if(n1 && !n2 && n3) {
+                        grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
+                    } else if(!n1 && n2 && n3) {
+                        grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
+                    } else if(n1 && n2 && !n3) {
+                        grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
+                    }
                 }, slice = k)
             }
         }
