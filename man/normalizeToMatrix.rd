@@ -7,10 +7,10 @@ Normalize associations between genomic signals and target regions into a matrix
 Normalize associations between genomic signals and target regions into a matrix
 }
 \usage{
-normalizeToMatrix(signal, target, extend = 5000, w = extend/50, value_column = NULL,
-    mapping_column = NULL, empty_value = 0, mean_mode = c("absolute", "weighted", "w0"),
-    include_target = any(width(target) > 1), target_ratio = 0.1, smooth = FALSE,
-    s = 1, trim = 0.01)
+normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50, value_column = NULL,
+    mapping_column = NULL, empty_value = ifelse(smooth, NA, 0), mean_mode = c("absolute", "weighted", "w0"),
+    include_target = any(width(target) > 1), target_ratio = ifelse(all(extend == 0), 1, 0.1),
+    k = min(20, round(min(width(target))/10)), smooth = FALSE, trim = 0.01)
 }
 \arguments{
 
@@ -24,8 +24,8 @@ normalizeToMatrix(signal, target, extend = 5000, w = extend/50, value_column = N
   \item{mean_mode}{when a window is not perfectly overlapped to \code{signal}, how to correspond  the values to this window. See 'Details' section for a detailed explanation.}
   \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target} is enforced to \code{FALSE}.}
   \item{target_ratio}{the ratio of width of \code{target} part compared to the full heatmap}
+  \item{k}{number of windows only when \code{target_ratio = 1} or \code{\link{}}extend == 0`, otherwise ignored.}
   \item{smooth}{whether apply smoothing on rows in the matrix. The smoothing is applied by \code{\link[locfit]{locfit}}. Please note the data range will change, you need to adjust values in the new matrix afterward.}
-  \item{s}{\code{\link[GenomicRanges]{findOverlaps}} sometimes uses a lot of memory. \code{target} is splitted into \code{s} parts and each part is processed serialized (note it will be slow!).}
   \item{trim}{percent of extreme values to remove, currently it is disabled.}
 
 }
