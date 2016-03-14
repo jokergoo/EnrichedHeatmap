@@ -23,18 +23,19 @@ makeWindows(query, w = NULL, k = NULL, direction = c("normal", "reverse"),
 Following illustrates the meaning of \code{direction} and \code{short.keep}:
 
   \preformatted{
-    ->--->--->  one region, split by 3bp window
+    ----->----  one region, split by 3bp window (">" means the direction of the sequence)
     aaabbbccc   direction = "normal",  short.keep = FALSE
     aaabbbcccd  direction = "normal",  short.keep = TRUE
      aaabbbccc  direction = "reverse", short.keep = FALSE
     abbbcccddd  direction = "reverse", short.keep = TRUE  }
-
-There is one additional column \code{.i_query} attached which contains the correspondance between small windows
-and original regions in \code{query} and one additional column \code{.i_window} which contains the index of the small window
-on the current region.
 }
 \value{
-A \code{\link[GenomicRanges]{GRanges}} object.
+A \code{\link[GenomicRanges]{GRanges}} object with two additional columns attached:
+
+\itemize{
+  \item \code{.i_query} which contains the correspondance between small windows and original regions in \code{query}
+  \item \code{.i_window} which contains the index of the small window on the current region.
+}
 }
 \author{
 Zuguang gu <z.gu@dkfz.de>

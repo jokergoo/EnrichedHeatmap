@@ -28,10 +28,10 @@ options(width = 100)
 ```
 
 Enriched heatmap is a special type of heatmap which visualizes the enrichment of genomic signals
-on specific target regions. It is broadly used to 
+to specific target regions. It is broadly used to 
 visualize e.g. how histone marks are enriched to transcription start sites.
 
-There are several tools that can make such heatmap (e.g. [ngs.plot](https://github.com/shenlab-sinai/ngsplot) or [deepTools](https://github.com/fidelram/deepTools)).
+There are several tools that can make such heatmap (e.g. [ngs.plot](https://github.com/shenlab-sinai/ngsplot), [deepTools](https://github.com/fidelram/deepTools)) or [ChIPseeker](https://bioconductor.org/packages/release/bioc/html/ChIPseeker.html).
 Here we implement Enriched heatmap by **ComplexHeatmap** package. Since this type of heatmap is just a
 normal heatmap but with some special settings, with the functionality of **ComplexHeatmap**, it would be much easier
 to customize the heatmap as well as concatenating to a list of heatmaps to show correspondance between different data sources.
@@ -39,6 +39,8 @@ to customize the heatmap as well as concatenating to a list of heatmaps to show 
 ```{r, echo = FALSE, message = FALSE}
 suppressPackageStartupMessages(library(EnrichedHeatmap))
 ```
+
+## Basic
 
 ```{r, eval = FALSE}
 library(EnrichedHeatmap)
@@ -60,20 +62,27 @@ The example data are all `GRanges` objects:
 - `meth`: methylation
 - `rpkm`: gene expression
 
-In order to build the vignette fast, the data only include chromosome 21.
+In order to build the vignette fast, the data only include chromosome 21. Also we downsampled 100000 CpG
+sites for methylation data.
 
-## Single heatmap for histone marks
+We will first visualize how H3K4me3 histone mark is enriched around TSS.
+First we extract TSS of genes:
 
-Heatmap for the enrichment of H3K4me3 histone mark on TSS:
-
-```{r h3k4me3, fig.width = 3}
+```{r, fig.width = 3}
 tss = promoters(genes, upstream = 0, downstream = 1)
 tss[1:5]
 H3K4me3[1:5]
+```
+
+Similar as other tools, the task of visualization are separated into two steps:
+
+1. get association between genomic signals and targets by normalizing to a matrix.
+2. visualize the matrix by heatmap.
+
+```{r}
 mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
     extend = 5000, mean_mode = "w0", w = 50)
 mat1
-EnrichedHeatmap(mat1, name = "H3K4me3")
 ```
 
 `normalizeToMatrix()` converts the association between genomic signals (`H3K4me3`) and targets(`tss`) in to a matrix. 
@@ -82,52 +91,62 @@ into a list of small windows (the width of the windows is controlled by `w`), th
 the value for every small window which is the mean value of genomic signals that intersects with the window (the value
 corresponds to genomic signals are controlled by `value_column` and how to calcualte the mean value is controlled by `mean_mode`).
 
-There are several modes for `mean_mode` according to different types of genomic signals. It will be explained in latter sections. 
+There are several modes for `mean_mode` according to different types of genomic signals. It will be explained in later sections. 
 
-`EnrichedHeatmap()` returns a `EnrichedHeatmap` class instance which is inherited from `Heatmap` class,
-so parameters and methods for `Heatmap` class can be directly applied to `EnrichedHeatmap` class.
+With `mat1`, we can visualize it as a heatmap:
 
-There is a special column annotation function `anno_enriched()` which shows mean values of columns in 
-the normalized matrix.
-
-```{r anno, fig.width = 3}
-EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3",
-    top_annotation = HeatmapAnnotation(lines = anno_enriched()), 
-    top_annotation_height = unit(2, "cm"))
+```{r, fig.width = 3}
+EnrichedHeatmap(mat1, name = "H3K4me3")
 ```
 
-Rows can be smoothed by setting `smooth` to `TRUE` when generating the matrix. 
-But since data range will change after smoothing,
-you need to manually adjust the color mapping if you want to make figures comparable.
+`EnrichedHeatmap()` returns an `EnrichedHeatmap` class instance which is inherited from `Heatmap` class,
+so parameters and methods for `Heatmap` class can be directly applied to `EnrichedHeatmap` class.
 
-In following example, we use `colorRamp2()` from **circlize** package to define
-a color mapping function.
+### Colors
 
-```{r smooth, fig.width = 3}
+Similar as the normal heatmap, colors are controlled by a vector or a color mapping function.
+
+```{r, fig.width = 3}
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3")
 library(circlize)
-mat1_smoothed = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
-    extend = 5000, mean_mode = "w0", w = 50, smooth = TRUE)
-# note we set the color range same as the unsmoothed matrix
-EnrichedHeatmap(mat1_smoothed, col = colorRamp2(range(mat1), c("white", "red")), 
+EnrichedHeatmap(mat1, col = colorRamp2(quantile(mat1, seq(0, 0.95, length = 10)), cm.colors(10)), 
     name = "H3K4me3")
 ```
 
-Since `EnrichedHeatmap` class is inherited from `Heatmap` class, it is easy to customize
-the heatmap, e.g. split rows, make clustering on rows, add titles, ...
+### Split on rows
 
-Split rows by a vector or a data frame:
+Split rows by a vector or a data frame.
 
-```{r split, fig.width = 3}
+```{r, fig.width = 3}
 EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", 
     split = sample(c("A", "B"), length(genes), replace = TRUE),
     column_title = "Enrichment of H3K4me3") 
 ```
 
-Split rows by k-means clustering:
+Split rows by k-means clustering.
 
-```{r kmeans, fig.width = 4}
+```{r, fig.width = 4}
 EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3,
     column_title = "Enrichment of H3K4me3", row_title_rot = 0)
+```
+
+### Cluster on rows
+
+Cluster on rows. By default `show_row_dend` is turned off, so you don't need to specify it here.
+
+```{r, fig.width = 3}
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", 
+    cluster_rows = TRUE, column_title = "Enrichment of H3K4me3")     
+```
+
+### Column annotation
+
+There is a special column annotation function anno_enriched() which shows mean values of columns (i.e. mean signals) in the normalized matrix.
+
+```{r, fig.width = 3}
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3",
+    top_annotation = HeatmapAnnotation(lines = anno_enriched()), 
+    top_annotation_height = unit(2, "cm"))
 ```
 
 Split rows and add column annotation as well:
@@ -140,76 +159,116 @@ EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3",
     km = 3, row_title_rot = 0)
 ```
 
-Cluster on rows:
+### Smoothing
 
-```{r, cluster, fig.width = 3}
-EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", 
-    cluster_rows = TRUE, show_row_dend = FALSE, column_title = "Enrichment of H3K4me3")     
+Rows can be smoothed by setting `smooth` to `TRUE` when generating the matrix. 
+Later we will demonstrate smoothing can also help to impute `NA` values.
+
+```{r smooth, fig.width = 3}
+mat1_smoothed = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
+    extend = 5000, mean_mode = "w0", w = 50, empty_value = 0, smooth = TRUE)
+EnrichedHeatmap(mat1_smoothed, col = colorRamp2(range(mat1), c("white", "red")), 
+    name = "H3K4me3")
 ```
 
-Some graphic settings specific for the `EnrichedHeatmap` object:
-
-```{r aixs, fig.width = 3}
-EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", 
-    pos_line_gp = gpar(col = "blue", lwd = 2), axis_name = c("-5kb", "TSS", "5kb"), 
-    axis_name_rot = -45, border = FALSE)
-```
+### Extensions to target regions
 
 Extension to upstream and downstream can be controled by `extend` either by a single value
 or a vector of length 2.
 
-```{r extend, fig.width = 3}
+```{r, fig.width = 3}
 # upstream 1kb, downstream 2kb
 mat12 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
     extend = c(1000, 2000), mean_mode = "w0", w = 50)
 EnrichedHeatmap(mat12, name = "H3K4me3", col = c("white", "red"))
 ```
 
-## Single heatmap for methylation
+Either upstream or downstream can be set to 0.
+
+```{r, fig.width = 3}
+mat12 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
+    extend = c(0, 2000), mean_mode = "w0", w = 50)
+EnrichedHeatmap(mat12, name = "H3K4me3", col = c("white", "red"))
+mat12 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
+    extend = c(1000, 0), mean_mode = "w0", w = 50)
+EnrichedHeatmap(mat12, name = "H3K4me3", col = c("white", "red"))
+```
+
+### Other graphic settings
+
+By default there is an axis on the bottom border of the heatmap. There are several
+arguments which can be used to customize:
+
+```{r, fig.width = 3}
+EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", 
+    pos_line_gp = gpar(col = "blue", lwd = 2), axis_name = c("-5kb", "TSS", "5kb"), 
+    axis_name_rot = -45, border = FALSE)
+```
+
+Second, we will look at how CpG methylation are enriched around gene TSS and CpG Islands (CGIs),
 
 Following heatmap visualizes the enrichment of low methylated regions on TSS:
 
-```{r meth, fig.width = 3}
+```{r, fig.width = 3}
 meth[1:5]
 mat2 = normalizeToMatrix(meth, tss, value_column = "meth", mean_mode = "absolute",
-    extend = 5000, w = 50, empty_value = 0.5)
+    extend = 5000, w = 50, empty_value = NA)
 EnrichedHeatmap(mat2, name = "methylation", column_title = "methylation near TSS")
 ```
 
-With window size set to 50bp, it can be possible that there is no CpG site in some of 
-the windows. In this case, `empty_value` is used to fill such windows. Since high methylation
-and low methylation are the major methylation types in the genome, we set the empty value to 0.5.
+### Mean mode
 
-Here we set `mean_mode` to `absolute`. Following illustrates different settings for ``mean_mode``:
+Upstream and downstream also with the target body are segmented into a list of small windows and overlap
+to signal regions. Since signal regions and small windows do not always 100 percent overlap, 
+to summarize values in small windows, there are three different average modes:
+ 
+Following illustrates different settings for `mean_mode`:
 
-```
-        4      5      2     values in signal
+       4      5      2     values in signal
      ++++++   +++   +++++   signal
        ================     window (16bp)
-        4      3     3      overlap
+         4     3     3      overlap
 
-  value for this window:
      absolute: (4 + 5 + 2)/3
      weighted: (4*4 + 5*3 + 2*3)/(4 + 3 + 3)
      w0:       (4*4 + 5*3 + 2*3)/16
-```
 
-So, according to above rules, if the genomic signals are from single base or very small regions, 
-setting `mean_mode` to `absolute` seems to be reasonable. For other case, `mean_mode` can be set to
-`weighted` or `w0`.
+Let's consider two scenarios. 
 
-The values for those windows which contain no CpG sites can also be fitted by `locfit` method (set `smooth` to `TRUE`):
+First, we want to calculate mean methylation from 3 CpG sites in a 20bp window. Since methylation
+is only measured at CpG site level, the mean value should only be calculated from the 3 CpG sites while not the non-CpG sites. In this
+case, `absolute` mode should be used here.
 
-```{r meth2, fig.width = 3}
+Second, we want to calculate mean coverage in a 20bp window. Let's assume coverage is 5 in 1bp ~ 5bp, 10 in 11bp ~ 15bp and 20 in 16bp ~ 20bp.
+Since converage is kind of attribute for all bases, all 20 bp should be taken in account. Thus, here `weighted` mode should be used
+which also takes account of the 0 coverage in 6bp ~ 10bp. The mean coverage will be caculated as `(5*5 + 10*5 + 20*5)/(5+5+5+5)`.
+
+### Smoothing improves visualization on methylation profiles
+
+When overlapping CpG positions to segmented target regions, it is possible that there is no CpG in some windows. 
+The values for these windows which contain no CpG sites can be imputed by smoothing.
+
+```{r, fig.width = 3}
 mat2 = normalizeToMatrix(meth, tss, value_column = "meth", mean_mode = "absolute",
     extend = 5000, w = 50, empty_value = NA, smooth = TRUE)
 EnrichedHeatmap(mat2, name = "methylation", column_title = "methylation near TSS")
 ```
 
+By default, `locfit()` is first applied to each row in the original matrix. If it is failed, `loess()` smoothing
+is applied afterwards. If both smoothing methods are failed, the original value is kept.
+
+Users can provides their own smoothing function by `smooth_fun` argument. This self-defined function accepts a numeric
+vector (may contains `NA` values) and returns a vector with same length. If the smoothing is failed, the function
+should call `stop()` to throw errors so that `normalizeToMatrix()` can catch how many rows are failed in smoothing. 
+Take a look at the source code of `default_smooth_fun()` to get an example.
+
+### Targets are regions
+
+In the example of H3K4me3, the target regions are single points. 
 The target of the enrichment can not only be a single point but also can be regions with width larger than 1.
 Following heatmap visualizes the enrichment of low methylation on CpG islands:
 
-```{r cgi, fig.width = 3}
+```{r, fig.width = 3}
 mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
     extend = 5000, w = 50, empty_value = NA, smooth = TRUE)
 EnrichedHeatmap(mat3, name = "methylation", column_title = "methylation near CGI")
@@ -221,24 +280,51 @@ the width of the complete heatmap.
 Target regions are also splitted into small windows, but since width of the target regions are different from each other, 
 they are splitted by percent to their full width (the percent value is calculated automatically).
 
-```{r fat_cgi, fig.width = 3}
+```{r, fig.width = 3}
 mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
     extend = 5000, w = 50, empty_value = NA, smooth = TRUE, target_ratio = 0.3)
 EnrichedHeatmap(mat3, name = "methylation", axis_name_rot = 90,
     column_title = "methylation near CGI")
 ```
 
+When genomic targets are regions, upstream and/or downstream can be excluded in the heatmap.
+
+```{r extension, fig.width = 3}
+mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
+    extend = c(0, 5000), w = 50, empty_value = NA, smooth = TRUE, target_ratio = 0.5)
+EnrichedHeatmap(mat3, name = "methylation", axis_name_rot = 90,
+    column_title = "methylation near CGI")
+mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
+    extend = c(5000, 0), w = 50, empty_value = NA, smooth = TRUE, target_ratio = 0.5)
+EnrichedHeatmap(mat3, name = "methylation", axis_name_rot = 90,
+    column_title = "methylation near CGI")
+mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
+    extend = 0, w = 50, empty_value = NA, smooth = TRUE, target_ratio = 1)
+EnrichedHeatmap(mat3, name = "methylation", axis_name_rot = 90,
+    column_title = "methylation near CGI")
+```
+
+You may notice there are warnings when executing above code, that is because there are very few signals overlapped to some rows,
+which means there are too many `NA` to do the smoothing. Corresponding index for failed rows can be get by :
+
+```{r}
+attr(mat3, "failed_rows")
+```
 
 ## Multiple heatmaps
 
-Thanks to the functionality of **ComplexHeatmap** package, heatmaps can be concatenated
+The power of **EnrichedHeatmap** package is that parallel heatmaps can be concatenated,
+both for enriched heatmap and normal heatmap (as well the normal row annotations), which
+provides a very efficient way to visualize multiple sources of information.
+
+With the functionality of **ComplexHeatmap** package, heatmaps can be concatenated
 by `+` operator. `EnrichedHeatmap` objects and `Heatmap` objects can be mixed.
 
 Following heatmaps visualizes correspondance between H3K4me3 mark, methylation and
 gene expression. It is quite straightforward to see high expression correlates
 with low methylation and high promoter activity around TSS.
 
-```{r list, fig.width = 6}
+```{r, fig.width = 6}
 EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", width = 1) + 
 EnrichedHeatmap(mat2, name = "methylation", width = 1) +
 Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
@@ -247,32 +333,35 @@ Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)",
 
 Of course you can split rows by splitting the main heatmap:
 
-```{r list_split, fig.width = 7}
-EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3, width = 1,
-    top_annotation = HeatmapAnnotation(lines = anno_enriched()), 
-    top_annotation_height = unit(2, "cm"), row_title_rot = 0,
-    column_title = "H3K4me3") + 
-EnrichedHeatmap(mat2, name = "methylation", width = 1,
-    column_title = "Methylation") +
-Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
-    show_row_names = FALSE, width = unit(5, "mm"))
+```{r, fig.width = 7, fig.height = 8}
+ht_list = EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3, width = 1,
+              top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
+              top_annotation_height = unit(2, "cm"), row_title_rot = 0,
+              column_title = "H3K4me3") + 
+          EnrichedHeatmap(mat2, name = "methylation", width = 1,
+              top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
+              top_annotation_height = unit(2, "cm"),
+              column_title = "Methylation") +
+          Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
+              show_row_names = FALSE, width = unit(5, "mm"))
+draw(ht_list, gap = unit(c(10, 2), "mm"))
 ```
-
 
 ## Restrict overlapping by providing mapping
 
 By default every genomic signal tries to intersect to every target region, but if mapping is
-provided, only those genomic signals that are mapped to the corresponding target region will be kept.
+provided, only those genomic signals that are mapped to the corresponding target region will be overlapped.
 
 To illustrate it more clearly, we load the example data. 
 `gene` column in `neg_cr` is used to map to the names of `all_tss`.
+In following example, `neg_cr` is the signal and `all_tss` is the target.
 
 ```{r}
-load(paste0(system.file("/extdata/neg_cr.RData", package = "EnrichedHeatmap")))
+load(paste0(system.file("extdata", "neg_cr.RData", package = "EnrichedHeatmap")))
 all_tss = promoters(all_genes, upstream = 0, downstream = 1)
 all_tss = all_tss[unique(neg_cr$gene)]
-neg_cr
-all_tss
+neg_cr[1:2]
+all_tss[1:2]
 ```
 
 In this example, `neg_cr` contains regions that show negative correlation between methylation
@@ -283,10 +372,11 @@ and expression for the genes. The negative correlated regions are detected as:
     and find correlated regions by looking at the correlation between methylation in the window and expression for the gene.
 
 Since genes may be close to each other, it is possible that one corrlated region for gene A
-overlaps with gene B. This is not what we want and by specifying the mapping, we can correspond 
+overlaps with gene B, and this is not what we want. By specifying the mapping, we can correspond 
 correlated regions to the correct genes.
 
-```{r neg_cr, fig.width = 3}
+```{r, fig.width = 3}
+# map `neg_cr` to the `gene` column in `all_tss`
 mat4 = normalizeToMatrix(neg_cr, all_tss, mapping_column = "gene", w = 50, mean_mode = "w0")
 EnrichedHeatmap(mat4, col = c("white", "green"), name = "neg_cr", cluster_rows = TRUE,
     top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = "green"))), 
@@ -301,8 +391,8 @@ Next we add another heatmap showing how transcripts are distributed to gene TSS.
 is not a nice way for showing transcripts, but according to the annotation graphs on the both top, 
 we can see there is a perfect fitting for the peaks of negative correlated regions and transcripts.
 
-```{r neg_cr_with_tx, fig.width = 6}
-mat5 = normalizeToMatrix(tx, all_tss, mapping_column="gene", w = 50, mean_mode = "w0")
+```{r, fig.width = 6}
+mat5 = normalizeToMatrix(tx, all_tss, mapping_column="gene", extend = c(5000, 10000), w = 50, mean_mode = "w0")
 ht_list = EnrichedHeatmap(mat4, col = c("white", "green"), name = "neg_cr", cluster_rows = TRUE,
               top_annotation = HeatmapAnnotation(lines1 = anno_enriched(gp = gpar(col = "green"))), 
               top_annotation_height = unit(2, "cm")) +
@@ -326,13 +416,13 @@ row_order(ht_list)
 ```
 
 If you are interested in a small cluster, under the interactive mode,
-you can use mouse to select this region by `select()` function, and it will give you the order of rows
+you can use mouse to select this region by `selectArea()` function, and it will give you the index of rows
 for the selected sub-region.
 
 ```{r, eval = FALSE}
 # code not run
 draw(ht_list)
-pos = select()
+pos = selectArea()
 ```
 
 Since `EnrichedHeatmap` and `EnrichedHeamtapList` class are inherited from `Heamtap` and `HeamtapList` class
@@ -403,6 +493,27 @@ EnrichedHeatmap(mat)
 
 If you generate the plot for the whole genome, I suggest you first save the figure as pdf format and then
 convert to png by [`convert`](http://www.imagemagick.org/script/convert.php) software, instead of directly saving as png format.
+
+If you meet following error when do smoothing in `normalizeToMatrix()`:
+
+```
+Error: segfault from C stack overflow
+```
+
+You can either:
+
+1. remove target regions for which there are few signals overlapped to them;
+2. change to another `smooth_fun()` or change parameters in `locfit()`.
+
+For solution 1, you can first calculate the matrix without smoothing and calculate
+the percent of `NA` values in each row. Rows having high `NA` values can be removed.
+
+```{r, eval = FALSE}
+# code not run
+mat = normalizeToMatrix(..., smooth = FALSE)
+# the percent of NA values in each row
+apply(mat, 1, function(x) sum(is.na(x)/length(x)))
+```
 
 ## Session info
 

@@ -1,3 +1,4 @@
+export(default_smooth_fun)
 export(EnrichedHeatmapList)
 export(enriched_score)
 export(print.normalizedMatrix)
@@ -26,4 +27,5 @@ importFrom("matrixStats", colSds)
 importFrom("stats", loess)
 import(locfit)
 importFrom("GetoptLong", qqcat)
+importFrom("GetoptLong", qq.options)
 

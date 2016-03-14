@@ -4,32 +4,35 @@
 # Normalize associations between genomic signals and target regions into a matrix
 #
 # == param
-# -signal a `GenomicRanges::GRanges` object which is the genomic signals.
+# -signal a `GenomicRanges::GRanges` object.
 # -target a `GenomicRanges::GRanges` object.
 # -extend extended base pairs to the upstream and downstream of ``target``. It can be a vector of length one or two.
 #         If it is length one, it means extension to the upstream and downstream are the same.
-# -w window size for splitting upstream and downstream, and probably ``target`` itself.
+# -w window size for splitting upstream and downstream.
 # -value_column column index in ``signal`` that will be mapped to colors. If it is ``NULL``, an internal column
-#         which all contains 1 will be attached.
+#         which all contains 1 will be used.
 # -mapping_column mapping column to restrict overlapping between ``signal`` and ``target``. By default it tries to look for
 #           all regions in ``signal`` that overlap with every target.
 # -empty_value values for small windows that don't overlap with ``signal``. 
-# -mean_mode when a window is not perfectly overlapped to ``signal``, how to correspond 
-#       the values to this window. See 'Details' section for a detailed explanation.
+# -mean_mode when a window is not perfectly overlapped to ``signal``, how to summarize 
+#        values to this window. See 'Details' section for a detailed explanation.
 # -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
 #               is enforced to ``FALSE``.
-# -target_ratio  the ratio of width of ``target`` part compared to the full heatmap
-# -k number of windows only when ``target_ratio = 1`` or ``extend == 0`, otherwise ignored.
-# -smooth whether apply smoothing on rows in the matrix. The smoothing is applied by `locfit::locfit`. Please
-#         note the data range will change, you need to adjust values in the new matrix afterward.
-# -trim percent of extreme values to remove, currently it is disabled.
+# -target_ratio  the ratio of width of ``target`` part compared to the full heatmap. If the value is 1, ``extend`` will be reset to 0.
+# -k number of windows only when ``target_ratio = 1`` or ``extend == 0``, otherwise ignored.
+# -smooth whether apply smoothing on rows in the matrix. 
+# -smooth_fun the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric
+#    vector (may contains ``NA`` values) and returns a vector with same length. If the smoothing is failed, the function
+#    should call `base::stop` to throw errors so that `normalizeToMatrix` can catch how many rows are failed in smoothing. 
+#    See the default `default_smooth_fun` for example.
+# -trim percent of extreme values to remove.
 #
 # == details
 # In order to visualize associations between ``signal`` and ``target``, the data is transformed into a matrix
-# and visualized as a heatmap afterward.
+# and visualized as a heatmap by `EnrichedHeatmap` afterward.
 #
 # Upstream and downstream also with the target body are splitted into a list of small windows and overlap
-# to ``signal``. Since regions in ``signal`` and small windows do not always 100 percent overlap, averaging should be applied.
+# to ``signal``. Since regions in ``signal`` and small windows do not always 100 percent overlap, there are three different average modes:
 # 
 # Following illustrates different settings for ``mean_mode``:
 #
@@ -42,6 +45,16 @@
 #     weighted: (4*4 + 5*3 + 2*3)/(4 + 3 + 3)
 #     w0:       (4*4 + 5*3 + 2*3)/16
 #
+# Let's consider two scenarios. 
+#
+# First, we want to calculate mean methylation from 3 CpG sites in a 20bp window. Since methylation
+# is only measured at CpG site level, the mean value should only be calculated from the 3 CpG sites while not the non-CpG sites. In this
+# case, ``absolute`` mode should be used here.
+#
+# Second, we want to calculate mean coverage in a 20bp window. Let's assume coverage is 5 in 1bp ~ 5bp, 10 in 11bp ~ 15bp and 20 in 16bp ~ 20bp.
+# Since converage is kind of attribute for all bases, all 20 bp should be taken in account. Thus, here ``weighted`` mode should be used
+# which also takes account of the 0 coverage in 6bp ~ 10bp. The mean coverage will be caculated as ``(5*5 + 10*5 + 20*5)/(5+5+5+5)``.
+#
 # == value
 # A matrix with following additional attributes:
 #
@@ -50,6 +63,7 @@
 # -downstream_index column index corresponding to downstream of ``target``
 # -extend extension on upstream and downstream
 # -smooth whether smoothing was applied on the matrix
+# -failed_rows index of rows which are failed for smoothing
 #
 # The matrix is wrapped into a simple ``normalizeToMatrix`` class.
 #
@@ -69,13 +83,13 @@
 normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, value_column = NULL, 
 	mapping_column = NULL, empty_value = ifelse(smooth, NA, 0), mean_mode = c("absolute", "weighted", "w0"), 
 	include_target = any(width(target) > 1), target_ratio = ifelse(all(extend == 0), 1, 0.1), 
-	k = min(20, round(min(width(target))/10)), smooth = FALSE, trim = 0.01) {
+	k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun, trim = 0.01) {
 
 	signal_name = deparse(substitute(signal))
 	target_name = deparse(substitute(target))
 
 	if(abs(target_ratio - 1) < 1e-6 || abs(target_ratio) >= 1) {
-		if(!all(extend == 0)) warning("Rest `extend` 0 when `target_ratio` is larger than or euqal to 1.")
+		if(!all(extend == 0)) warning("Rest `extend` to 0 when `target_ratio` is larger than or euqal to 1.")
 		extend = c(0, 0)
 	} else if(all(extend == 0)) {
 		warning("Reset `target_ratio` to 1 when `extend` is 0.")
@@ -199,7 +213,8 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, 
 
 	if(include_target) {
 		if(!all(extend == 0)) {
-			k = (ncol(mat_upstream) + ncol(mat_downstream)) * target_ratio/(1-target_ratio)
+			k = round((ncol(mat_upstream) + ncol(mat_downstream)) * target_ratio/(1-target_ratio))
+			if(k < 1) k = 1
 		} 
 		mat_target = makeMatrix(signal, target, k = k, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
 	} else {
@@ -211,38 +226,33 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, 
   	max_v = max(mat, na.rm = TRUE)
   	min_v = min(mat, na.rm = TRUE)
   	# apply smoothing on rows in mat
+  	failed_rows = NULL
+  	
 	if(smooth) {
 		i_row = 0
-		failed_rows = NULL
+		ow = options("warn")[[1]]
 		mat = t(apply(mat, 1, function(x) {
 			i_row <<- i_row + 1
-			l = !is.na(x)
-			if(sum(l) >= 2) {
-				oe = try(x <- suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l], nn = 0.2)), seq_along(x))), silent = TRUE)
-				if(inherits(oe, "try-error")) {
-					oe = try(x <-  suppressWarnings(predict(loess(x[l] ~ seq_along(x)[l], control = loess.control(surface = "direct")), seq_along(x))))
 
-					if(inherits(oe, "try-error")) {
-						failed_rows <<- c(failed_rows, i_row)
-					} else {
-						# cat(paste0("row ", i_row, " is smoothed by loess\n"))
-					}
-				} else {
-					# cat(paste0("row ", i_row, " is smoothed by locfit\n"))
-				}
-			} else {
+			oe = try(x <- suppressWarnings(smooth_fun(x)), silent = TRUE)
+			if(inherits(oe, "try-error")) {
 				failed_rows <<- c(failed_rows, i_row)
 			}
 			return(x)
 		}))
-
+		options(warn = ow)
+		
 		if(!is.null(failed_rows)) {
-			msg = paste(strwrap(paste0("Smoothig are failed for following rows because there are very few signals overlapped:\n", paste(failed_rows, collapse = ", "), "\n")), collapse = "\n")
-			msg = paste0(msg, "\n")
+			if(length(failed_rows) == 1) {
+				msg = paste(strwrap(paste0("Smoothig is failed for one row because there are very few signals overlapped to it. Please use `attr(mat, 'failed_rows')` to get the index of the failed row and consider to remove it.\n")), collapse = "\n")
+			} else {
+				msg = paste(strwrap(paste0("Smoothig are failed for ", length(failed_rows), " rows because there are very few signals overlapped to them. Please use `attr(mat, 'failed_rows')` to get the index of failed rows and consider to remove them.\n")), collapse = "\n")
+			}
+			msg = paste0("\n", msg, "\n")
 			warning(msg)
 		}
 	}
-
+	
 	upstream_index = seq_len(ncol(mat_upstream))
 	target_index = seq_len(ncol(mat_target)) + ncol(mat_upstream)	
 	downstream_index = seq_len(ncol(mat_downstream)) + ncol(mat_upstream) + ncol(mat_target)
@@ -255,6 +265,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, 
 	attr(mat, "signal_name") = signal_name
 	attr(mat, "target_name") = target_name
 	attr(mat, "target_is_single_point") = target_is_single_point
+	attr(mat, "failed_rows") = failed_rows
 
 	.paste0 = function(a, b) {
 		if(length(a) == 0 || length(b) == 0) {
@@ -368,8 +379,9 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 		} else {
 			seq_len(n)
 		}
-	})
-  
+	}, SIMPLIFY = FALSE)
+	column_index = do.call("cbind", column_index)
+
 	# is column_index has the same length for all regions in target?
 	# if extension of upstream are the same or split body into k pieces,
 	# then all column index has the same length
@@ -403,18 +415,18 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 # == details
 # Following illustrates the meaning of ``direction`` and ``short.keep``:
 #
-#     ->--->--->  one region, split by 3bp window
+#     ----->----  one region, split by 3bp window (">" means the direction of the sequence)
 #     aaabbbccc   direction = "normal",  short.keep = FALSE
 #     aaabbbcccd  direction = "normal",  short.keep = TRUE
 #      aaabbbccc  direction = "reverse", short.keep = FALSE
 #     abbbcccddd  direction = "reverse", short.keep = TRUE
 #     
-# There is one additional column ``.i_query`` attached which contains the correspondance between small windows
-# and original regions in ``query`` and one additional column ``.i_window`` which contains the index of the small window
-# on the current region.
 #
 # == value
-# A `GenomicRanges::GRanges` object.
+# A `GenomicRanges::GRanges` object with two additional columns attached:
+# 
+# - ``.i_query`` which contains the correspondance between small windows and original regions in ``query``
+# - ``.i_window`` which contains the index of the small window on the current region.
 #
 # == author
 # Zuguang gu <z.gu@dkfz.de>
@@ -548,7 +560,7 @@ makeWindows = function(query, w = NULL, k = NULL, direction = c("normal", "rever
 # -drop whether drop the dimension
 #
 # == value
-# A ``normalizeToMatrix`` class object.
+# A ``normalizedMatrix`` class object.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -693,7 +705,7 @@ copyAttr = function(x, y) {
 #
 # == example
 # NULL
-getSignalsFromList = function(lt, fun = mean) {
+getSignalsFromList = function(lt, fun = function(x) mean(x, na.rm = TRUE)) {
 
 	if(!inherits(lt, "list")) {
 		stop("`lt` should be a list of objects which are returned by `normalizeToMatrix()`.")
@@ -709,7 +721,7 @@ getSignalsFromList = function(lt, fun = mean) {
 			attr1 = attr(lt[[i]], c("upstream_index", "target_index", "downstream_index", "extend"))
 			attr2 = attr(lt[[i+1]], c("upstream_index", "target_index", "downstream_index", "extend"))
 			if(!identical(attr1, attr2)) {
-				stop("Objects in `lt` should be from same settings.")
+				stop("Objects in `lt` should have same settings.")
 			}
 		}
 	}
@@ -721,6 +733,16 @@ getSignalsFromList = function(lt, fun = mean) {
 	    }
 	    arr[, , i] = tm
 	}
+
+	if(identical(fun, mean)) {
+		fun = function(x) mean(x, na.rm = TRUE)
+	} else if(identical(fun, median)) {
+		fun = function(x) median(x, na.rm = TRUE)
+	} else if(identical(fun, max)) {
+		fun = function(x) max(x, na.rm = TRUE)
+	} else if(identical(fun, min)) {
+		fun = function(x) min(x, na.rm = TRUE)
+	} 
 
 	if(length(as.list(fun)) == 2) {
 		m = apply(arr[, , ,drop = FALSE], c(1, 2), fun)
@@ -738,3 +760,36 @@ getSignalsFromList = function(lt, fun = mean) {
 	return(m)
 }
 
+# == title
+# Default smooth function
+#
+# == param
+# -x input numeric vector
+#
+# == details
+# `locfit::locfit` is first tried on the vector. If there is error, `stats::loess` smoothing is tried afterwards.
+# If both smoothing are failed, there will be an error.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+default_smooth_fun = function(x) {
+	l = !is.na(x)
+	if(sum(l) >= 2) {
+		oe1 = try(x <- suppressWarnings(predict(locfit(x[l] ~ lp(seq_along(x)[l], nn = 0.1, h = 0.8)), seq_along(x))), silent = TRUE)
+		if(inherits(oe1, "try-error")) {
+			oe2 = try(x <-  suppressWarnings(predict(loess(x[l] ~ seq_along(x)[l], control = loess.control(surface = "direct")), seq_along(x))))
+
+			if(inherits(oe2, "try-error")) {
+				stop("error when doing locfit or loess smoothing")
+			} else {
+				return(x)
+			}
+		} else {
+			return(x)
+		}
+	} else {
+		stop("Too few data points.")
+	}
+	return(x)
+}

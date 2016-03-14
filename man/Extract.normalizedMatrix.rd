@@ -18,7 +18,7 @@ Subset normalized matrix by rows
 
 }
 \value{
-A \code{normalizeToMatrix} class object.
+A \code{normalizedMatrix} class object.
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>
@@ -26,4 +26,5 @@ Zuguang Gu <z.gu@dkfz.de>
 \examples{
 # There is no example
 NULL
+
 }

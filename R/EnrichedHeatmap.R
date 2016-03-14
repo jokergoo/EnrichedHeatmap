@@ -7,8 +7,8 @@
 # `ComplexHeatmap::HeatmapList-class` and the class is inherited from `ComplexHeatmap::Heatmap-class`.
 # 
 # The `EnrichedHeatmap-class` pre-defines some parameters for `ComplexHeatmap::Heatmap-class` such as
-# the order of rows and supressing column clustering. Also there are several
-# new parameters that are attached in the object.
+# the order of rows and suppressing column clustering. Also there are several
+# new parameters that are attached to the object.
 #
 # == methods
 # The `EnrichedHeatmap-class` provides following methods:

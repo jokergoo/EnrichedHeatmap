@@ -3,6 +3,7 @@ library(ComplexHeatmap)
 library(GenomicFeatures)
 library(GenomicRanges)
 library(locfit)
+library(GetoptLong)
 
 load(paste0(system.file("extdata", "chr21_test_data.RData", package = "EnrichedHeatmap")))
 

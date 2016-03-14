@@ -7,7 +7,7 @@ Get signals from a list
 Get signals from a list
 }
 \usage{
-getSignalsFromList(lt, fun = mean)
+getSignalsFromList(lt, fun = function(x) mean(x, na.rm = TRUE))
 }
 \arguments{
 

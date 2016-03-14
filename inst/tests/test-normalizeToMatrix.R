@@ -10,10 +10,10 @@ normalizeToMatrix(signal, target, extend = 10, w = 2, value_column = "score")
 
 normalizeToMatrix(signal, target, extend = 10, w = 2, target_ratio = 0.5)
 normalizeToMatrix(signal, target, extend = 10, w = 2, target_ratio = 1)
-normalizeToMatrix(signal, target, extend = 10, w = 2, extend = c(5, 5))
-normalizeToMatrix(signal, target, extend = 10, w = 2, extend = c(0, 5))
-normalizeToMatrix(signal, target, extend = 10, w = 2, extend = c(5, 0))
-normalizeToMatrix(signal, target, extend = 10, w = 2, extend = c(0, 0))
+normalizeToMatrix(signal, target, w = 2, extend = c(5, 5))
+normalizeToMatrix(signal, target, w = 2, extend = c(0, 5))
+normalizeToMatrix(signal, target, w = 2, extend = c(5, 0))
+normalizeToMatrix(signal, target, w = 2, extend = c(0, 0))
 
 
 
