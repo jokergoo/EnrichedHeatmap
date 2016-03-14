@@ -38,17 +38,20 @@ mat2 = normalizeToMatrix(meth, tss, value_column = "meth", mean_mode = "absolute
 ```
 
 ```{r}
-EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3, width = 1,
-    top_annotation = HeatmapAnnotation(lines = anno_enriched()), 
-    top_annotation_height = unit(2, "cm"), row_title_rot = 0,
-    column_title = "H3K4me3") + 
-EnrichedHeatmap(mat2, name = "methylation", width = 1,
-    column_title = "Methylation") +
-Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
-    show_row_names = FALSE, width = unit(5, "mm"))
+ht_list = EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3, width = 1,
+              top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
+              top_annotation_height = unit(2, "cm"), row_title_rot = 0,
+              column_title = "H3K4me3") + 
+          EnrichedHeatmap(mat2, name = "methylation", width = 1,
+              top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
+              top_annotation_height = unit(2, "cm"),
+              column_title = "Methylation") +
+          Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
+              show_row_names = FALSE, width = unit(5, "mm"))
+draw(ht_list, gap = unit(c(10, 2), "mm"))
 ```
 
-![image](https://cloud.githubusercontent.com/assets/449218/13722072/57b0083c-e839-11e5-96a3-451b2caa9355.png)
+![image](https://cloud.githubusercontent.com/assets/449218/13746903/e64abcc8-e9f5-11e5-9744-69ea8ee29f2f.png)
 
 Actually you can generate rather complex heatmaps:
 
