@@ -1,5 +1,5 @@
-\name{print.normalizeToMatrix}
-\alias{print.normalizeToMatrix}
+\name{print.normalizedMatrix}
+\alias{print.normalizedMatrix}
 \title{
 Print normalized matrix
 }
@@ -7,7 +7,7 @@ Print normalized matrix
 Print normalized matrix
 }
 \usage{
-\method{print}{normalizeToMatrix}(x, ...)
+\method{print}{normalizedMatrix}(x, ...)
 }
 \arguments{
 

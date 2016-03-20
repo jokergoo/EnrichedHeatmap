@@ -1,5 +1,5 @@
-\name{[.normalizeToMatrix}
-\alias{[.normalizeToMatrix}
+\name{[.normalizedMatrix}
+\alias{[.normalizedMatrix}
 \title{
 Subset normalized matrix by rows
 }
@@ -7,7 +7,7 @@ Subset normalized matrix by rows
 Subset normalized matrix by rows
 }
 \usage{
-\method{[}{normalizeToMatrix}(x, i, j, drop = FALSE)
+\method{[}{normalizedMatrix}(x, i, j, drop = FALSE)
 }
 \arguments{
 
@@ -18,7 +18,7 @@ Subset normalized matrix by rows
 
 }
 \value{
-A \code{normalizeToMatrix} class object.
+A \code{normalizedMatrix} class object.
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>

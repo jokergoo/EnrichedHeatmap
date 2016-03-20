@@ -7,7 +7,7 @@ Constructor method for EnrichedHeatmap class
 Constructor method for EnrichedHeatmap class
 }
 \usage{
-EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
+EnrichedHeatmap(mat, score_fun = enriched_score, row_order = NULL, pos_line = TRUE,
     pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = NULL,
     axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE,
     show_row_dend = FALSE, ...)
@@ -16,6 +16,7 @@ EnrichedHeatmap(mat, score_fun = enriched_score, pos_line = TRUE,
 
   \item{mat}{a matrix which is returned by \code{\link{normalizeToMatrix}}}
   \item{score_fun}{a function which calculates enriched scores for rows in \code{mat}}
+  \item{row_order}{row order. If it is specified, \code{score_fun} is ignored.}
   \item{pos_line}{whether draw vertical lines which represent the position of \code{target}}
   \item{pos_line_gp}{graphic parameters for lines}
   \item{axis_name}{names for axis which is below the heatmap. If the targets are single points, \code{axis_name} is a vector of length three which corresponds to upstream, target itself and downstream. If the targets are regions with width larger than 1, \code{axis_name} should be a vector of length four which  corresponds to upstream, start of targets, end of targets and downstream.}
