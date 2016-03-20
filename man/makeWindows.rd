@@ -7,12 +7,12 @@ Split regions into windows
 Split regions into windows
 }
 \usage{
-makeWindows(gr, w = NULL, k = NULL, direction = c("normal", "reverse"),
+makeWindows(query, w = NULL, k = NULL, direction = c("normal", "reverse"),
     short.keep = FALSE)
 }
 \arguments{
 
-  \item{gr}{a \code{\link[GenomicRanges]{GRanges}} object.}
+  \item{query}{a \code{\link[GenomicRanges]{GRanges}} object.}
   \item{w}{window size, a value larger than 1 means the number of base pairs and a value between 0 and 1 is the percent to the current region.}
   \item{k}{number of partitions for each region. If it is set, all other arguments are ignored.}
   \item{direction}{where to start the splitting. See 'Details' section.}
@@ -23,35 +23,36 @@ makeWindows(gr, w = NULL, k = NULL, direction = c("normal", "reverse"),
 Following illustrates the meaning of \code{direction} and \code{short.keep}:
 
   \preformatted{
-    ->--->--->  one region, split by 3bp window
+    ----->----  one region, split by 3bp window (">" means the direction of the sequence)
     aaabbbccc   direction = "normal",  short.keep = FALSE
     aaabbbcccd  direction = "normal",  short.keep = TRUE
      aaabbbccc  direction = "reverse", short.keep = FALSE
     abbbcccddd  direction = "reverse", short.keep = TRUE  }
-
-There is one additional column \code{.row} attached which contains the correspondance between small windows
-and original regions in \code{gr} and one additional column \code{.column} which contains the index of the small window
-on the current region.
 }
 \value{
-A \code{\link[GenomicRanges]{GRanges}} object.
+A \code{\link[GenomicRanges]{GRanges}} object with two additional columns attached:
+
+\itemize{
+  \item \code{.i_query} which contains the correspondance between small windows and original regions in \code{query}
+  \item \code{.i_window} which contains the index of the small window on the current region.
+}
 }
 \author{
 Zuguang gu <z.gu@dkfz.de>
 }
 \examples{
-gr = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 11, 21), end = c(10, 20, 30)))
-makeWindows(gr, w = 2)
-makeWindows(gr, w = 0.2)
-makeWindows(gr, w = 3)
-makeWindows(gr, w = 3, direction = "reverse")
-makeWindows(gr, w = 3, short.keep = TRUE)
-makeWindows(gr, w = 3, direction = "reverse", short.keep = TRUE)
-makeWindows(gr, w = 12)
-makeWindows(gr, w = 12, short.keep = TRUE)
-makeWindows(gr, k = 2)
-makeWindows(gr, k = 3)
-gr = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 11, 31), end = c(10, 30, 70)))
-makeWindows(gr, w = 2)
-makeWindows(gr, w = 0.2)
+query = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 11, 21), end = c(10, 20, 30)))
+makeWindows(query, w = 2)
+makeWindows(query, w = 0.2)
+makeWindows(query, w = 3)
+makeWindows(query, w = 3, direction = "reverse")
+makeWindows(query, w = 3, short.keep = TRUE)
+makeWindows(query, w = 3, direction = "reverse", short.keep = TRUE)
+makeWindows(query, w = 12)
+makeWindows(query, w = 12, short.keep = TRUE)
+makeWindows(query, k = 2)
+makeWindows(query, k = 3)
+query = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 11, 31), end = c(10, 30, 70)))
+makeWindows(query, w = 2)
+makeWindows(query, w = 0.2)
 }

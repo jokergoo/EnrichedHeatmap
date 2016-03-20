@@ -17,7 +17,12 @@ bioc_packages:
 r_github_packages:
 - jokergoo/circlize
 - jokergoo/ComplexHeatmap
+- jimhester/covr
 
 bioc_required: true
 
 r_check_args: --no-build-vignettes --no-vignettes
+
+after_success:
+  - Rscript -e 'library(covr);codecov()'
+  

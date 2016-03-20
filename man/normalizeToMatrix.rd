@@ -7,34 +7,35 @@ Normalize associations between genomic signals and target regions into a matrix
 Normalize associations between genomic signals and target regions into a matrix
 }
 \usage{
-normalizeToMatrix(signal, target, extend = 5000, w = extend/50, value_column = NULL,
-    mapping_column = NULL, empty_value = 0, mean_mode = c("absolute", "weighted", "w0"),
-    include_target = any(width(target) > 1), target_ratio = 0.1, smooth = FALSE,
-    s = 1, trim = 0.01)
+normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50, value_column = NULL,
+    mapping_column = NULL, empty_value = ifelse(smooth, NA, 0), mean_mode = c("absolute", "weighted", "w0"),
+    include_target = any(width(target) > 1), target_ratio = ifelse(all(extend == 0), 1, 0.1),
+    k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun, trim = 0.01)
 }
 \arguments{
 
-  \item{signal}{a \code{\link[GenomicRanges]{GRanges}} object which is the genomic signals.}
+  \item{signal}{a \code{\link[GenomicRanges]{GRanges}} object.}
   \item{target}{a \code{\link[GenomicRanges]{GRanges}} object.}
   \item{extend}{extended base pairs to the upstream and downstream of \code{target}. It can be a vector of length one or two. If it is length one, it means extension to the upstream and downstream are the same.}
-  \item{w}{window size for splitting upstream and downstream, and probably \code{target} itself.}
-  \item{value_column}{column index in \code{signal} that will be mapped to colors. If it is \code{NULL}, an internal column which all contains 1 will be attached.}
+  \item{w}{window size for splitting upstream and downstream.}
+  \item{value_column}{column index in \code{signal} that will be mapped to colors. If it is \code{NULL}, an internal column which all contains 1 will be used.}
   \item{mapping_column}{mapping column to restrict overlapping between \code{signal} and \code{target}. By default it tries to look for all regions in \code{signal} that overlap with every target.}
   \item{empty_value}{values for small windows that don't overlap with \code{signal}. }
-  \item{mean_mode}{when a window is not perfectly overlapped to \code{signal}, how to correspond  the values to this window. See 'Details' section for a detailed explanation.}
+  \item{mean_mode}{when a window is not perfectly overlapped to \code{signal}, how to summarize  values to this window. See 'Details' section for a detailed explanation.}
   \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target} is enforced to \code{FALSE}.}
-  \item{target_ratio}{the ratio of width of \code{target} part compared to the full heatmap}
-  \item{smooth}{whether apply smoothing on rows in the matrix. The smoothing is applied by \code{\link[locfit]{locfit}}. Please note the data range will change, you need to adjust values in the new matrix afterward.}
-  \item{s}{\code{\link[GenomicRanges]{findOverlaps}} sometimes uses a lot of memory. \code{target} is splitted into \code{s} parts and each part is processed serialized (note it will be slow!).}
-  \item{trim}{percent of extreme values to remove, currently it is disabled.}
+  \item{target_ratio}{the ratio of width of \code{target} part compared to the full heatmap. If the value is 1, \code{extend} will be reset to 0.}
+  \item{k}{number of windows only when \code{target_ratio = 1} or \code{extend == 0}, otherwise ignored.}
+  \item{smooth}{whether apply smoothing on rows in the matrix. }
+  \item{smooth_fun}{the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric vector (may contains \code{NA} values) and returns a vector with same length. If the smoothing is failed, the function should call \code{\link[base]{stop}} to throw errors so that \code{\link{normalizeToMatrix}} can catch how many rows are failed in smoothing.  See the default \code{\link{default_smooth_fun}} for example.}
+  \item{trim}{percent of extreme values to remove.}
 
 }
 \details{
 In order to visualize associations between \code{signal} and \code{target}, the data is transformed into a matrix
-and visualized as a heatmap afterward.
+and visualized as a heatmap by \code{\link{EnrichedHeatmap}} afterward.
 
 Upstream and downstream also with the target body are splitted into a list of small windows and overlap
-to \code{signal}. Since regions in \code{signal} and small windows do not always 100 percent overlap, averaging should be applied.
+to \code{signal}. Since regions in \code{signal} and small windows do not always 100 percent overlap, there are three different average modes:
 
 Following illustrates different settings for \code{mean_mode}:
 
@@ -47,6 +48,16 @@ Following illustrates different settings for \code{mean_mode}:
     absolute: (4 + 5 + 2)/3
     weighted: (4*4 + 5*3 + 2*3)/(4 + 3 + 3)
     w0:       (4*4 + 5*3 + 2*3)/16  }
+
+Let's consider two scenarios.
+
+First, we want to calculate mean methylation from 3 CpG sites in a 20bp window. Since methylation
+is only measured at CpG site level, the mean value should only be calculated from the 3 CpG sites while not the non-CpG sites. In this
+case, \code{absolute} mode should be used here.
+
+Second, we want to calculate mean coverage in a 20bp window. Let's assume coverage is 5 in 1bp ~ 5bp, 10 in 11bp ~ 15bp and 20 in 16bp ~ 20bp.
+Since converage is kind of attribute for all bases, all 20 bp should be taken in account. Thus, here \code{weighted} mode should be used
+which also takes account of the 0 coverage in 6bp ~ 10bp. The mean coverage will be caculated as \code{(5*5 + 10*5 + 20*5)/(5+5+5+5)}.
 }
 \value{
 A matrix with following additional attributes:
@@ -57,6 +68,7 @@ A matrix with following additional attributes:
   \item{downstream_index}{column index corresponding to downstream of \code{target}}
   \item{extend}{extension on upstream and downstream}
   \item{smooth}{whether smoothing was applied on the matrix}
+  \item{failed_rows}{index of rows which are failed for smoothing}
 }
 
 The matrix is wrapped into a simple \code{normalizeToMatrix} class.
