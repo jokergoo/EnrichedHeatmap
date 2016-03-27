@@ -516,6 +516,13 @@ EnrichedHeatmap(mat)
 If you generate the plot for the whole genome, I suggest you first save the figure as pdf format and then
 convert to png by [`convert`](http://www.imagemagick.org/script/convert.php) software, instead of directly saving as png format.
 
+A seond solution is to set `use_raster` to `TRUE` to replace the heatmap bodies with rasterd images:
+
+```{r, eval = FALSE}
+# code not run
+EnrichedHeatmap(mat, use_raster = TRUE, raster_device = ..., raster_device_param = ...)
+```
+
 If you meet following error when do smoothing in `normalizeToMatrix()`:
 
 ```
