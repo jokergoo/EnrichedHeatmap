@@ -266,6 +266,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, 
 	attr(mat, "target_name") = target_name
 	attr(mat, "target_is_single_point") = target_is_single_point
 	attr(mat, "failed_rows") = failed_rows
+	attr(mat, "empty_value") = empty_value
 
 	.paste0 = function(a, b) {
 		if(length(a) == 0 || length(b) == 0) {

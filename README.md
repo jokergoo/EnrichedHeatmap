@@ -38,20 +38,23 @@ mat2 = normalizeToMatrix(meth, tss, value_column = "meth", mean_mode = "absolute
 ```
 
 ```{r}
-ht_list = EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", km = 3, width = 1,
+partition = kmeans(mat1, centers = 3)$cluster
+ht_list = Heatmap(partition, col = structure(2:4, names = as.character(1:3)), name = "partition",
+              show_row_names = FALSE, width = unit(3, "mm")) +
+          EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", split = partition, width = 1,
               top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
               top_annotation_height = unit(2, "cm"), row_title_rot = 0,
-              column_title = "H3K4me3") + 
+              column_title = "H3K4me3", combined_name_fun = NULL) + 
           EnrichedHeatmap(mat2, name = "methylation", width = 1,
               top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
               top_annotation_height = unit(2, "cm"),
               column_title = "Methylation") +
           Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
               show_row_names = FALSE, width = unit(5, "mm"))
-draw(ht_list, gap = unit(c(10, 2), "mm"))
+draw(ht_list, main_heatmap = "H3K4me3", gap = unit(c(2, 10, 2), "mm"))
 ```
 
-![image](https://cloud.githubusercontent.com/assets/449218/13746903/e64abcc8-e9f5-11e5-9744-69ea8ee29f2f.png)
+![image](https://cloud.githubusercontent.com/assets/449218/14051514/d83023d6-f2c3-11e5-92c8-93f2683c1044.png)
 
 Actually you can generate rather complex heatmaps:
 
