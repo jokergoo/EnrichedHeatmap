@@ -462,6 +462,7 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 			y = sapply(ht@row_order_list, function(i) {
 				colSums(mat[i, , drop = FALSE], na.rm = TRUE)
 			})
+			show_error = FALSE
 		} else {
 			y = sapply(ht@row_order_list, function(i) {
 				colMeans(mat[i, , drop = FALSE], na.rm = TRUE)
@@ -490,7 +491,10 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 		grid.rect(gp = gpar(col = "black", fill = NA))
 		for(i in seq_len(ncol(y))) {
 			if(show_error) {
-				grid.polygon(c(seq_len(n)-0.5, rev(seq_len(n)-0.5)), c(y[,i]+y_sd[,i], rev(y[,i]-y_sd[,i])), default.units = "native", gp = gpar(col = NA, fill = "#00000040"))
+				line_col = col2rgb(subset_gp(gp, i)$col, alpha = TRUE)[, 1]
+				line_col[4] = floor(line_col[4]*0.25)
+				grid.polygon(c(seq_len(n)-0.5, rev(seq_len(n)-0.5)), c(y[,i]+y_sd[,i], rev(y[,i]-y_sd[,i])), 
+					default.units = "native", gp = gpar(col = NA, fill = rgb(line_col[1], line_col[2], line_col[3], line_col[4], maxColorValue = 255)))
 			}
 			grid.lines(seq_len(n)-0.5, y[,i], default.units = "native", gp = subset_gp(gp, i))
 		}

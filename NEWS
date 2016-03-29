@@ -1,3 +1,10 @@
+changes in version 1.1.4
+
+* the color of error areas is set 25% light of the color of corresponding line.
+* support raster image for heatmap body
+
+======================================
+
 changes in version 1.1.3
 
 * parameter name was wrong when constructin `ht@layout$graphic_fun_list`
