@@ -1,3 +1,9 @@
+changes in version 1.1.5
+
+* `normalizeToMatrix`: modified default of `trim` to 0
+
+====================================
+
 changes in version 1.1.4
 
 * the color of error areas is set 25% light of the color of corresponding line.

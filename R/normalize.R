@@ -25,7 +25,8 @@
 #    vector (may contains ``NA`` values) and returns a vector with same length. If the smoothing is failed, the function
 #    should call `base::stop` to throw errors so that `normalizeToMatrix` can catch how many rows are failed in smoothing. 
 #    See the default `default_smooth_fun` for example.
-# -trim percent of extreme values to remove.
+# -trim percent of extreme values to remove. IF it is a vector of length 2, it corresponds to the lower quantile and higher quantile.
+#        e.g. ``c(0.01, 0.01)`` means to trim outliers less than 1th quantile and larger than 99th quantile.
 #
 # == details
 # In order to visualize associations between ``signal`` and ``target``, the data is transformed into a matrix
@@ -83,7 +84,7 @@
 normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, value_column = NULL, 
 	mapping_column = NULL, empty_value = ifelse(smooth, NA, 0), mean_mode = c("absolute", "weighted", "w0"), 
 	include_target = any(width(target) > 1), target_ratio = ifelse(all(extend == 0), 1, 0.1), 
-	k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun, trim = 0.01) {
+	k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun, trim = 0) {
 
 	signal_name = deparse(substitute(signal))
 	target_name = deparse(substitute(target))
@@ -283,13 +284,12 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, 
   	} else {
   		colnames(mat) = c(.paste0("u", seq_along(upstream_index)), .paste0("d", seq_along(downstream_index)))
   	}
-
-  	if(trim > 0) {
-  		q1 = quantile(mat, trim/2, na.rm = TRUE)
-  		q2 = quantile(mat, 1 - trim/2, na.rm = TRUE)
-  		mat[mat <= q1] = q1
-  		mat[mat >= q2] = q2
-  	}
+  	if(length(trim) == 1) trim = c(trim, trim)
+	q1 = quantile(mat, trim[1], na.rm = TRUE)
+	q2 = quantile(mat, 1 - trim[2], na.rm = TRUE)
+	mat[mat <= q1] = q1
+	mat[mat >= q2] = q2
+  	
   	mat[mat <= min_v] = min_v
   	mat[mat >= max_v] = max_v
 	class(mat) = c("normalizedMatrix", "matrix")
