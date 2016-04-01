@@ -10,7 +10,7 @@ Normalize associations between genomic signals and target regions into a matrix
 normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50, value_column = NULL,
     mapping_column = NULL, empty_value = ifelse(smooth, NA, 0), mean_mode = c("absolute", "weighted", "w0"),
     include_target = any(width(target) > 1), target_ratio = ifelse(all(extend == 0), 1, 0.1),
-    k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun, trim = 0.01)
+    k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun, trim = 0)
 }
 \arguments{
 
@@ -27,7 +27,7 @@ normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50, value_colum
   \item{k}{number of windows only when \code{target_ratio = 1} or \code{extend == 0}, otherwise ignored.}
   \item{smooth}{whether apply smoothing on rows in the matrix. }
   \item{smooth_fun}{the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric vector (may contains \code{NA} values) and returns a vector with same length. If the smoothing is failed, the function should call \code{\link[base]{stop}} to throw errors so that \code{\link{normalizeToMatrix}} can catch how many rows are failed in smoothing.  See the default \code{\link{default_smooth_fun}} for example.}
-  \item{trim}{percent of extreme values to remove.}
+  \item{trim}{percent of extreme values to remove. IF it is a vector of length 2, it corresponds to the lower quantile and higher quantile. e.g. \code{c(0.01, 0.01)} means to trim outliers less than 1th quantile and larger than 99th quantile.}
 
 }
 \details{
