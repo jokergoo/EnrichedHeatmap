@@ -353,11 +353,19 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 	v = mcols(m_gr)[[value_column]]
   
 	mean_mode = match.arg(mean_mode)[1]
-  
+
 	if(mean_mode == "w0") {
 		mintersect = pintersect(m_gr, m_target_windows)
 		p = width(mintersect)/width(m_target_windows)
 		x = tapply(p*v, mtch[, 2], sum, na.rm = TRUE)
+		# w = width(mintersect)
+		# msetdiff = psetdiff(m_target_windows, m_gr)
+		# wdf = width(msetdiff)
+		# wdf[wdf < 0] = 0
+		# x = tapply(w*v, mtch[, 2], sum, na.rm = TRUE) / (tapply(w, mtch[, 2], sum, na.rm = TRUE) + tapply(wdf, mtch[, 2], sum, na.rm = TRUE))
+
+		# m_target_windows_list = split(m_target_windows, mtch[, 2])
+		# sapply(names(m_target_windows_list), function(i) sum(width(setdiff(m_target_windows[as.numeric(i)], m_target_windows_list[[i]]))))
 	} else if(mean_mode == "absolute") {
 		x = tapply(v, mtch[, 2], mean, na.rm = TRUE)
 	} else {
@@ -365,7 +373,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 		w = width(mintersect)
 		x = tapply(w*v, mtch[, 2], sum, na.rm = TRUE) / tapply(w, mtch[, 2], sum, na.rm = TRUE)
 	}
-  
+
 	v2 = rep(empty_value, length(target_windows))
 	v2[ as.numeric(names(x)) ] = x
   
