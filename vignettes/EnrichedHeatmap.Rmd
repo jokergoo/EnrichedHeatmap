@@ -187,6 +187,7 @@ EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3",
 Split rows and add column annotation as well:
 
 ```{r, kmeans_anno, fig.width = 4}
+set.seed(123)
 EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3",
     # note we have three row-clusters, so we assign three colors for the annotation lines
     top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
@@ -204,6 +205,7 @@ Actually I am not quite sure whether we should visualize the errors because the 
 can already be seen in the heatmaps.
 
 ```{r,, fig.width = 4}
+set.seed(123)
 EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3",
     # note we have three row-clusters, so we assign three colors for the annotation lines
     top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4), show_error = TRUE)), 
@@ -298,6 +300,20 @@ case, `absolute` mode should be used here.
 Second, we want to calculate mean coverage in a 20bp window. Let's assume coverage is 5 in 1bp ~ 5bp, 10 in 11bp ~ 15bp and 20 in 16bp ~ 20bp.
 Since converage is kind of attribute for all bases, all 20 bp should be taken in account. Thus, here `weighted` mode should be used
 which also takes account of the 0 coverage in 6bp ~ 10bp. The mean coverage will be caculated as `(5*5 + 10*5 + 20*5)/(5+5+5+5)`.
+
+Please note for **w0** mode, the sum is always divided by the width of the window, which means we assume
+the genomic signals do not overlap to each other. Actually there is some solution to deal with overlapping
+signals with **w0** mode but the implementation is too slow and it is not supported yet now. However, users
+can still do it by modifying the signals a little bit and change to **weighted** mode. 
+
+```{r, eval = FALSE}
+signal_complement = gaps(signals)
+# if there is no strand info for signals
+signal_complement = signal_complement[strand(signal_complement) == "*"]
+signal_complement[[value_column]] = 0
+signal = c(signal, signal_complement)
+normalizeToMatrix(signal, mean_mode = "weighted")
+```
 
 ### Smoothing improves visualization on methylation profiles
 
@@ -396,6 +412,7 @@ Here we emphasize again, proper trimming on the matrix will greatly help to reve
 You can try replace `mat1` to a un-trimmed matrix and see whether this patterns shown below still preserve.
 
 ```{r, fig.width = 7, fig.height = 8}
+set.seed(123)
 partition = kmeans(mat1, centers = 3)$cluster
 ht_list = Heatmap(partition, col = structure(2:4, names = as.character(1:3)), name = "partition",
               show_row_names = FALSE, width = unit(3, "mm")) +
