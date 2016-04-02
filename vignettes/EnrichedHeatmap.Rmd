@@ -160,6 +160,7 @@ EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3",
 Split rows by k-means clustering.
 
 ```{r, fig.width = 4}
+set.seed(123)
 EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3", km = 3,
     column_title = "Enrichment of H3K4me3", row_title_rot = 0)
 ```
@@ -300,20 +301,6 @@ case, `absolute` mode should be used here.
 Second, we want to calculate mean coverage in a 20bp window. Let's assume coverage is 5 in 1bp ~ 5bp, 10 in 11bp ~ 15bp and 20 in 16bp ~ 20bp.
 Since converage is kind of attribute for all bases, all 20 bp should be taken in account. Thus, here `weighted` mode should be used
 which also takes account of the 0 coverage in 6bp ~ 10bp. The mean coverage will be caculated as `(5*5 + 10*5 + 20*5)/(5+5+5+5)`.
-
-Please note for **w0** mode, the sum is always divided by the width of the window, which means we assume
-the genomic signals do not overlap to each other. Actually there is some solution to deal with overlapping
-signals with **w0** mode but the implementation is too slow and it is not supported yet now. However, users
-can still do it by modifying the signals a little bit and change to **weighted** mode. 
-
-```{r, eval = FALSE}
-signal_complement = gaps(signals)
-# if there is no strand info for signals
-signal_complement = signal_complement[strand(signal_complement) == "*"]
-signal_complement[[value_column]] = 0
-signal = c(signal, signal_complement)
-normalizeToMatrix(signal, mean_mode = "weighted")
-```
 
 ### Smoothing improves visualization on methylation profiles
 
