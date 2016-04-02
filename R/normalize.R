@@ -356,16 +356,16 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 
 	if(mean_mode == "w0") {
 		mintersect = pintersect(m_gr, m_target_windows)
-		p = width(mintersect)/width(m_target_windows)
-		x = tapply(p*v, mtch[, 2], sum, na.rm = TRUE)
-		# w = width(mintersect)
-		# msetdiff = psetdiff(m_target_windows, m_gr)
-		# wdf = width(msetdiff)
-		# wdf[wdf < 0] = 0
-		# x = tapply(w*v, mtch[, 2], sum, na.rm = TRUE) / (tapply(w, mtch[, 2], sum, na.rm = TRUE) + tapply(wdf, mtch[, 2], sum, na.rm = TRUE))
 
-		# m_target_windows_list = split(m_target_windows, mtch[, 2])
-		# sapply(names(m_target_windows_list), function(i) sum(width(setdiff(m_target_windows[as.numeric(i)], m_target_windows_list[[i]]))))
+		# p = width(mintersect)/width(m_target_windows)
+		# x = tapply(p*v, mtch[, 2], sum, na.rm = TRUE)
+		w = width(mintersect)
+		target_windows_list = split(ranges(m_gr), mtch[, 2])
+		target_windows2 = target_windows[as.numeric(names(target_windows_list))]
+		cov = coverage(target_windows_list, shift = -start(target_windows2), width = width(target_windows2))
+		#non_intersect_width = sapply(cov, function(x) sum(x == 0))
+		non_intersect_width = sapply(cov@listData, function(x) {ind = x@values == 0;sum(x@lengths[ind])})
+		x = tapply(w*v, mtch[, 2], sum, na.rm = TRUE) / (tapply(w, mtch[, 2], sum, na.rm = TRUE) + non_intersect_width)
 	} else if(mean_mode == "absolute") {
 		x = tapply(v, mtch[, 2], mean, na.rm = TRUE)
 	} else {
