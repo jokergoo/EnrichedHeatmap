@@ -1,6 +1,7 @@
 changes in version 1.1.5
 
 * `normalizeToMatrix`: modified default of `trim` to 0
+* `makeMatrix`: w0 mode can deal with overlapping signals
 
 ====================================
 
