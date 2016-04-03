@@ -18,7 +18,7 @@
 #        values to this window. See 'Details' section for a detailed explanation.
 # -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
 #               is enforced to ``FALSE``.
-# -target_ratio  the ratio of width of ``target`` part compared to the full heatmap. If the value is 1, ``extend`` will be reset to 0.
+# -target_ratio  the ratio of ``target`` in the full heatmap. If the value is 1, ``extend`` will be reset to 0.
 # -k number of windows only when ``target_ratio = 1`` or ``extend == 0``, otherwise ignored.
 # -smooth whether apply smoothing on rows in the matrix. 
 # -smooth_fun the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric
@@ -26,35 +26,41 @@
 #    should call `base::stop` to throw errors so that `normalizeToMatrix` can catch how many rows are failed in smoothing. 
 #    See the default `default_smooth_fun` for example.
 # -trim percent of extreme values to remove. IF it is a vector of length 2, it corresponds to the lower quantile and higher quantile.
-#        e.g. ``c(0.01, 0.01)`` means to trim outliers less than 1th quantile and larger than 99th quantile.
+#        e.g. ``c(0.01, 0.01)`` means to trim outliers less than 1st quantile and larger than 99th quantile.
 #
 # == details
 # In order to visualize associations between ``signal`` and ``target``, the data is transformed into a matrix
-# and visualized as a heatmap by `EnrichedHeatmap` afterward.
+# and visualized as a heatmap by `EnrichedHeatmap` afterwards.
 #
 # Upstream and downstream also with the target body are splitted into a list of small windows and overlap
-# to ``signal``. Since regions in ``signal`` and small windows do not always 100 percent overlap, there are three different average modes:
+# to ``signal``. Since regions in ``signal`` and small windows do not always 100 percent overlap, there are four different average modes:
 # 
-# Following illustrates different settings for ``mean_mode``:
+# Following illustrates different settings for ``mean_mode`` (note there is one signal region overlapping with other signals):
 #
-#        4      5      2     values in signal
-#     ++++++   +++   +++++   signal
-#       ================     window (16bp)
-#         4     3     3      overlap
+#       40      50     20     values in signal
+#     ++++++   +++    +++++   signal
+#            30               values in signal
+#          ++++++             signal
+#       =================     window (17bp), there are 4bp not overlapping to any signal region.
+#         4  6  3      3      overlap
 #
-#     absolute: (4 + 5 + 2)/3
-#     weighted: (4*4 + 5*3 + 2*3)/(4 + 3 + 3)
-#     w0:       (4*4 + 5*3 + 2*3)/16
+#     absolute: (40 + 30 + 50 + 20)/4
+#     weighted: (40*4 + 30*6 + 50*3 + 20*3)/(4 + 6 + 3 + 3)
+#     w0:       (40*4 + 30*6 + 50*3 + 20*3)/(4 + 6 + 3 + 3 + 4)
+#     coverage: (40*4 + 30*6 + 50*3 + 20*3)/17
 #
-# Let's consider two scenarios. 
+# To explain it more clearly, let's consider three scenarios:
 #
 # First, we want to calculate mean methylation from 3 CpG sites in a 20bp window. Since methylation
 # is only measured at CpG site level, the mean value should only be calculated from the 3 CpG sites while not the non-CpG sites. In this
 # case, ``absolute`` mode should be used here.
 #
 # Second, we want to calculate mean coverage in a 20bp window. Let's assume coverage is 5 in 1bp ~ 5bp, 10 in 11bp ~ 15bp and 20 in 16bp ~ 20bp.
-# Since converage is kind of attribute for all bases, all 20 bp should be taken in account. Thus, here ``weighted`` mode should be used
+# Since converage is kind of attribute for all bases, all 20 bp should be taken into account. Thus, here ``w0`` mode should be used
 # which also takes account of the 0 coverage in 6bp ~ 10bp. The mean coverage will be caculated as ``(5*5 + 10*5 + 20*5)/(5+5+5+5)``.
+#
+# Third, genes have multiple transcripts and we want to calculate how many transcripts eixst in a certain position in the gene body.
+# In this case, values associated to each transcript are binary (either 1 or 0) and ``coverage`` mean mode should be used.
 #
 # == value
 # A matrix with following additional attributes:
@@ -81,10 +87,11 @@
 # normalizeToMatrix(signal, target, extend = 10, w = 2, include_target = TRUE)
 # normalizeToMatrix(signal, target, extend = 10, w = 2, value_column = "score")
 #
-normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, value_column = NULL, 
-	mapping_column = NULL, empty_value = ifelse(smooth, NA, 0), mean_mode = c("absolute", "weighted", "w0"), 
-	include_target = any(width(target) > 1), target_ratio = ifelse(all(extend == 0), 1, 0.1), 
-	k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun, trim = 0) {
+normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, 
+	value_column = NULL, mapping_column = NULL, empty_value = ifelse(smooth, NA, 0), 
+	mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1), 
+	target_ratio = ifelse(all(extend == 0), 1, 0.1), k = min(c(20, min(width(target)))), 
+	smooth = FALSE, smooth_fun = default_smooth_fun, trim = 0) {
 
 	signal_name = deparse(substitute(signal))
 	target_name = deparse(substitute(target))
@@ -309,7 +316,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, 
 # makeMatrix(gr, target, w = 2)
 #
 makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mapping_column = mapping_column, empty_value = 0,
-    mean_mode = c("absolute", "weighted", "w0"), direction = c("normal", "reverse")) {
+    mean_mode = c("absolute", "weighted", "w0", "coverage"), direction = c("normal", "reverse")) {
   
 	if(is.null(value_column)) {
 		gr$..value = rep(1, length(gr))
@@ -356,9 +363,6 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 
 	if(mean_mode == "w0") {
 		mintersect = pintersect(m_gr, m_target_windows)
-
-		# p = width(mintersect)/width(m_target_windows)
-		# x = tapply(p*v, mtch[, 2], sum, na.rm = TRUE)
 		w = width(mintersect)
 		target_windows_list = split(ranges(m_gr), mtch[, 2])
 		target_windows2 = target_windows[as.numeric(names(target_windows_list))]
@@ -366,6 +370,10 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 		#non_intersect_width = sapply(cov, function(x) sum(x == 0))
 		non_intersect_width = sapply(cov@listData, function(x) {ind = x@values == 0;sum(x@lengths[ind])})
 		x = tapply(w*v, mtch[, 2], sum, na.rm = TRUE) / (tapply(w, mtch[, 2], sum, na.rm = TRUE) + non_intersect_width)
+	} else if(mean_mode == "coverage") {
+		mintersect = pintersect(m_gr, m_target_windows)
+		p = width(mintersect)/width(m_target_windows)
+		x = tapply(p*v, mtch[, 2], sum, na.rm = TRUE)
 	} else if(mean_mode == "absolute") {
 		x = tapply(v, mtch[, 2], mean, na.rm = TRUE)
 	} else {
@@ -644,7 +652,7 @@ print.normalizedMatrix = function(x, ...) {
 }
 
 # == title
-# copy attributes to another object
+# Copy attributes to another object
 #
 # == param
 # -x object 1
@@ -652,7 +660,7 @@ print.normalizedMatrix = function(x, ...) {
 #
 # == details
 # The `normalizeToMatrix` object actually is a matrix but with more additional attributes attached.
-# This function is used copy these new attributes when dealing with the matrix.
+# This function is used to copy these new attributes when dealing with the matrix.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -676,16 +684,16 @@ copyAttr = function(x, y) {
 #
 # == param
 # -lt a list of objects which are returned by `normalizeToMatrix`. Objects in the list should come from same settings.
-# -fun a self-defined function which summarize from the third dimension. If we assume the objects in the list correspond
-#        to different samples in a same subtype, then different regions in the targets are the first dimension, different positions
-#        upstream or downstream the targets are the second dimension, and different samples are the third dimension.
+# -fun a self-defined function which gives mean signals across samples. If we assume the objects in the list correspond
+#        to different samples, then different regions in the targets are the first dimension, different positions
+#        upstream or downstream of the targets are the second dimension, and different samples are the third dimension.
 #        This self-defined function can have one argument which is the vector containing values in different samples
 #        in a specific position to a specific target region. Or it can have a second argument which is the index for 
 #        the current target.
 #
 # == details
-# Let's assume you have a list of histone modification signals for different samples in a same subtype and you want
-# to visualize the mean pattern for this subtype. You can first normalize histone mark signal for each sample and then
+# Let's assume you have a list of histone modification signals for different samples and you want
+# to visualize the mean pattern across samples. You can first normalize histone mark signals for each sample and then
 # calculate means values across all samples. In following example code, ``hm_gr_list`` is a list of ``GRanges`` objects
 # which contain positions of histone modifications, ``tss`` is a ``GRanges`` object containing positions of gene TSS.
 #
@@ -693,16 +701,23 @@ copyAttr = function(x, y) {
 #     for(i in seq_along(hm_gr_list)) {
 #         mat_list[[i]] = normalizeToMatrix(hm_gr_list[[i]], tss, value_column = "density")
 #     }
+#
+# Applying ``getSignalsFromList()`` to ``mat_list``, it gives a new normalized matrix which contains mean signals and can
+# be directly used in ``EnrichedHeatmap()``.
+#
 #     mat = getSignalsFromList(mat_list)
 #     EnrichedHeatmap(mat)
 #
 # Next let's consider a second scenario: we want to see the correlation between histone modification and gene expression.
 # In this case, ``fun`` can have a second argument so that users can correspond histone signals to the expression of the
-# associated gene. In following code, ``expr`` is a matrix of expression, columns in ``expr`` are same as elements in ``hm_gr_list``,
+# associated gene. In following code, ``expr`` is a matrix of expression, columns in ``expr`` correspond to elements in ``hm_gr_list``,
 # rows in ``expr`` are same as ``tss``.
 # 
 #     mat = getSignalsFromList(mat_list, 
 #         fun = function(x, i) cor(x, expr[i, ], method = "spearman"))
+#
+# Then ``mat`` here can be used to visualize how gene expression is correlated to histone modification around TSS.
+#
 #     EnrichedHeatmap(mat)
 #
 #
@@ -776,6 +791,7 @@ getSignalsFromList = function(lt, fun = function(x) mean(x, na.rm = TRUE)) {
 # -x input numeric vector
 #
 # == details
+# The smooth function is applied to every row in the normalized matrix. For this default smooth function,
 # `locfit::locfit` is first tried on the vector. If there is error, `stats::loess` smoothing is tried afterwards.
 # If both smoothing are failed, there will be an error.
 #
