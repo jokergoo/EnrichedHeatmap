@@ -3,8 +3,7 @@
 # Class for a list of heatmaps
 #
 # == details
-# The structure of `EnrichedHeatmapList-class` is the same as
-# `ComplexHeatmap::HeatmapList-class` and the class is inherited from `ComplexHeatmap::HeatmapList-class`.
+# The `EnrichedHeatmapList-class` is inherited from `ComplexHeatmap::HeatmapList-class`.
 #
 # == methods
 # The `EnrichedHeatmapList-class` provides following methods:

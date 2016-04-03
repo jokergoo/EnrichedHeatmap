@@ -15,7 +15,7 @@ EnrichedHeatmap(mat, score_fun = enriched_score, row_order = NULL, pos_line = TR
 \arguments{
 
   \item{mat}{a matrix which is returned by \code{\link{normalizeToMatrix}}}
-  \item{score_fun}{a function which calculates enriched scores for rows in \code{mat}}
+  \item{score_fun}{a function which calculates enriched scores for rows in \code{mat}. This function can be self-defined, take a look at \code{\link{enriched_score}} to find out how to design it. Note if row clustering is turned on, this argument is ignored.}
   \item{row_order}{row order. If it is specified, \code{score_fun} is ignored.}
   \item{pos_line}{whether draw vertical lines which represent the position of \code{target}}
   \item{pos_line_gp}{graphic parameters for lines}

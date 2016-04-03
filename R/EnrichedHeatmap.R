@@ -3,12 +3,7 @@
 # Class for a single heatmap
 #
 # == details
-# The structure of `EnrichedHeatmap-class` is the same as
-# `ComplexHeatmap::HeatmapList-class` and the class is inherited from `ComplexHeatmap::Heatmap-class`.
-# 
-# The `EnrichedHeatmap-class` pre-defines some parameters for `ComplexHeatmap::Heatmap-class` such as
-# the order of rows and suppressing column clustering. Also there are several
-# new parameters that are attached to the object.
+# The `EnrichedHeatmap-class` is inherited from `ComplexHeatmap::Heatmap-class`.
 #
 # == methods
 # The `EnrichedHeatmap-class` provides following methods:
@@ -34,6 +29,9 @@ EnrichedHeatmap = setClass("EnrichedHeatmap",
 # == details
 # The function calculates how the signal is enriched in the targets.
 # The score is the sum of values weighted by the reciprocal of the distance to the targets.
+#
+# Basically, to be a score function which calculates enriched score, it should accept three arguments
+# which are explained in **Arguments** section and return a single value. Rows are sorted decreasingly by the enriched scores.
 #
 # == value
 # A numeric value.
@@ -71,7 +69,8 @@ enriched_score = function(x1, x2, x3) {
 # 
 # == param
 # -mat a matrix which is returned by `normalizeToMatrix`
-# -score_fun a function which calculates enriched scores for rows in ``mat``
+# -score_fun a function which calculates enriched scores for rows in ``mat``. This function can be self-defined, take
+#             a look at `enriched_score` to find out how to design it. Note if row clustering is turned on, this argument is ignored.
 # -row_order row order. If it is specified, ``score_fun`` is ignored.
 # -pos_line whether draw vertical lines which represent the position of ``target``
 # -pos_line_gp graphic parameters for lines
@@ -395,26 +394,27 @@ setMethod(f = "draw",
 # Annotation function to show the enrichment
 #
 # == param
-# -gp graphical parameters for the line
+# -gp graphic parameters
 # -pos_line whether draw vertical lines which represent the position of ``target``
-# -pos_line_gp graphical parameters for lines
+# -pos_line_gp graphic parameters
 # -yaxis whether show yaxis
 # -ylim ranges on y-axis
 # -value what type of value corresponds to the y-axis
 # -yaxis_side side of y-axis
-# -yaxis_gp graphical parameters for yaxis
-# -show_error whether show error regions which are +-1 sd to the mean value
+# -yaxis_gp graphic parameters for yaxis
+# -show_error whether show error regions which are +-1 sd to the mean value. Color of error
+#            area is same as the corresponding lines with 75 percent transparency.
 #
 # == details
 # This annotation functions shows mean values of columns in the normalized matrix
 # which represents the enrichment of the signals to the targets.
 #
-# If rows are splitted, there will also be multiple lines for this annotation.
+# If rows are splitted, there will also be multiple lines in this annotation.
 #
 # It should only be placed as column annotation of the Enriched Heatmap.
 #
 # == values
-# A column annotation function which can be set to ``top_annotation`` argument
+# A column annotation function which can be set to ``top_annotation`` argument in `EnrichedHeatmap`.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -423,7 +423,7 @@ setMethod(f = "draw",
 # load(paste0(system.file("extdata", "chr21_test_data.RData", package = "EnrichedHeatmap")))
 # tss = promoters(genes, upstream = 0, downstream = 1)
 # mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
-#     extend = 5000, mean_mode = "w0", w = 50)
+#     extend = 5000, mean_mode = "w0", w = 50, trim = c(0, 0.01))
 # EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3",
 #     top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
 #     top_annotation_height = unit(2, "cm"),

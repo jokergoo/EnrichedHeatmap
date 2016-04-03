@@ -8,12 +8,7 @@ Class for a single heatmap
 Class for a single heatmap
 }
 \details{
-The structure of \code{\link{EnrichedHeatmap-class}} is the same as
-\code{\link[ComplexHeatmap]{HeatmapList-class}} and the class is inherited from \code{\link[ComplexHeatmap]{Heatmap-class}}.
-
-The \code{\link{EnrichedHeatmap-class}} pre-defines some parameters for \code{\link[ComplexHeatmap]{Heatmap-class}} such as
-the order of rows and suppressing column clustering. Also there are several
-new parameters that are attached to the object.
+The \code{\link{EnrichedHeatmap-class}} is inherited from \code{\link[ComplexHeatmap]{Heatmap-class}}.
 }
 \section{Methods}{
 The \code{\link{EnrichedHeatmap-class}} provides following methods:

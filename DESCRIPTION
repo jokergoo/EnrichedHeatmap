@@ -11,7 +11,7 @@ Suggests: testthat (>= 0.3), knitr, markdown, circlize (>= 0.3.1)
 VignetteBuilder: knitr
 Description: Enriched heatmap is a special type of heatmap which 
   visualizes the enrichment of genomic signals on specific target regions.
-  Here we implement Enriched heatmap by ComplexHeatmap package. 
+  Here we implement enriched heatmap by ComplexHeatmap package. 
   Since this type of heatmap is just a normal heatmap but with some special settings, 
   with the functionality of ComplexHeatmap, it would be much easier
   to customize the heatmap as well as concatenating to a list of heatmaps to 

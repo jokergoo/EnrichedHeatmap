@@ -15,6 +15,7 @@ default_smooth_fun(x)
 
 }
 \details{
+The smooth function is applied to every row in the normalized matrix. For this default smooth function,
 \code{\link[locfit]{locfit}} is first tried on the vector. If there is error, \code{\link[stats]{loess}} smoothing is tried afterwards.
 If both smoothing are failed, there will be an error.
 }
