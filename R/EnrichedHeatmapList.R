@@ -111,8 +111,8 @@ setMethod(f = "show",
 # == param
 # -object an `EnrichedHeatmapList-class` object
 # -padding padding of the plot. Elements correspond to bottom, left, top, right paddings.
-# -... pass to `ComplexHeatmap::make_layout,HeatmapList-method`
 # -newpage whether to create a new page
+# -... pass to `ComplexHeatmap::make_layout,HeatmapList-method` or `ComplexHeatmap::draw,HeatmapList-method`
 #
 # == detail
 # It calls `ComplexHeatmap::draw,HeatmapList-method` to make the plot but with some adjustment
@@ -129,7 +129,8 @@ setMethod(f = "show",
 # NULL
 setMethod(f = "draw",
     signature = "EnrichedHeatmapList",
-    definition = function(object, padding = unit(c(2, 2, 2, 2), "mm"), ..., newpage= TRUE) {
+    definition = function(object, padding = unit(c(2, 2, 2, 2), "mm"), 
+        newpage= TRUE, ...) {
 
     if(newpage) {
         grid.newpage()
@@ -193,7 +194,13 @@ setMethod(f = "draw",
         }
     }
 
-    object = selectMethod("draw", "HeatmapList")(object, padding = padding, newpage = FALSE, ...)
+    object = selectMethod("draw", "HeatmapList")(object, padding = padding, newpage = FALSE, 
+        row_title = row_title, row_title_gp = row_title_gp, row_title_side = row_title_side,
+        column_title = column_title, column_title_side = column_title_side, column_title_gp = column_title_gp,
+        heatmap_legend_side = heatmap_legend_side, show_heatmap_legend = show_heatmap_legend, heatmap_legend_list = heatmap_legend_list,
+        annotation_legend_side = annotation_legend_side, show_annotation_legend = show_annotation_legend,
+        annotation_legend_list = annotation_legend_list, gap = gap, main_heatmap = main_heatmap, row_dend_side = row_dend_side,
+        row_hclust_side = row_hclust_side, row_sub_title_side = row_sub_title_side)
     changeClassName(object, "EnrichedHeatmapList")
 
     # add borders and pos lines
