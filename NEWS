@@ -1,6 +1,6 @@
-changes in verison 1.1.6
+changes in verison 1.1.7
 
-* change version number to update on bioconductor website
+* add legends by Legend() function in the vignette
 
 ===================================
 
