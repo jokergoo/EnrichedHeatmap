@@ -202,7 +202,7 @@ EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3",
     km = 3, row_title_rot = 0)
 ```
 
-You can also add error ares (1 sd) for each line. The color of error areas always have the same 
+You can also add error areas (1 sd) for each line. The color of error areas always have the same 
 color of corresponding line but with 75 percent transparency.
 
 Users should be careful with `show_error`. It only makes sense when patterns in heatmap or row clusters
@@ -211,13 +211,18 @@ are homogeneous.
 Actually I am not quite sure whether we should visualize the errors because the spreadness of the data
 can already be seen in the heatmaps.
 
+Also we demonstrate how to add legend for the annotation lines by `Legend()` function from **ComplexHeatmap** package.
+
 ```{r,, fig.width = 4}
 set.seed(123)
-EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3",
+lgd = Legend(at = c("cluster1", "cluster2", "cluster3"), title = "Clusters", 
+    type = "lines", legend_gp = gpar(col = 2:4))
+ht = EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3",
     # note we have three row-clusters, so we assign three colors for the annotation lines
     top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4), show_error = TRUE)), 
     top_annotation_height = unit(2, "cm"),
     km = 3, row_title_rot = 0)
+draw(ht, annotation_legend_list = list(lgd))
 ```
 
 ### Smoothing
@@ -418,6 +423,8 @@ You can try replace `mat1` to a un-trimmed matrix and see whether this patterns 
 ```{r, fig.width = 7, fig.height = 8}
 set.seed(123)
 partition = kmeans(mat1, centers = 3)$cluster
+lgd = Legend(at = c("cluster1", "cluster2", "cluster3"), title = "Clusters", 
+    type = "lines", legend_gp = gpar(col = 2:4))
 ht_list = Heatmap(partition, col = structure(2:4, names = as.character(1:3)), name = "partition",
               show_row_names = FALSE, width = unit(3, "mm")) +
           EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3", split = partition, width = 1,
@@ -430,7 +437,8 @@ ht_list = Heatmap(partition, col = structure(2:4, names = as.character(1:3)), na
               column_title = "Methylation") +
           Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
               show_row_names = FALSE, width = unit(5, "mm"))
-draw(ht_list, main_heatmap = "H3K4me3", gap = unit(c(2, 10, 2), "mm"))
+draw(ht_list, main_heatmap = "H3K4me3", gap = unit(c(2, 10, 2), "mm"),
+    annotation_legend_list = list(lgd))
 ```
 
 ## Restrict overlapping by providing mapping
