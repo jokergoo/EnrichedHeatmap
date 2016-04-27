@@ -194,13 +194,7 @@ setMethod(f = "draw",
         }
     }
 
-    object = selectMethod("draw", "HeatmapList")(object, padding = padding, newpage = FALSE, 
-        row_title = row_title, row_title_gp = row_title_gp, row_title_side = row_title_side,
-        column_title = column_title, column_title_side = column_title_side, column_title_gp = column_title_gp,
-        heatmap_legend_side = heatmap_legend_side, show_heatmap_legend = show_heatmap_legend, heatmap_legend_list = heatmap_legend_list,
-        annotation_legend_side = annotation_legend_side, show_annotation_legend = show_annotation_legend,
-        annotation_legend_list = annotation_legend_list, gap = gap, main_heatmap = main_heatmap, row_dend_side = row_dend_side,
-        row_hclust_side = row_hclust_side, row_sub_title_side = row_sub_title_side)
+    object = selectMethod("draw", "HeatmapList")(object, padding = padding, newpage = FALSE, ...)
     changeClassName(object, "EnrichedHeatmapList")
 
     # add borders and pos lines
