@@ -39,6 +39,8 @@ mat2 = normalizeToMatrix(meth, tss, value_column = "meth", mean_mode = "absolute
 
 ```{r}
 partition = kmeans(mat1, centers = 3)$cluster
+lgd = Legend(at = c("cluster1", "cluster2", "cluster3"), title = "Clusters", 
+    type = "lines", legend_gp = gpar(col = 2:4))
 ht_list = Heatmap(partition, col = structure(2:4, names = as.character(1:3)), name = "partition",
               show_row_names = FALSE, width = unit(3, "mm")) +
           EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", split = partition, width = 1,
@@ -54,7 +56,7 @@ ht_list = Heatmap(partition, col = structure(2:4, names = as.character(1:3)), na
 draw(ht_list, main_heatmap = "H3K4me3", gap = unit(c(2, 10, 2), "mm"))
 ```
 
-![image](https://cloud.githubusercontent.com/assets/449218/14051514/d83023d6-f2c3-11e5-92c8-93f2683c1044.png)
+![image](https://cloud.githubusercontent.com/assets/449218/14768684/41a6d534-0a49-11e6-800a-36ce15ad83ca.png)
 
 Actually you can generate rather complex heatmaps:
 
