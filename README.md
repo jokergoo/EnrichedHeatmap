@@ -60,7 +60,7 @@ draw(ht_list, main_heatmap = "H3K4me3", gap = unit(c(2, 10, 2), "mm"))
 
 Actually you can generate rather complex heatmaps:
 
-![image](https://cloud.githubusercontent.com/assets/449218/13722053/04a9fd6e-e839-11e5-90bb-568e7b2acc67.png)
+![image](https://cloud.githubusercontent.com/assets/449218/15091050/e94e1070-146e-11e6-83da-7708009b11b0.png)
 
 
 ### License
