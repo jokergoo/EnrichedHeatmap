@@ -1,11 +1,11 @@
 Package: EnrichedHeatmap
 Type: Package
 Title: Making Enriched Heatmaps
-Version: 1.3.0
-Date: 2016-4-27
+Version: 1.3.1
+Date: 2016-5-4
 Author: Zuguang Gu
 Maintainer: Zuguang Gu <z.gu@dkfz.de>
-Depends: R (>= 3.1.2), grid, ComplexHeatmap (>= 1.9.7), GenomicRanges, IRanges, locfit
+Depends: R (>= 3.1.2), grid, ComplexHeatmap (>= 1.11.1), GenomicRanges, IRanges, locfit
 Imports: methods, matrixStats, stats, GetoptLong
 Suggests: testthat (>= 0.3), knitr, markdown, circlize (>= 0.3.1)
 VignetteBuilder: knitr
@@ -19,6 +19,6 @@ Description: Enriched heatmap is a special type of heatmap which
 biocViews: Software, Visualization, Sequencing, GenomeAnnotation, Coverage
 URL: https://github.com/jokergoo/EnrichedHeatmap
 License: GPL (>= 2)
-Packaged: 2016-4-27 00:00:00 UTC; Administrator
+Packaged: 2016-5-4 00:00:00 UTC; Administrator
 Repository: Bioconductor
-Date/Publication: 2016-4-27 00:00:00
+Date/Publication: 2016-5-4 00:00:00

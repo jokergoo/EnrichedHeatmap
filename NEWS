@@ -1,3 +1,9 @@
+changes in verison 1.1.8
+
+* bug fixed that when there is no column name in a normal heatmap, axis is hidden.
+
+===================================
+
 changes in verison 1.1.7
 
 * add legends by Legend() function in the vignette

@@ -150,7 +150,7 @@ setMethod(f = "draw",
     normal_heatmap_index = which(sapply(object@ht_list, function(ht) {
 		inherits(ht, "Heatmap") & !inherits(ht, "EnrichedHeatmap")
 	}))
-    
+
     if(length(normal_heatmap_index) == 0) {
     	# if all heatmaps are Enriched heatmaps, the just put the
     	# axis in the bottom colnames component
@@ -174,7 +174,7 @@ setMethod(f = "draw",
 
     		for(i in normal_heatmap_index) {
     			ht = object@ht_list[[i]]
-    			ht@layout$layout_column_title_bottom_height = ht@layout$layout_column_title_bottom_height + bottom_height - max_axis_height
+    			ht@layout$layout_column_title_bottom_height = ht@layout$layout_column_title_bottom_height + max_axis_height - bottom_height
     			object@ht_list[[i]] = ht
     		}
 
