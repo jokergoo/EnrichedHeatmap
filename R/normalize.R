@@ -358,33 +358,36 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 
 	# the value associated with `gr`
 	v = mcols(m_gr)[[value_column]]
-  
+
 	mean_mode = match.arg(mean_mode)[1]
 
-	if(mean_mode == "w0") {
-		mintersect = pintersect(m_gr, m_target_windows)
-		w = width(mintersect)
-		target_windows_list = split(ranges(m_gr), mtch[, 2])
-		target_windows2 = target_windows[as.numeric(names(target_windows_list))]
-		cov = coverage(target_windows_list, shift = -start(target_windows2), width = width(target_windows2))
-		#non_intersect_width = sapply(cov, function(x) sum(x == 0))
-		non_intersect_width = sapply(cov@listData, function(x) {ind = x@values == 0;sum(x@lengths[ind])})
-		x = tapply(w*v, mtch[, 2], sum, na.rm = TRUE) / (tapply(w, mtch[, 2], sum, na.rm = TRUE) + non_intersect_width)
-	} else if(mean_mode == "coverage") {
-		mintersect = pintersect(m_gr, m_target_windows)
-		p = width(mintersect)/width(m_target_windows)
-		x = tapply(p*v, mtch[, 2], sum, na.rm = TRUE)
-	} else if(mean_mode == "absolute") {
-		x = tapply(v, mtch[, 2], mean, na.rm = TRUE)
+	if(length(mtch)) {
+		if(mean_mode == "w0") {
+			mintersect = pintersect(m_gr, m_target_windows)
+			w = width(mintersect)
+			target_windows_list = split(ranges(m_gr), mtch[, 2])
+			target_windows2 = target_windows[as.numeric(names(target_windows_list))]
+			cov = coverage(target_windows_list, shift = -start(target_windows2), width = width(target_windows2))
+			#non_intersect_width = sapply(cov, function(x) sum(x == 0))
+			non_intersect_width = sapply(cov@listData, function(x) {ind = x@values == 0;sum(x@lengths[ind])})
+			x = tapply(w*v, mtch[, 2], sum, na.rm = TRUE) / (tapply(w, mtch[, 2], sum, na.rm = TRUE) + non_intersect_width)
+		} else if(mean_mode == "coverage") {
+			mintersect = pintersect(m_gr, m_target_windows)
+			p = width(mintersect)/width(m_target_windows)
+			x = tapply(p*v, mtch[, 2], sum, na.rm = TRUE)
+		} else if(mean_mode == "absolute") {
+			x = tapply(v, mtch[, 2], mean, na.rm = TRUE)
+		} else {
+			mintersect = pintersect(m_gr, m_target_windows)
+			w = width(mintersect)
+			x = tapply(w*v, mtch[, 2], sum, na.rm = TRUE) / tapply(w, mtch[, 2], sum, na.rm = TRUE)
+		}
+		v2 = rep(empty_value, length(target_windows))
+		v2[ as.numeric(names(x)) ] = x
 	} else {
-		mintersect = pintersect(m_gr, m_target_windows)
-		w = width(mintersect)
-		x = tapply(w*v, mtch[, 2], sum, na.rm = TRUE) / tapply(w, mtch[, 2], sum, na.rm = TRUE)
+		v2 = rep(empty_value, length(target_windows))
 	}
 
-	v2 = rep(empty_value, length(target_windows))
-	v2[ as.numeric(names(x)) ] = x
-  
 	target_windows$..value = v2
 
 	# transform into a matrix
