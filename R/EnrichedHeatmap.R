@@ -402,7 +402,7 @@ setMethod(f = "draw",
 # -value what type of value corresponds to the y-axis
 # -yaxis_side side of y-axis
 # -yaxis_gp graphic parameters for yaxis
-# -show_error whether show error regions which are +-1 sd to the mean value. Color of error
+# -show_error whether show error regions which are +-1 se to the mean value. Color of error
 #            area is same as the corresponding lines with 75 percent transparency.
 #
 # == details
@@ -470,11 +470,11 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 		}
 
 		if(show_error) {
-			y_sd = sapply(ht@row_order_list, function(i) {
-				colSds(mat[i, , drop = FALSE], na.rm = TRUE)
+			y_se = sapply(ht@row_order_list, function(i) {
+				colSds(mat[i, , drop = FALSE], na.rm = TRUE)/sqrt(length(i))
 			})
 			if(is.null(ylim)) {
-				ylim = range(c(y+y_sd, y-y_sd), na.rm = TRUE)
+				ylim = range(c(y+y_se, y-y_se), na.rm = TRUE)
 				ylim[2] = ylim[2] + (ylim[2] - ylim[1]) * 0.05
 			}
 		} else {
@@ -493,7 +493,7 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 			if(show_error) {
 				line_col = col2rgb(subset_gp(gp, i)$col, alpha = TRUE)[, 1]
 				line_col[4] = floor(line_col[4]*0.25)
-				grid.polygon(c(seq_len(n)-0.5, rev(seq_len(n)-0.5)), c(y[,i]+y_sd[,i], rev(y[,i]-y_sd[,i])), 
+				grid.polygon(c(seq_len(n)-0.5, rev(seq_len(n)-0.5)), c(y[,i]+y_se[,i], rev(y[,i]-y_se[,i])), 
 					default.units = "native", gp = gpar(col = NA, fill = rgb(line_col[1], line_col[2], line_col[3], line_col[4], maxColorValue = 255)))
 			}
 			grid.lines(seq_len(n)-0.5, y[,i], default.units = "native", gp = subset_gp(gp, i))

@@ -672,12 +672,12 @@ print.normalizedMatrix = function(x, ...) {
 # NULL
 copyAttr = function(x, y) {
 	if(!identical(ncol(x), ncol(y))) {
-		stop("x and y should have same dimension.\n")
+		stop("x and y should have same number of columns.\n")
 	}
 	attr = attributes(x)
 	for(bb in setdiff(names(attr), c("dim"))) {
 		if(bb == "dimnames") {
-			attr(y, bb)[[2]] = attr[[bb]][[2]]
+			attr(y, bb)[[2]] = attr[[bb]][[2]]  # set same column names
 		} else {
 			attr(y, bb) = attr[[bb]]
 		}
