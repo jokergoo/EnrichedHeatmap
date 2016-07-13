@@ -202,7 +202,7 @@ EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3",
     km = 3, row_title_rot = 0)
 ```
 
-You can also add error areas (1 sd) for each line. The color of error areas always have the same 
+You can also add error areas (1 se) for each line. The color of error areas always have the same 
 color of corresponding line but with 75 percent transparency.
 
 Users should be careful with `show_error`. It only makes sense when patterns in heatmap or row clusters
@@ -598,6 +598,60 @@ Then `mat` here can be used to visualize how gene expression is correlated to hi
 ```{r, eval = FALSE}
 # code not run
 EnrichedHeatmap(mat)
+```
+
+## Use your own matrix
+
+`normalizeToMatrix()` is used to normalize the associations between genomic signals to the targets. The returned value
+is just a simple matrix but with several attributes attached. Sometimes, users may have their own way to generate such matrix.
+It is easy to add the addtional attributes and send to `EnrichedHeamtap()` for visualization.
+
+Following four attributes should be attached. Basically they are used for making the axes and labels.
+
+```{r, eval = FALSE}
+attr(mat, "upstream_index")
+attr(mat, "target_index")
+attr(mat, "downstream_index")
+attr(mat, "extend")
+```
+
+To taks as an example, in following code, `mat2` is a simple matrix which only contains `dim` attributes.
+`mat2` can be thought as a matrix obtained from other methods.
+
+```{r}
+mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
+    extend = 5000, mean_mode = "w0", w = 50)
+mat2 = mat1
+attributes(mat2) = NULL
+dim(mat2) = dim(mat1)
+mat2[1:4, 1:4]
+```
+
+As we already know, in `mat2`, upstream is extended to 5kb by 50bp window, which means the first 100 columns
+correspond to the upstream. Similar the last 100 columns for downstream. Here the targets is TSS which can be thought
+as with no width. So we can set column index attributes for upstream, target and downstream as follows:
+
+```{r}
+attr(mat2, "upstream_index") = 1:100
+attr(mat2, "target_index") = integer(0)
+attr(mat2, "downstream_index") = 101:200
+attr(mat2, "extend") = c(5000, 5000)  # it must be a vector of length two
+```
+
+And don't forget to set `mat2` to `normalizedMatrix` class. And now `mat2` is a valid object for `EnrichedHeamtap()`.
+
+```{r}
+class(mat2) = c("normalizedMatrix", "matrix")
+mat2
+```
+
+Above four attributes are enough for making the heatmaps, there are several more attributes which can give
+better information when printing `mat2`.
+
+```{r}
+attr(mat2, "signal_name") = "H3K4me3"
+attr(mat2, "target_name") = "TSS"
+mat2
 ```
 
 ## Notice
