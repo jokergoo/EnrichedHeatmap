@@ -1,6 +1,5 @@
 changes in version 1.3.4
 
-* add upstream, downstream and body function to extract submatrix
 * add a new section in the vignette ("Use your own matrix")
 * standard error is used instead of standard deviation for the annotation
 
