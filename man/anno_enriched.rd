@@ -8,7 +8,7 @@ Annotation function to show the enrichment
 }
 \usage{
 anno_enriched(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
-    yaxis = TRUE, ylim = NULL, value = c("mean", "sum"), yaxis_side = "right",
+    yaxis = TRUE, ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"), yaxis_side = "right",
     yaxis_gp = gpar(fontsize = 8), show_error = FALSE)
 }
 \arguments{
@@ -21,7 +21,7 @@ anno_enriched(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 
   \item{value}{what type of value corresponds to the y-axis}
   \item{yaxis_side}{side of y-axis}
   \item{yaxis_gp}{graphic parameters for yaxis}
-  \item{show_error}{whether show error regions which are +-1 sd to the mean value. Color of error area is same as the corresponding lines with 75 percent transparency.}
+  \item{show_error}{whether show error regions which are +-1 se to the mean value. Color of error area is same as the corresponding lines with 75 percent transparency.}
 
 }
 \details{
