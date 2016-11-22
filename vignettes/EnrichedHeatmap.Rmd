@@ -442,6 +442,29 @@ draw(ht_list, main_heatmap = "H3K4me3", gap = unit(c(2, 10, 2), "mm"),
     annotation_legend_list = list(lgd))
 ```
 
+## Visualize positive signals and negative signals separatedly
+
+Sometimes we visualize the general correlation around certain genomic targets or the difference
+between two subgroups. In this case, it makes more sense to visualize the enrichment for the 
+positive signals and negative signals separatedly. In following example, variable `mat_H3K4me1`
+contains correlation between H3K4me1 signal and expression of corresponding genes in (-5kb, 10kb)
+of the gene TSS.
+
+```{r}
+load(paste0(system.file("extdata", "H3K4me1_corr_normalize_to_tss.RData", package = "EnrichedHeatmap")))
+mat_H3K4me1
+```
+
+In `anno_enriched()`, there are two non-standard parameters `neg_col` and `pos_col` for `gp`. If these
+two are set, the enrichment lines are drawn for the positive signals and negative signals in the matrix
+separatedly.
+
+```{r, fig.width = 4}
+EnrichedHeatmap(mat_H3K4me1, col = colorRamp2(c(-1, 0, 1), c("darkgreen", "white", "red")), name = "corr_H3K4me1",
+    top_annotation = HeatmapAnnotation(line = anno_enriched(gp = gpar(neg_col = "darkgreen", pos_col = "red"))),
+    top_annotation_height = unit(2, "cm"))
+```
+
 ## Restrict overlapping by providing mapping
 
 By default every genomic signal tries to intersect to every target region, but if mapping is

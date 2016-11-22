@@ -394,7 +394,8 @@ setMethod(f = "draw",
 # Annotation function to show the enrichment
 #
 # == param
-# -gp graphic parameters
+# -gp graphic parameters. There are two unstandard parameters: ``neg_col`` and ``pos_col``. 
+#     If these two parameters are defined, the positive signal and negatie signal are visualized separatedly.
 # -pos_line whether draw vertical lines which represent the position of ``target``
 # -pos_line_gp graphic parameters
 # -yaxis whether show yaxis
@@ -443,11 +444,30 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 	yaxis_gp = yaxis_gp
 	show_error = show_error
 
+	by_sign = FALSE
+	if(!is.null(gp$neg_col) && !is.null(gp$pos_col)) {
+		by_sign = TRUE
+		show_error = FALSE
+	} else if(!is.null(gp$neg_col) && is.null(gp$pos_col)) {
+		stop("Since you defined `neg_col` in `gp`, you should also define `pos_col`.")
+	} else if(is.null(gp$neg_col) && !is.null(gp$pos_col)) {
+		stop("Since you defined `pos_col` in `gp`, you should also define `neg_col`.")
+	}
+
 	value = match.arg(value)[1]
 	function(index) {
 
 		ht = get("object", envir = parent.frame(n = 5))
 		mat = ht@matrix
+
+		if(by_sign) {
+			mat_pos = mat
+			mat_pos[mat_pos < 0] = 0
+			mat_neg = mat
+			mat_neg[mat_neg > 0] = 0
+			mat_pos = abs(mat_pos)
+			mat_neg = abs(mat_neg)
+		}
 
 		upstream_index = attr(mat, "upstream_index")
 		downstream_index = attr(mat, "downstream_index")
@@ -458,24 +478,43 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 		n3 = length(downstream_index)
 		n = n1 + n2 + n3
 
-		if(value == "sum") {
-			y = sapply(ht@row_order_list, function(i) {
-				colSums(mat[i, , drop = FALSE], na.rm = TRUE)
-			})
-			show_error = FALSE
-		} else if(value == "abs_sum") {
-			y = sapply(ht@row_order_list, function(i) {
-				colSums(abs(mat[i, , drop = FALSE]), na.rm = TRUE)
-			})
-			show_error = FALSE
-		} else if(value == "mean") {
-			y = sapply(ht@row_order_list, function(i) {
-				colMeans(mat[i, , drop = FALSE], na.rm = TRUE)
-			})
-		} else if(value == "abs_mean") {
-			y = sapply(ht@row_order_list, function(i) {
-				colMeans(abs(mat[i, , drop = FALSE]), na.rm = TRUE)
-			})
+		if(by_sign) {
+			if(value == "sum" || value == "abs_sum") {
+				y_pos = sapply(ht@row_order_list, function(i) {
+					colSums(mat_pos[i, , drop = FALSE], na.rm = TRUE)
+				})
+				y_neg = sapply(ht@row_order_list, function(i) {
+					colSums(mat_neg[i, , drop = FALSE], na.rm = TRUE)
+				})
+				show_error = FALSE
+			} else if(value == "mean" || value == "abs_mean") {
+				y_pos = sapply(ht@row_order_list, function(i) {
+					colMeans(mat_pos[i, , drop = FALSE], na.rm = TRUE)
+				})
+				y_neg = sapply(ht@row_order_list, function(i) {
+					colMeans(mat_neg[i, , drop = FALSE], na.rm = TRUE)
+				})
+			}
+		} else {
+			if(value == "sum") {
+				y = sapply(ht@row_order_list, function(i) {
+					colSums(mat[i, , drop = FALSE], na.rm = TRUE)
+				})
+				show_error = FALSE
+			} else if(value == "abs_sum") {
+				y = sapply(ht@row_order_list, function(i) {
+					colSums(abs(mat[i, , drop = FALSE]), na.rm = TRUE)
+				})
+				show_error = FALSE
+			} else if(value == "mean") {
+				y = sapply(ht@row_order_list, function(i) {
+					colMeans(mat[i, , drop = FALSE], na.rm = TRUE)
+				})
+			} else if(value == "abs_mean") {
+				y = sapply(ht@row_order_list, function(i) {
+					colMeans(abs(mat[i, , drop = FALSE]), na.rm = TRUE)
+				})
+			}
 		}
 
 		if(show_error) {
@@ -488,9 +527,12 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 			}
 		} else {
 			if(is.null(ylim)) {
-				ylim = range(y, na.rm = TRUE)
+				if(by_sign) {
+					ylim = range(c(y_pos, y_neg), na.rm = TRUE)
+				} else {
+					ylim = range(y, na.rm = TRUE)
+				}
 				ylim[2] = ylim[2] + (ylim[2] - ylim[1]) * 0.05
-
 			}
 		}
 
@@ -498,14 +540,23 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 
 		pushViewport(viewport(xscale = c(0, n), yscale = ylim))
 		grid.rect(gp = gpar(col = "black", fill = NA))
-		for(i in seq_len(ncol(y))) {
-			if(show_error) {
-				line_col = col2rgb(subset_gp(gp, i)$col, alpha = TRUE)[, 1]
-				line_col[4] = floor(line_col[4]*0.25)
-				grid.polygon(c(seq_len(n)-0.5, rev(seq_len(n)-0.5)), c(y[,i]+y_se[,i], rev(y[,i]-y_se[,i])), 
-					default.units = "native", gp = gpar(col = NA, fill = rgb(line_col[1], line_col[2], line_col[3], line_col[4], maxColorValue = 255)))
+		if(by_sign) {
+			for(i in seq_len(ncol(y_pos))) {
+				gp2 = subset_gp(gp, i); gp2$col = gp2$pos_col
+				grid.lines(seq_len(n)-0.5, y_pos[,i], default.units = "native", gp = gp2)
+				gp2 = subset_gp(gp, i); gp2$col = gp2$neg_col
+				grid.lines(seq_len(n)-0.5, y_neg[,i], default.units = "native", gp = gp2)
 			}
-			grid.lines(seq_len(n)-0.5, y[,i], default.units = "native", gp = subset_gp(gp, i))
+		} else {
+			for(i in seq_len(ncol(y))) {
+				if(show_error) {
+					line_col = col2rgb(subset_gp(gp, i)$col, alpha = TRUE)[, 1]
+					line_col[4] = floor(line_col[4]*0.25)
+					grid.polygon(c(seq_len(n)-0.5, rev(seq_len(n)-0.5)), c(y[,i]+y_se[,i], rev(y[,i]-y_se[,i])), 
+						default.units = "native", gp = gpar(col = NA, fill = rgb(line_col[1], line_col[2], line_col[3], line_col[4], maxColorValue = 255)))
+				}
+				grid.lines(seq_len(n)-0.5, y[,i], default.units = "native", gp = subset_gp(gp, i))
+			}
 		}
 		if(pos_line) {
 		    if(n1 && n2 && n3) {

@@ -13,7 +13,7 @@ anno_enriched(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 
 }
 \arguments{
 
-  \item{gp}{graphic parameters}
+  \item{gp}{graphic parameters. There are two unstandard parameters: \code{neg_col} and \code{pos_col}.  If these two parameters are defined, the positive signal and negatie signal are visualized separatedly.}
   \item{pos_line}{whether draw vertical lines which represent the position of \code{target}}
   \item{pos_line_gp}{graphic parameters}
   \item{yaxis}{whether show yaxis}
