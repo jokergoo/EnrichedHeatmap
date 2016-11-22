@@ -1,3 +1,9 @@
+changes in version 1.5.1
+
+* anno_enriched(): can visualize positive signals and negative signals separatedly
+
+==================================
+
 changes in version 1.3.5
 
 * anno_enriched(): add `abs_mean` and `abs_sum` for `value` argument
