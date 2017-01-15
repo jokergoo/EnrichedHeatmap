@@ -1,6 +1,7 @@
 changes in version 1.5.1
 
 * anno_enriched(): can visualize positive signals and negative signals separatedly
+* add rbind.normalizedMatrix function
 
 ==================================
 
