@@ -611,6 +611,14 @@ makeWindows = function(query, w = NULL, k = NULL, direction = c("normal", "rever
 	return(x)
 }
 
+rbind.normalizedMatrix = function(..., deparse.level = 1) {
+	mat_list = list(...)
+	rbind_matrix = selectMethod("rbind", signature = "matrix")
+	mat = do.call("rbind_matrix", mat_list)
+	mat = copyAttr(mat_list[[1]], mat)
+	return(mat)
+}
+
 # == title
 # Print normalized matrix
 #
