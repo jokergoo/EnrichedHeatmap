@@ -70,12 +70,12 @@ In this case, values associated to each transcript are binary (either 1 or 0) an
 A matrix with following additional attributes:
 
 \describe{
-  \item{upstream_index}{column index corresponding to upstream of \code{target}}
-  \item{target_index}{column index corresponding to \code{target}}
-  \item{downstream_index}{column index corresponding to downstream of \code{target}}
-  \item{extend}{extension on upstream and downstream}
-  \item{smooth}{whether smoothing was applied on the matrix}
-  \item{failed_rows}{index of rows which are failed for smoothing}
+  \item{\code{upstream_index}}{column index corresponding to upstream of \code{target}}
+  \item{\code{target_index}}{column index corresponding to \code{target}}
+  \item{\code{downstream_index}}{column index corresponding to downstream of \code{target}}
+  \item{\code{\link{}}extend}{extension\code{\link{}} on upstream and downstream}
+  \item{\code{smooth}}{whether smoothing was applied on the matrix}
+  \item{\code{failed_rows}}{index of rows which are failed for smoothing}
 }
 
 The matrix is wrapped into a simple \code{normalizeToMatrix} class.

@@ -65,12 +65,12 @@
 # == value
 # A matrix with following additional attributes:
 #
-# -upstream_index column index corresponding to upstream of ``target``
-# -target_index column index corresponding to ``target``
-# -downstream_index column index corresponding to downstream of ``target``
-# -extend extension on upstream and downstream
-# -smooth whether smoothing was applied on the matrix
-# -failed_rows index of rows which are failed for smoothing
+# -``upstream_index`` column index corresponding to upstream of ``target``
+# -``target_index`` column index corresponding to ``target``
+# -``downstream_index`` column index corresponding to downstream of ``target``
+# -``extend extension`` on upstream and downstream
+# -``smooth`` whether smoothing was applied on the matrix
+# -``failed_rows`` index of rows which are failed for smoothing
 #
 # The matrix is wrapped into a simple ``normalizeToMatrix`` class.
 #
