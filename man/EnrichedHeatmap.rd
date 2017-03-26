@@ -33,12 +33,12 @@ EnrichedHeatmap(mat, score_fun = enriched_score, row_order = NULL, pos_line = TR
 set with pre-defined values:
 
 \describe{
-  \item{row_order}{the rows are sorted by the enriched score which is calcualted by \code{score_fun}. The sorting is applied decreasingly.}
-  \item{cluster_columns}{enforced to be \code{FALSE}}
-  \item{show_row_names}{enforced to be \code{FALSE}}
-  \item{show_column_names}{enforced to be \code{FALSE}}
-  \item{bottom_annotation}{enforced to be \code{NULL} }
-  \item{column_title_side}{enforced to be \code{top}}
+  \item{\code{row_order}}{the rows are sorted by the enriched score which is calcualted by \code{score_fun}. The sorting is applied decreasingly.}
+  \item{\code{cluster_columns}}{enforced to be \code{FALSE}}
+  \item{\code{show_row_names}}{enforced to be \code{FALSE}}
+  \item{\code{show_column_names}}{enforced to be \code{FALSE}}
+  \item{\code{bottom_annotation}}{enforced to be \code{NULL} }
+  \item{\code{column_title_side}}{enforced to be \code{top}}
 }
 
 With above pre-defined values, no graphics will be drawn below the heatmap, then the space

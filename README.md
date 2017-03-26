@@ -1,5 +1,9 @@
 [![Build Status](https://travis-ci.org/jokergoo/EnrichedHeatmap.svg)](https://travis-ci.org/jokergoo/EnrichedHeatmap)
- [![codecov](https://img.shields.io/codecov/c/github/jokergoo/EnrichedHeatmap.svg)](https://codecov.io/github/jokergoo/EnrichedHeatmap) [![bioc](http://www.bioconductor.org/shields/downloads/EnrichedHeatmap.svg)](http://bioconductor.org/packages/stats/bioc/EnrichedHeatmap.html) ![bioc](http://www.bioconductor.org/shields/years-in-bioc/EnrichedHeatmap.svg)
+[![codecov](https://img.shields.io/codecov/c/github/jokergoo/EnrichedHeatmap.svg)](https://codecov.io/github/jokergoo/EnrichedHeatmap)
+[![bioc](http://www.bioconductor.org/shields/downloads/EnrichedHeatmap.svg)](https://bioconductor.org/packages/stats/bioc/EnrichedHeatmap/) 
+[![bioc](http://mcube.nju.edu.cn/cgi-bin/zuguanggu/bioc_download.pl?package=EnrichedHeatmap)](https://bioconductor.org/packages/stats/bioc/EnrichedHeatmap/) 
+[![bioc](http://www.bioconductor.org/shields/years-in-bioc/EnrichedHeatmap.svg)](http://bioconductor.org/packages/devel/bioc/html/EnrichedHeatmap.html)
+
  
 ## Make Enriched Heatmaps
 

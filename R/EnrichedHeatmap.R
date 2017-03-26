@@ -89,13 +89,13 @@ enriched_score = function(x1, x2, x3) {
 # `EnrichedHeatmap-class` is inherited from `ComplexHeatmap::Heatmap-class`. Following parameters are 
 # set with pre-defined values:
 #
-# -row_order the rows are sorted by the enriched score which is calcualted by ``score_fun``.
+# -``row_order`` the rows are sorted by the enriched score which is calcualted by ``score_fun``.
 #            The sorting is applied decreasingly.
-# -cluster_columns enforced to be ``FALSE``
-# -show_row_names enforced to be ``FALSE``
-# -show_column_names enforced to be ``FALSE``
-# -bottom_annotation enforced to be ``NULL`` 
-# -column_title_side enforced to be ``top``
+# -``cluster_columns`` enforced to be ``FALSE``
+# -``show_row_names`` enforced to be ``FALSE``
+# -``show_column_names`` enforced to be ``FALSE``
+# -``bottom_annotation`` enforced to be ``NULL`` 
+# -``column_title_side`` enforced to be ``top``
 #
 # With above pre-defined values, no graphics will be drawn below the heatmap, then the space
 # below the heatmap can be used to add a new graph which contains the axis. A (or two) line which corresponds to 
