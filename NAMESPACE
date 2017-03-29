@@ -28,4 +28,6 @@ importFrom("methods", setClass)
 importFrom("methods", setGeneric)
 importFrom("methods", setMethod)
 importFrom("stats", loess)
-
+importFrom("grDevices", "col2rgb", "rgb")
+importFrom("methods", "new", "selectMethod", "slot", "slot<-", "slotNames")
+importFrom("stats", "loess.control", "predict")
