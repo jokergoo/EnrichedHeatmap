@@ -68,7 +68,7 @@
 # -``upstream_index`` column index corresponding to upstream of ``target``
 # -``target_index`` column index corresponding to ``target``
 # -``downstream_index`` column index corresponding to downstream of ``target``
-# -``extend extension`` on upstream and downstream
+# -``extend`` extension on upstream and downstream
 # -``smooth`` whether smoothing was applied on the matrix
 # -``failed_rows`` index of rows which are failed for smoothing
 #
