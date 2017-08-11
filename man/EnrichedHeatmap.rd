@@ -10,7 +10,7 @@ Constructor method for EnrichedHeatmap class
 EnrichedHeatmap(mat, score_fun = enriched_score, row_order = NULL, pos_line = TRUE,
     pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = NULL,
     axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE,
-    show_row_dend = FALSE, ...)
+    show_row_dend = FALSE, show_row_names = FALSE, ...)
 }
 \arguments{
 
@@ -25,6 +25,7 @@ EnrichedHeatmap(mat, score_fun = enriched_score, row_order = NULL, pos_line = TR
   \item{border}{whether show border of the heatmap}
   \item{cluster_rows}{clustering on rows are turned off by default}
   \item{show_row_dend}{whether show dendrograms on rows}
+  \item{show_row_names}{whether show row names}
   \item{...}{pass to \code{\link[ComplexHeatmap]{Heatmap}}}
 
 }
@@ -35,7 +36,6 @@ set with pre-defined values:
 \describe{
   \item{\code{row_order}}{the rows are sorted by the enriched score which is calcualted by \code{score_fun}. The sorting is applied decreasingly.}
   \item{\code{cluster_columns}}{enforced to be \code{FALSE}}
-  \item{\code{show_row_names}}{enforced to be \code{FALSE}}
   \item{\code{show_column_names}}{enforced to be \code{FALSE}}
   \item{\code{bottom_annotation}}{enforced to be \code{NULL} }
   \item{\code{column_title_side}}{enforced to be \code{top}}

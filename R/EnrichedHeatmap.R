@@ -83,6 +83,7 @@ enriched_score = function(x1, x2, x3) {
 # -border whether show border of the heatmap
 # -cluster_rows clustering on rows are turned off by default
 # -show_row_dend whether show dendrograms on rows
+# -show_row_names whether show row names
 # -... pass to `ComplexHeatmap::Heatmap`
 #
 # == details
@@ -92,7 +93,6 @@ enriched_score = function(x1, x2, x3) {
 # -``row_order`` the rows are sorted by the enriched score which is calcualted by ``score_fun``.
 #            The sorting is applied decreasingly.
 # -``cluster_columns`` enforced to be ``FALSE``
-# -``show_row_names`` enforced to be ``FALSE``
 # -``show_column_names`` enforced to be ``FALSE``
 # -``bottom_annotation`` enforced to be ``NULL`` 
 # -``column_title_side`` enforced to be ``top``
@@ -124,7 +124,7 @@ enriched_score = function(x1, x2, x3) {
 EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, pos_line = TRUE, 
 	pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = NULL, 
 	axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, 
-	show_row_dend = FALSE, ...) {
+	show_row_dend = FALSE, show_row_names = FALSE, ...) {
 
 	upstream_index = attr(mat, "upstream_index")
 	downstream_index = attr(mat, "downstream_index")
@@ -313,7 +313,7 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, po
 	class(mat) = NULL
 
 	ht = Heatmap(mat, row_order = od, cluster_columns = FALSE, cluster_rows = cluster_rows,
-			show_row_names = FALSE, show_column_names = FALSE, bottom_annotation = NULL, 
+			show_row_names = show_row_names, show_column_names = FALSE, bottom_annotation = NULL, 
 			column_title_side = "top", show_row_dend = show_row_dend, ...)
 
 	# additional parameters specific for `EnrichedHeatmap` class
