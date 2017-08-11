@@ -252,9 +252,9 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 		
 		if(!is.null(failed_rows)) {
 			if(length(failed_rows) == 1) {
-				msg = paste(strwrap(paste0("Smoothig is failed for one row because there are very few signals overlapped to it. Please use `attr(mat, 'failed_rows')` to get the index of the failed row and consider to remove it.\n")), collapse = "\n")
+				msg = paste(strwrap(paste0("Smoothing is failed for one row because there are very few signals overlapped to it. Please use `attr(mat, 'failed_rows')` to get the index of the failed row and consider to remove it.\n")), collapse = "\n")
 			} else {
-				msg = paste(strwrap(paste0("Smoothig are failed for ", length(failed_rows), " rows because there are very few signals overlapped to them. Please use `attr(mat, 'failed_rows')` to get the index of failed rows and consider to remove them.\n")), collapse = "\n")
+				msg = paste(strwrap(paste0("Smoothing are failed for ", length(failed_rows), " rows because there are very few signals overlapped to them. Please use `attr(mat, 'failed_rows')` to get the index of failed rows and consider to remove them.\n")), collapse = "\n")
 			}
 			msg = paste0("\n", msg, "\n")
 			warning(msg)
