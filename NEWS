@@ -1,6 +1,7 @@
 changes in version 1.7.1
 
 * show_row_names is put in the function argument list
+* we don't use a position with 0 (either +1 or -1)
 
 ==================================
 
