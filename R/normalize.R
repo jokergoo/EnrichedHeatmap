@@ -182,7 +182,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
   	if(target_is_single_point) {
   		# do not need to separate upstream and downstream
   		# and it makes the boundary between upstream and downstream smoothing
-  		suppressWarnings(both <- promoters(target, upstream = extend[1], downstream = extend[2]))
+  		suppressWarnings(both <- promoters(target, upstream = extend[1], downstream = extend[2] + 1))
 
 		mat_both = makeMatrix(signal, both, w = w, value_column = value_column, mapping_column = mapping_column, 
 			empty_value = empty_value, mean_mode = mean_mode)
@@ -192,7 +192,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 		# }
 		mat_upstream = mat_both[, .seq(1, i), drop = FALSE]
 		mat_downstream = mat_both[, .seq(i+1, ncol(mat_both)), drop = FALSE]
-	  
+
   	} else {
 		# extend and normalize in upstream 
 		if(extend[1] <= 0) {
@@ -211,7 +211,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 		if(extend[2] <= 0) {
 			mat_downstream = matrix(0, nrow = length(target), ncol = 0)
 		} else {
-			suppressWarnings(downstream <- promoters(end_target, upstream = 0, downstream = extend[2]))
+			suppressWarnings(downstream <- promoters(end_target, upstream = 0, downstream = extend[2] ))
 			names(downstream) = names(target)
 		  
 			mat_downstream = makeMatrix(signal, downstream, w = w, value_column = value_column, mapping_column = mapping_column, 
@@ -315,7 +315,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 # target = GRanges(seqnames = "chr1", ranges =IRanges(start = 1, end = 10))
 # makeMatrix(gr, target, w = 2)
 #
-makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mapping_column = mapping_column, empty_value = 0,
+makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mapping_column = NULL, empty_value = 0,
     mean_mode = c("absolute", "weighted", "w0", "coverage"), direction = c("normal", "reverse")) {
   
 	if(is.null(value_column)) {

@@ -187,13 +187,13 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, po
 	axis_fun = function() {
 		grid.lines(c(0.5/n, (n-0.5)/n), c(1, 1))
 		if(n1 && n2 && n3) {
-			grid.segments(c(0.5/n, (n1-0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n), 
+			grid.segments(c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n), 
 				          unit(1, "npc") - unit(c(1, 1, 1, 1), "mm"), 
-				          c(0.5/n, (n1-0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n), 
+				          c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n), 
 				          c(1, 1, 1, 1))
 			if(axis_name_rot == 0) {
 				grid.text(axis_name,
-					      c(0.5/n, (n1-0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n),
+					      c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n),
 					      unit(1, "npc") - unit(c(2, 2, 2, 2), "mm"), gp = axis_name_gp,
 					      hjust = c(0, 0.5, 0.5, 1), vjust = 1)
 			} else {
@@ -205,18 +205,18 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, po
 					vjust = 0.5
 				}
 				grid.text(axis_name,
-					      c(0.5/n, (n1-0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n),
+					      c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n),
 					      unit(1, "npc") - unit(c(2, 2, 2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
 					      hjust = hjust, vjust = vjust)
 			}
 		} else if(n1 && !n2 && n3) {
-			grid.segments(c(0.5/n, (n1-0.5)/n, (n-0.5)/n), 
+			grid.segments(c(0.5/n, (n1+0.5)/n, (n-0.5)/n), 
 				          unit(1, "npc") - unit(c(1, 1, 1), "mm"), 
-				          c(0.5/n, (n1-0.5)/n, (n-0.5)/n), 
+				          c(0.5/n, (n1+0.5)/n, (n-0.5)/n), 
 				          c(1, 1, 1))
 			if(axis_name_rot == 0) {
 				grid.text(axis_name,
-					      c(0.5/n, (n1-0.5)/n, (n-0.5)/n),
+					      c(0.5/n, (n1+0.5)/n, (n-0.5)/n),
 					      unit(1, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp,
 					      hjust = c(0, 0.5, 1), vjust = 1)
 			} else {
@@ -228,7 +228,7 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, po
 					vjust = 0.5
 				}
 				grid.text(axis_name,
-					      c(0.5/n, (n1-0.5)/n, (n-0.5)/n),
+					      c(0.5/n, (n1+0.5)/n, (n-0.5)/n),
 					      unit(1, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
 					      hjust = hjust, vjust = vjust)
 			}
@@ -256,13 +256,13 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, po
 					      hjust = hjust, vjust = vjust)
 			}
 		} else if(n1 && n2 && !n3) {
-			grid.segments(c(0.5/n, (n1-0.5)/n, (n1+n2-0.5)/n), 
+			grid.segments(c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n), 
 				          unit(1, "npc") - unit(c(1, 1, 1), "mm"), 
-				          c(0.5/n, (n1-0.5)/n, (n1+n2-0.5)/n), 
+				          c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n), 
 				          c(1, 1, 1))
 			if(axis_name_rot == 0) {
 				grid.text(axis_name,
-					      c(0.5/n, (n1-0.5)/n, (n1+n2-0.5)/n),
+					      c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n),
 					      unit(1, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp,
 					      hjust = c(0, 0.5, 1), vjust = 1)
 			} else {
@@ -274,7 +274,7 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, po
 					vjust = 0.5
 				}
 				grid.text(axis_name,
-					      c(0.5/n, (n1-0.5)/n, (n1+n2-0.5)/n),
+					      c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n),
 					      unit(1, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
 					      hjust = hjust, vjust = vjust)
 			}
@@ -562,10 +562,10 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 		}
 		if(pos_line) {
 		    if(n1 && n2 && n3) {
-                grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = pos_line_gp)
+                grid.lines(rep((n1+0.5)/n, 2), c(0, 1), gp = pos_line_gp)
                 grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = pos_line_gp)
             } else if(n1 && !n2 && n3) {
-                grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = pos_line_gp)
+                grid.lines(rep((n1+0.5)/n, 2), c(0, 1), gp = pos_line_gp)
             } else if(!n1 && n2 && n3) {
                 grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = pos_line_gp)
             } else if(n1 && n2 && !n3) {
