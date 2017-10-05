@@ -437,6 +437,7 @@ setMethod(f = "draw",
 #
 anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
 	yaxis = TRUE, ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"), yaxis_side = "right", 
+	yaxis_facing = ifelse(yaxis_side == "right", "right", "left"), 
 	yaxis_gp = gpar(fontsize = 8), show_error = FALSE) {
 
 	# in case of lazy loading
@@ -446,6 +447,7 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 	yaxis = yaxis
 	ylim = ylim
 	yaxis_side = yaxis_side
+	yaxis_facing = yaxis_facing
 	yaxis_gp = yaxis_gp
 	show_error = show_error
 
@@ -576,10 +578,31 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
             }
 		}
 		if(yaxis) {
-			if(yaxis_side == "right") {
-				grid.yaxis(main = FALSE, gp = yaxis_gp)
+			le1 = grid.pretty(ylim)
+			le2 = pretty(ylim, n = 3)
+			if(abs(length(le1) - 5) < abs(length(le2) - 5)) {
+				le = le1
 			} else {
-				grid.yaxis(gp = yaxis_gp)
+				le = le2
+			}
+			breaks = le[le >= ylim[1] & le <= ylim[2]]
+			n_break = length(breaks)
+			if(yaxis_side == "right") {
+				if(yaxis_facing == "right") {
+					grid.segments(unit(1, "npc"), breaks, unit(1, "npc") + unit(1, "mm"), breaks, default.units = "native", gp = yaxis_gp)
+					grid.text(breaks, unit(1, "npc") + unit(2, "mm"), breaks, default.units = "native", gp = yaxis_gp, just = "left")
+				} else {
+					grid.segments(unit(1, "npc"), breaks, unit(1, "npc") - unit(1, "mm"), breaks, default.units = "native", gp = yaxis_gp)
+					grid.text(breaks, unit(1, "npc") - unit(2, "mm"), breaks, default.units = "native", gp = yaxis_gp, just = "right")
+				}
+			} else {
+				if(yaxis_facing == "right") {
+					grid.segments(unit(0, "npc"), breaks, unit(0, "npc") + unit(1, "mm"), breaks, default.units = "native", gp = yaxis_gp)
+					grid.text(breaks, unit(0, "npc") + unit(2, "mm"), breaks, default.units = "native", gp = yaxis_gp, just = "left")
+				} else {
+					grid.segments(unit(0, "npc"), breaks, unit(0, "npc") - unit(1, "mm"), breaks, default.units = "native", gp = yaxis_gp)
+					grid.text(breaks, unit(0, "npc") - unit(2, "mm"), breaks, default.units = "native", gp = yaxis_gp, just = "right")
+				}
 			}
 		}
 	    upViewport()
