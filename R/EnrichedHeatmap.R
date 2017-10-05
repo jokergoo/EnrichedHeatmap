@@ -11,6 +11,9 @@
 # - `EnrichedHeatmap`: constructor method.
 # - `draw,EnrichedHeatmap-method`: draw a single heatmap.
 #
+# == seealso
+# `EnrichedHeatmapList-class`
+#
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
@@ -27,11 +30,27 @@ EnrichedHeatmap = setClass("EnrichedHeatmap",
 # -x3 a vector corresponding to values in downstream windows
 #
 # == details
-# The function calculates how the signal is enriched in the targets.
-# The score is the sum of values weighted by the reciprocal of the distance to the targets.
+# The function calculates how the signal is enriched in the target by weighting
+# the distance to the target.
 #
+# For a numeric vector, assume the vector is denoted as combination of three sub-vectors
+# ``c(x1, x2, x3)`` with length ``n1``, ``n2`` and ``n3``, 
+# where ``x1`` are data points in upstream windows, ``x2`` are data points in target windows and 
+# ``x3`` are data points in downstream windows, the enriched score is calcualted as 
+#
+# sum(x_1i* i/n1) + sum(x_3j* (n3 - j + 1)/n3) + sum(x_2k * abs(n2/2 - abs(k - n2/2)))
+#
+# where the first two terms are the distance to the start or end position of the target
+# by weighting the distance to the position that if it is closer to the start or end position
+# of the target, it has higher weight. The second term weight the distance to the center point
+# of the target and similar, if it is closer to the center position, it has higher weight.
+#
+# == seealso
+# This `enriched_score` is the default scoring function for ``score_fun`` argument in `EnrichedHeatmap`
+# function. It is also an example function for implementing customized scoreing function.
 # Basically, to be a score function which calculates enriched score, it should accept three arguments
-# which are explained in **Arguments** section and return a single value. Rows are sorted decreasingly by the enriched scores.
+# which are the values in upstream windows, the target windows and downstream windows 
+# The user-defined function should return a single value. Rows are sorted decreasingly by the enriched scores.
 #
 # == value
 # A numeric value.
@@ -69,11 +88,11 @@ enriched_score = function(x1, x2, x3) {
 # 
 # == param
 # -mat a matrix which is returned by `normalizeToMatrix`
-# -score_fun a function which calculates enriched scores for rows in ``mat``. This function can be self-defined, take
-#             a look at `enriched_score` to find out how to design it. Note if row clustering is turned on, this argument is ignored.
+# -score_fun a function which calculates enriched scores for rows in ``mat``. This function can be self-defined, refer to
+#            `enriched_score` to find out how to design it. Note if row clustering is turned on, this argument is ignored.
 # -row_order row order. If it is specified, ``score_fun`` is ignored.
-# -pos_line whether draw vertical lines which represent the position of ``target``
-# -pos_line_gp graphic parameters for lines
+# -pos_line whether draw vertical lines which represent the positions of ``target``
+# -pos_line_gp graphic parameters for the position lines
 # -axis_name names for axis which is below the heatmap. If the targets are single points, ``axis_name`` is a vector
 #         of length three which corresponds to upstream, target itself and downstream. If the
 #         targets are regions with width larger than 1, ``axis_name`` should be a vector of length four which 
@@ -82,7 +101,7 @@ enriched_score = function(x1, x2, x3) {
 # -axis_name_gp graphic parameters for axis names
 # -border whether show border of the heatmap
 # -cluster_rows clustering on rows are turned off by default
-# -show_row_dend whether show dendrograms on rows
+# -show_row_dend whether show dendrograms on rows if apply hierarchical clustering on rows
 # -show_row_names whether show row names
 # -... pass to `ComplexHeatmap::Heatmap`
 #
@@ -90,22 +109,17 @@ enriched_score = function(x1, x2, x3) {
 # `EnrichedHeatmap-class` is inherited from `ComplexHeatmap::Heatmap-class`. Following parameters are 
 # set with pre-defined values:
 #
-# -``row_order`` the rows are sorted by the enriched score which is calcualted by ``score_fun``.
+# -``row_order`` the rows are sorted by the enriched score which is calculated by ``score_fun``.
 #            The sorting is applied decreasingly.
 # -``cluster_columns`` enforced to be ``FALSE``
 # -``show_column_names`` enforced to be ``FALSE``
 # -``bottom_annotation`` enforced to be ``NULL`` 
 # -``column_title_side`` enforced to be ``top``
 #
-# With above pre-defined values, no graphics will be drawn below the heatmap, then the space
-# below the heatmap can be used to add a new graph which contains the axis. A (or two) line which corresponds to 
-# the position of ``target`` will be added to the heatmap body as well.
-#
-# Same as the `ComplexHeatmap::Heatmap-class`, users can make more controls on the heatmap such as
-# apply clustering on rows, or split rows by data frame or k-means clustering. Users can also 
-# add more than one heatmaps by ``+`` operator.
-#
-# For a detailed demonstration, please go to the vignette.
+# A `EnrichedHeatmap-class` object is also a `ComplexHeatmap::Heatmap-class` object, thus, most of the 
+# arguments in `ComplexHeatmap::Heatmap` are usable in `EnrichedHeatmap()` such as
+# to apply clustering on rows, or to split rows by data frame or k-means clustering. Users can also 
+# add more than one heatmaps by ``+`` operator. For a detailed demonstration, please go to the vignette.
 #
 # == value
 # An `EnrichedHeatmap-class` object which is inherited from `ComplexHeatmap::Heatmap-class`.
@@ -114,15 +128,14 @@ enriched_score = function(x1, x2, x3) {
 # Zuguang Gu <z.gu@dkfz.de>
 #
 # == example
-# load(paste0(system.file("extdata", "chr21_test_data.RData", 
-#     package = "EnrichedHeatmap")))
+# load(system.file("extdata", "chr21_test_data.RData", package = "EnrichedHeatmap"))
 # mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
 #     extend = 5000, w = 50, empty_value = 0.5)
 # EnrichedHeatmap(mat3, name = "methylation", column_title = "methylation near CGI")
 # EnrichedHeatmap(mat3, name = "meth1") + EnrichedHeatmap(mat3, name = "meth2")
 # # for more examples, please go to the vignette
 EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, pos_line = TRUE, 
-	pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = NULL, 
+	pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = 0, 
 	axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, 
 	show_row_dend = FALSE, show_row_names = FALSE, ...) {
 
@@ -132,14 +145,6 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, po
 
 	if(is.null(upstream_index) || is.null(downstream_index)) {
 		stop("`mat` should be generated by `normalizeToMatrix()`.")
-	}
-
-	if(is.null(axis_name_rot)) {
-		if(length(target_index)) {
-			axis_name_rot = 90
-		} else {
-			axis_name_rot = 0
-		}
 	}
 
 	# in the arguments of this function, it cannot be set as `score_fun = score_fun`
@@ -396,21 +401,21 @@ setMethod(f = "draw",
 # == param
 # -gp graphic parameters. There are two unstandard parameters: ``neg_col`` and ``pos_col``. 
 #     If these two parameters are defined, the positive signal and negatie signal are visualized separatedly.
-# -pos_line whether draw vertical lines which represent the position of ``target``
-# -pos_line_gp graphic parameters
+# -pos_line whether to draw vertical lines which represent positions of ``target``
+# -pos_line_gp graphic parameters for the position lines
 # -yaxis whether show yaxis
-# -ylim ranges on y-axis
+# -ylim ranges on y-axis, by default it is inferred from the data
 # -value what type of value corresponds to the y-axis
 # -yaxis_side side of y-axis
-# -yaxis_gp graphic parameters for yaxis
-# -show_error whether show error regions which are +-1 se to the mean value. Color of error
+# -yaxis_gp graphic parameters for y-axis
+# -show_error whether show error regions which are +-1 standard error to the mean value. Color of error
 #            area is same as the corresponding lines with 75 percent transparency.
 #
 # == details
-# This annotation functions shows mean values of columns in the normalized matrix
+# This annotation functions shows mean values (or depends on the value set in ``value`` argument) of columns in the normalized matrix
 # which represents the enrichment of the signals to the targets.
 #
-# If rows are splitted, there will also be multiple lines in this annotation.
+# If rows are splitted, the enriched lines are calculated for each row cluster and there will also be multiple lines in this annotation viewport.
 #
 # It should only be placed as column annotation of the Enriched Heatmap.
 #
@@ -421,7 +426,7 @@ setMethod(f = "draw",
 # Zuguang Gu <z.gu@dkfz.de>
 #
 # == example
-# load(paste0(system.file("extdata", "chr21_test_data.RData", package = "EnrichedHeatmap")))
+# load(system.file("extdata", "chr21_test_data.RData", package = "EnrichedHeatmap"))
 # tss = promoters(genes, upstream = 0, downstream = 1)
 # mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
 #     extend = 5000, mean_mode = "w0", w = 50, trim = c(0, 0.01))
