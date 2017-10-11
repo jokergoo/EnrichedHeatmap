@@ -8,27 +8,28 @@ Normalize associations between genomic signals and target regions into a matrix
 }
 \usage{
 normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50,
-    value_column = NULL, mapping_column = NULL, empty_value = ifelse(smooth, NA, 0),
+    value_column = NULL, mapping_column = NULL, background = ifelse(smooth, NA, 0),
     mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1),
-    target_ratio = ifelse(all(extend == 0), 1, 0.1), k = min(c(20, min(width(target)))),
-    smooth = FALSE, smooth_fun = default_smooth_fun, trim = 0)
+    target_ratio = min(c(0.6, mean(width(target))/(sum(extend)) + mean(width(target)))),
+    k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun,
+    keep = c(0, 1))
 }
 \arguments{
 
   \item{signal}{a \code{\link[GenomicRanges]{GRanges}} object.}
   \item{target}{a \code{\link[GenomicRanges]{GRanges}} object.}
-  \item{extend}{extended base pairs to the upstream and downstream of \code{target}. It can be a vector of length one or two. If it is length one, it means extension to the upstream and downstream are the same.}
+  \item{extend}{extended base pairs to the upstream and downstream of \code{target}. It can be a vector of length one or two. Length one means same extension to the upstream and downstream.}
   \item{w}{window size for splitting upstream and downstream.}
-  \item{value_column}{column index in \code{signal} that will be mapped to colors. If it is \code{NULL}, an internal column which all contains 1 will be used.}
+  \item{value_column}{column index in \code{signal} that is mapped to colors. If it is not set, it assumes values for all all signal regiosn are 1.}
   \item{mapping_column}{mapping column to restrict overlapping between \code{signal} and \code{target}. By default it tries to look for all regions in \code{signal} that overlap with every target.}
-  \item{empty_value}{values for small windows that don't overlap with \code{signal}. }
-  \item{mean_mode}{when a window is not perfectly overlapped to \code{signal}, how to summarize  values to this window. See 'Details' section for a detailed explanation.}
+  \item{background}{values for windows that don't overlap with \code{signal}. }
+  \item{mean_mode}{when a window is not perfectly overlapped to \code{signal}, how to summarize  values to the window. See 'Details' section for a detailed explanation.}
   \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target} is enforced to \code{FALSE}.}
   \item{target_ratio}{the ratio of \code{target} in the full heatmap. If the value is 1, \code{extend} will be reset to 0.}
   \item{k}{number of windows only when \code{target_ratio = 1} or \code{extend == 0}, otherwise ignored.}
   \item{smooth}{whether apply smoothing on rows in the matrix. }
   \item{smooth_fun}{the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric vector (may contains \code{NA} values) and returns a vector with same length. If the smoothing is failed, the function should call \code{\link[base]{stop}} to throw errors so that \code{\link{normalizeToMatrix}} can catch how many rows are failed in smoothing.  See the default \code{\link{default_smooth_fun}} for example.}
-  \item{trim}{percent of extreme values to remove. IF it is a vector of length 2, it corresponds to the lower quantile and higher quantile. e.g. \code{c(0.01, 0.01)} means to trim outliers less than 1st quantile and larger than 99th quantile.}
+  \item{keep}{values in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first percentile is replaces with the first pencentile and values larger than the second percentile is replaced with the second percentile.}
 
 }
 \details{
@@ -52,19 +53,6 @@ Following illustrates different settings for \code{mean_mode} (note there is one
     weighted: (40*4 + 30*6 + 50*3 + 20*3)/(4 + 6 + 3 + 3)
     w0:       (40*4 + 30*6 + 50*3 + 20*3)/(4 + 6 + 3 + 3 + 4)
     coverage: (40*4 + 30*6 + 50*3 + 20*3)/17  }
-
-To explain it more clearly, let's consider three scenarios:
-
-First, we want to calculate mean methylation from 3 CpG sites in a 20bp window. Since methylation
-is only measured at CpG site level, the mean value should only be calculated from the 3 CpG sites while not the non-CpG sites. In this
-case, \code{absolute} mode should be used here.
-
-Second, we want to calculate mean coverage in a 20bp window. Let's assume coverage is 5 in 1bp ~ 5bp, 10 in 11bp ~ 15bp and 20 in 16bp ~ 20bp.
-Since converage is kind of attribute for all bases, all 20 bp should be taken into account. Thus, here \code{w0} mode should be used
-which also takes account of the 0 coverage in 6bp ~ 10bp. The mean coverage will be caculated as \code{(5*5 + 10*5 + 20*5)/(5+5+5+5)}.
-
-Third, genes have multiple transcripts and we want to calculate how many transcripts eixst in a certain position in the gene body.
-In this case, values associated to each transcript are binary (either 1 or 0) and \code{coverage} mean mode should be used.
 }
 \value{
 A matrix with following additional attributes:

@@ -6,7 +6,7 @@ Date: 2017-8-11
 Author: Zuguang Gu
 Maintainer: Zuguang Gu <z.gu@dkfz.de>
 Depends: R (>= 3.1.2), methods, grid, ComplexHeatmap (>= 1.11.1), GenomicRanges, IRanges, locfit
-Imports: matrixStats, stats, GetoptLong
+Imports: matrixStats, stats, GetoptLong, Rcpp
 Suggests: testthat (>= 0.3), knitr, markdown, circlize (>= 0.3.1)
 VignetteBuilder: knitr
 Description: Enriched heatmap is a special type of heatmap which 
@@ -22,3 +22,4 @@ License: GPL (>= 2)
 Packaged: 2017-8-11 00:00:00 UTC; Administrator
 Repository: Bioconductor
 Date/Publication: 2017-8-11 00:00:00
+LinkingTo: Rcpp

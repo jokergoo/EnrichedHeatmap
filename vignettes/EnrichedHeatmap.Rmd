@@ -122,12 +122,12 @@ quantile(mat1, c(0, 0.25, 0.5, 0.75, 0.99, 1))
 
 If a vector of colors is specified, sequential values from minimal to maximal are mapped to the colors,
 and other values are linearly interpolated. To get rid of such extreme values, there are two ways. 
-The first is to specify `trim` option which trims extreme values both at lower and upper bounds.
+The first is to specify `keep` option which trims extreme values both at lower and upper bounds.
 (In following, it means only to trim values larger than 99th quantile.)
 
 ```{r, fig.width = 3}
 mat1_trim = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
-    extend = 5000, mean_mode = "w0", w = 50, trim = c(0, 0.01))
+    extend = 5000, mean_mode = "w0", w = 50, keep = c(0, 0.99))
 EnrichedHeatmap(mat1_trim, col = c("white", "red"), name = "H3K4me3")
 ```
 
@@ -233,13 +233,13 @@ Later we will demonstrate smoothing can also help to impute `NA` values.
 As smoothing may change the original data range, the color mapping function `col_fun`
 here ensures that the color palette is still the same as the unsmoothed one.
 
-`empty_value` corresponds to the regions that have no signal overlapped. The proper value
+`background` corresponds to the regions that have no signal overlapped. The proper value
 depends on specific scenarios. Here since we visualize coverage from ChIP-Seq data, it is reasonable
 to assign 0 to regions with no H3K4me3 signal.
 
 ```{r smooth, fig.width = 3}
 mat1_smoothed = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
-    extend = 5000, mean_mode = "w0", w = 50, empty_value = 0, smooth = TRUE)
+    extend = 5000, mean_mode = "w0", w = 50, background = 0, smooth = TRUE)
 EnrichedHeatmap(mat1_smoothed, col = col_fun, name = "H3K4me3")
 ```
 
@@ -313,13 +313,13 @@ In this case, values associated to each transcript are binary (either 1 or 0) an
 ### Smoothing improves visualization on methylation profiles
 
 Following heatmap visualizes the enrichment of low methylated regions on TSS. The grey colors
-represent the windows with no CpG sites (note we set `NA` to `empty_value` and grey is the default color
+represent the windows with no CpG sites (note we set `NA` to `background` and grey is the default color
 for `NA` values by **ComplexHeatmap**).
 
 ```{r, fig.width = 3}
 meth[1:5]
 mat2 = normalizeToMatrix(meth, tss, value_column = "meth", mean_mode = "absolute",
-    extend = 5000, w = 50, empty_value = NA)
+    extend = 5000, w = 50, background = NA)
 meth_col_fun = colorRamp2(c(0, 0.5, 1), c("blue", "white", "red"))
 EnrichedHeatmap(mat2, col = meth_col_fun, name = "methylation", column_title = "methylation near TSS")
 ```
@@ -330,7 +330,7 @@ to assign methylation values to non-CpG windows, but it will enhance the effect 
 
 ```{r, fig.width = 3}
 mat2 = normalizeToMatrix(meth, tss, value_column = "meth", mean_mode = "absolute",
-    extend = 5000, w = 50, empty_value = NA, smooth = TRUE)
+    extend = 5000, w = 50, background = NA, smooth = TRUE)
 EnrichedHeatmap(mat2, col = meth_col_fun, name = "methylation", column_title = "methylation near TSS")
 ```
 
@@ -350,7 +350,7 @@ Following heatmap visualizes the enrichment of low methylation on CpG islands:
 
 ```{r, fig.width = 3}
 mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
-    extend = 5000, w = 50, empty_value = NA, smooth = TRUE)
+    extend = 5000, w = 50, background = NA, smooth = TRUE)
 EnrichedHeatmap(mat3, col = meth_col_fun, name = "methylation", column_title = "methylation near CGI")
 ```
 
@@ -362,7 +362,7 @@ they are splitted by percent to their full width (the percent value is calculate
 
 ```{r, fig.width = 3}
 mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
-    extend = 5000, w = 50, empty_value = NA, smooth = TRUE, target_ratio = 0.3)
+    extend = 5000, w = 50, background = NA, smooth = TRUE, target_ratio = 0.3)
 EnrichedHeatmap(mat3, col = meth_col_fun, name = "methylation", axis_name_rot = 90,
     column_title = "methylation near CGI")
 ```
@@ -371,16 +371,16 @@ When genomic targets are regions, upstream and/or downstream can be excluded in 
 
 ```{r extension, fig.width = 3}
 mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
-    extend = c(0, 5000), w = 50, empty_value = NA, smooth = TRUE, target_ratio = 0.5)
+    extend = c(0, 5000), w = 50, background = NA, smooth = TRUE, target_ratio = 0.5)
 EnrichedHeatmap(mat3, col = meth_col_fun, name = "methylation", axis_name_rot = 90,
     column_title = "methylation near CGI")
 mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
-    extend = c(5000, 0), w = 50, empty_value = NA, smooth = TRUE, target_ratio = 0.5)
+    extend = c(5000, 0), w = 50, background = NA, smooth = TRUE, target_ratio = 0.5)
 EnrichedHeatmap(mat3, col = meth_col_fun, name = "methylation", axis_name_rot = 90,
     column_title = "methylation near CGI")
 # since there is not upstream and downstream, the number of columns is controlled by `k` argument
 mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
-    extend = 0, k = 20, empty_value = NA, smooth = TRUE, target_ratio = 1)
+    extend = 0, k = 20, background = NA, smooth = TRUE, target_ratio = 1)
 EnrichedHeatmap(mat3, col = meth_col_fun, name = "methylation", axis_name_rot = 90,
     column_title = "methylation near CGI")
 ```

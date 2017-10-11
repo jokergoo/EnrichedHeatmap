@@ -16,7 +16,7 @@ makeWindows(query, w = NULL, k = NULL, direction = c("normal", "reverse"),
   \item{w}{window size, a value larger than 1 means the number of base pairs and a value between 0 and 1 is the percent to the current region.}
   \item{k}{number of partitions for each region. If it is set, all other arguments are ignored.}
   \item{direction}{where to start the splitting. See 'Details' section.}
-  \item{short.keep}{if the the region can not be splitted equally under the window size,  whether to keep the windows that are smaller than the window size. See 'Details' section.}
+  \item{short.keep}{if the the region can not be split equally under the window size,  whether to keep the windows that are smaller than the window size. See 'Details' section.}
 
 }
 \details{

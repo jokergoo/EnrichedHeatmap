@@ -130,7 +130,7 @@ enriched_score = function(x1, x2, x3) {
 # == example
 # load(system.file("extdata", "chr21_test_data.RData", package = "EnrichedHeatmap"))
 # mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
-#     extend = 5000, w = 50, empty_value = 0.5)
+#     extend = 5000, w = 50, background = 0.5)
 # EnrichedHeatmap(mat3, name = "methylation", column_title = "methylation near CGI")
 # EnrichedHeatmap(mat3, name = "meth1") + EnrichedHeatmap(mat3, name = "meth2")
 # # for more examples, please go to the vignette

@@ -236,3 +236,58 @@ setMethod(f = "draw",
     return(invisible(object))
 })
 
+
+
+# == title
+# Extarct enrichment annotation graphic as a separate plot
+#
+# == param
+# -ht_list the heatmap list returned by `draw,EnrichedHeatmapList-method`
+# -which the index of enrichment heamtap. The value can be an integer or a character
+# -newpage whether call `grid::newpage()` to create a new page
+#
+# == details
+# The extracted plot is exactly the same as the one in the heatmap. When there are multiple
+# heamtaps, the annotation graphics can be arranged by `grid::grid.layout` for comparison.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+extract_anno_enriched = function(ht_list, which = NULL, newpage = TRUE) {
+
+    if(!inherits(ht_list, "EnrichedHeatmapList")) {
+        stop("`ht_list` should be returned by `draw()` function.")
+    }
+    if(!ht_list@layout$initialized) {
+        stop("`ht_list` should be returned by `draw()` function.")
+    }
+
+    if(newpage) grid.newpage()
+    if(is.null(which)) which = which(sapply(ht_list@ht_list, inherits, "EnrichedHeatmap"))[1]
+    object = ht_list@ht_list[[which]]
+    column_title = object@column_title
+    title_height = 2*grobHeight(textGrob(column_title))
+    axis_height = object@heatmap_param$axis_height
+    # viewprot for title
+    pushViewport(viewport(y = 1, width = unit(1, "npc") - unit(4, "mm"), height = title_height, just = "top"))
+    grid.text(column_title)
+    upViewport()
+
+    # viewport the enriched lines
+    pushViewport(viewport(y = axis_height, width = unit(1, "npc") - unit(4, "mm"), height = unit(1, "npc") - axis_height - title_height, just = "bottom"))
+    grid.segments(1:9/10, 0, 1:9/10, 1, gp = gpar(col = "#CCCCCC", lty = 2))
+    f = ht_list@ht_list[[which]]@top_annotation@anno_list[[1]]@fun
+    f1 = function() f(seq_len(ncol(object@matrix)))
+    f2 = function() f1()
+    f3 = function() f2()
+    f4 = function() f3()
+    f5 = function() f4()
+    f5()
+    upViewport()
+
+    # viewport for axis
+    pushViewport(viewport(y = 0, width = unit(1, "npc") - unit(4, "mm"), height = axis_height, just = "bottom"))
+    object@heatmap_param$axis_fun()
+    upViewport()
+}
+

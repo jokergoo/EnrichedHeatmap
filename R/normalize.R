@@ -586,6 +586,9 @@ print.normalizedMatrix = function(x, ...) {
 	signal_name = attr(x, "signal_name")
 	target_name = attr(x, "target_name")
 	target_is_single_point = attr(x, "target_is_single_point")
+	if(is.null(target_is_single_point)) {
+		target_is_single_point = FALSE
+	}
 
 	op = qq.options(READ.ONLY = FALSE)
     on.exit(qq.options(op))
