@@ -275,7 +275,10 @@ extract_anno_enriched = function(ht_list, which = NULL, newpage = TRUE) {
 
     # viewport the enriched lines
     pushViewport(viewport(y = axis_height, width = unit(1, "npc") - unit(4, "mm"), height = unit(1, "npc") - axis_height - title_height, just = "bottom"))
-    grid.segments(1:9/10, 0, 1:9/10, 1, gp = gpar(col = "#CCCCCC", lty = 2))
+    x = calc_minor_ticks(object@matrix)
+    if(length(x)) {
+        grid.segments(x, 0, x, 1, gp = gpar(col = "#CCCCCC", lty = 2))
+    }
     f = ht_list@ht_list[[which]]@top_annotation@anno_list[[1]]@fun
     f1 = function() f(seq_len(ncol(object@matrix)))
     f2 = function() f1()
@@ -291,3 +294,50 @@ extract_anno_enriched = function(ht_list, which = NULL, newpage = TRUE) {
     upViewport()
 }
 
+
+calc_minor_ticks = function(mat, n = 20) {
+    mat_attr = attributes(mat)
+    pos = NULL
+    if(mat_attr$target_is_single_point) {
+        breaks = pretty(c(-mat_attr$extend[1], mat_attr$extend[2]), n = n)
+        w = breaks[2] - breaks[1]
+        breaks = breaks[breaks + mat_attr$extend[1] > 0.01*w & mat_attr$extend[2] - breaks > 0.01*w]
+        breaks = breaks[abs(breaks) > 0.01*w]
+        if(length(breaks)) {
+            pos = (breaks + mat_attr$extend[1])/sum(mat_attr$extend)
+        }
+    } else {
+        upstream_ratio = length(mat_attr$upstream_index)/ncol(mat)
+        downstream_ratio = length(mat_attr$downstream_index)/ncol(mat)
+        ratio = c(upstream_ratio, downstream_ratio)
+        i = which.max(mat_attr$extend)
+        breaks = pretty(c(0, mat_attr$extend[i]), n = round(n*ratio[i]))
+        w = breaks[2] - breaks[1]
+        # upstream
+        x = seq(-mat_attr$extend[1], 0, by = w)
+        x = x[x + mat_attr$extend[1] > 0.01*w & -x > 0.01*w]
+        if(length(x)) {
+            x = (x + mat_attr$extend[1])/mat_attr$extend[1] * upstream_ratio
+        }
+        pos = c(pos, x)
+        # downstream
+        x = seq(0, mat_attr$extend[2], by = w)
+        x = x[x > 1e-6 & mat_attr$extend[2]- x > 0.01*w]
+        if(length(x)) {
+            x = x/mat_attr$extend[2] * downstream_ratio + (1 - downstream_ratio)
+        }
+        pos = c(pos, x)
+        # target
+        if(length(mat_attr$target_index)) {
+            target_ratio = 1 - upstream_ratio - downstream_ratio
+            n_breaks = round(target_ratio*n)
+            if(n_breaks >= 2) {
+                x = seq(upstream_ratio, upstream_ratio + target_ratio, length.out = n_breaks)
+                w = x[2] - x[1]
+                x = x[x - upstream_ratio > 0.01*w & upstream_ratio + target_ratio - x > 0.01*w]
+                pos = c(pos, x)
+            }
+        }
+    }
+    return(pos)
+}

@@ -307,6 +307,10 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, po
 					      hjust = hjust, vjust = vjust)
 			}
 		}
+		minor_ticks = calc_minor_ticks(mat)
+		if(length(minor_ticks)) {
+	        grid.segments(minor_ticks, unit(1, "npc") - unit(0.5, "mm"), minor_ticks, 1)
+	    }
 	}
 	
 	if(axis_name_rot == 0) {
@@ -605,6 +609,12 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 				}
 			}
 		}
+
+		# minor_ticks = calc_minor_ticks(mat)
+		# if(length(minor_ticks)) {
+	 #        grid.segments(minor_ticks, unit(0.5, "mm"), minor_ticks, 0)
+	 #    }
+
 	    upViewport()
 	}
 }

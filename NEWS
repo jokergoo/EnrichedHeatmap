@@ -4,6 +4,7 @@ changes in version 1.7.1
 * we don't use a position with 0 (either +1 or -1)
 * add `dist_by_closeness()`
 * add `extract_anno_enriched()`
+* add ticks on axes
 
 ==================================
 
