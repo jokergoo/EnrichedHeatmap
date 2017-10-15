@@ -15,12 +15,11 @@ dist_by_closeness(mat)
 
 }
 \details{
-The distance is calcuated by the relative closeness in the matrix.
-For two rows in the matrix, assume x_1, x_2, x_{n_1} and
-y_1, y_2, ... y_{n_2} are the column index where there are non-zero values, 
-the distance based on the closeness is calculated as:
+For two rows in the matrix, assume x_1, x_2, ..., x_n1 are the column index of none-zero values in row 1
+and y_1, y_2, ... y_n2 are the column index for non-zero values in row 2, 
+the distance between the two rows based on the closeness is calculated as:
 
-d_closeness = sum_{i,j}(|x_i - y_j|) / (n_1*n_2)
+d_closeness = sum_i sum_j(|x_i - y_j|) / (n_1*n_2)
 }
 \value{
 A \code{\link[stats]{dist}} object
@@ -31,7 +30,8 @@ Zuguang Gu <z.gu@dkfz.de>
 \examples{
 x1 = c(0, 0, 0, 0, 1, 1, 1, 0, 0, 0)
 x2 = c(0, 0, 0, 1, 1, 1, 0, 0, 0, 0)
-x3 = c(0, 0, 1, 1, 1, 0, 0, 0, 0, 0)
+x3 = c(1, 0, 0, 0, 1, 1, 0, 0, 0, 0)
 m = rbind(x1, x2, x3)
+dist(m)
 dist_by_closeness(m)
 }

@@ -67,18 +67,34 @@ enriched_score = function(x1, x2, x3) {
 	n2 = length(x2)
 	n3 = length(x3)
 
+	x1_index = seq_along(x1)
+	x2_index = seq_along(x2)
+	x3_index = seq_along(x3)
+
+	l1 = !is.na(x1)
+	x1 = x1[l1]
+	x1_index = x1_index[l1]
+
+	l2 = !is.na(x2)
+	x2 = x2[l2]
+	x2_index = x2_index[l2]
+
+	l3 = !is.na(x3)
+	x3 = x3[l3]
+	x3_index = x3_index[l3]
+
 	if(length(n1) && length(n2)) {
-		sum(x1 * seq_along(x1)/n1) + 
-			sum(x2 * abs(n2/2 - abs(seq_along(x2) - n2/2))) + 
-			sum(x3 * rev(seq_along(x3))/n3)
+		sum(x1 * x1_index/n1) + 
+			sum(x2 * abs(n2/2 - abs(x2_index - n2/2))) + 
+			sum(x3 * rev(x3_index)/n3)
 	} else if(!length(n1) && length(n2)) {
-		sum(x2 * abs(n2/2 - abs(seq_along(x2) - n2/2))) + 
-			sum(x3 * rev(seq_along(x3))/n3)
+		sum(x2 * abs(n2/2 - abs(x2_index - n2/2))) + 
+			sum(x3 * rev(x3_index)/n3)
 	} else if(length(n1) && !length(n2)) {
-		sum(x1 * seq_along(x1)/n1) + 
-			sum(x2 * abs(n2/2 - abs(seq_along(x2) - n2/2)))
+		sum(x1 * x1_index/n1) + 
+			sum(x2 * abs(n2/2 - abs(x2_index - n2/2)))
 	} else {
-		sum(x2 * abs(n2/2 - abs(seq_along(x2) - n2/2)))
+		sum(x2 * abs(n2/2 - abs(x2_index - n2/2)))
 	}
 
 }
@@ -88,6 +104,8 @@ enriched_score = function(x1, x2, x3) {
 # 
 # == param
 # -mat a matrix which is returned by `normalizeToMatrix`
+# -top_annotation a specific annotation which is always put on top of the enriched heatmap and is constructed by `anno_enriched`
+# -top_annotation_height the height of the top annotation
 # -score_fun a function which calculates enriched scores for rows in ``mat``. This function can be self-defined, refer to
 #            `enriched_score` to find out how to design it. Note if row clustering is turned on, this argument is ignored.
 # -row_order row order. If it is specified, ``score_fun`` is ignored.
@@ -117,7 +135,7 @@ enriched_score = function(x1, x2, x3) {
 # -``column_title_side`` enforced to be ``top``
 #
 # A `EnrichedHeatmap-class` object is also a `ComplexHeatmap::Heatmap-class` object, thus, most of the 
-# arguments in `ComplexHeatmap::Heatmap` are usable in `EnrichedHeatmap()` such as
+# arguments in `ComplexHeatmap::Heatmap` are usable in `EnrichedHeatmap` such as
 # to apply clustering on rows, or to split rows by data frame or k-means clustering. Users can also 
 # add more than one heatmaps by ``+`` operator. For a detailed demonstration, please go to the vignette.
 #
@@ -134,7 +152,9 @@ enriched_score = function(x1, x2, x3) {
 # EnrichedHeatmap(mat3, name = "methylation", column_title = "methylation near CGI")
 # EnrichedHeatmap(mat3, name = "meth1") + EnrichedHeatmap(mat3, name = "meth2")
 # # for more examples, please go to the vignette
-EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, pos_line = TRUE, 
+EnrichedHeatmap = function(mat, top_annotation = HeatmapAnnotation(enriched = anno_enriched()),
+	top_annotation_height = unit(2, "cm"),
+	score_fun = enriched_score, row_order = NULL, pos_line = TRUE, 
 	pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = 0, 
 	axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, 
 	show_row_dend = FALSE, show_row_names = FALSE, ...) {
@@ -323,7 +343,8 @@ EnrichedHeatmap = function(mat, score_fun = enriched_score, row_order = NULL, po
 
 	ht = Heatmap(mat, row_order = od, cluster_columns = FALSE, cluster_rows = cluster_rows,
 			show_row_names = show_row_names, show_column_names = FALSE, bottom_annotation = NULL, 
-			column_title_side = "top", show_row_dend = show_row_dend, ...)
+			column_title_side = "top", show_row_dend = show_row_dend, 
+			top_annotation = top_annotation, top_annotation_height = top_annotation_height, ...)
 
 	# additional parameters specific for `EnrichedHeatmap` class
 	ht@heatmap_param$pos_line = pos_line
@@ -403,25 +424,28 @@ setMethod(f = "draw",
 # Annotation function to show the enrichment
 #
 # == param
-# -gp graphic parameters. There are two unstandard parameters: ``neg_col`` and ``pos_col``. 
-#     If these two parameters are defined, the positive signal and negatie signal are visualized separatedly.
+# -gp graphic parameters. There are two non-standard parameters: ``neg_col`` and ``pos_col``. 
+#     If these two parameters are defined, the positive signals and negatie signals are visualized separatedly.
+#     The graphic parameters can be set as vectors when the heatmap or heatmap list is split into several row clusters.
 # -pos_line whether to draw vertical lines which represent positions of ``target``
 # -pos_line_gp graphic parameters for the position lines
 # -yaxis whether show yaxis
 # -ylim ranges on y-axis, by default it is inferred from the data
-# -value what type of value corresponds to the y-axis
+# -value the method to summarize signals from columns of the noramlized matrix
 # -yaxis_side side of y-axis
+# -yaxis_facing facing of the axis ticks and labels. It can be set to avoid overlapping text when multiple
+#               heatmaps are plotted together
 # -yaxis_gp graphic parameters for y-axis
-# -show_error whether show error regions which are +-1 standard error to the mean value. Color of error
+# -show_error whether show error regions which are one standard error to the mean value. Color of error
 #            area is same as the corresponding lines with 75 percent transparency.
 #
 # == details
-# This annotation functions shows mean values (or depends on the value set in ``value`` argument) of columns in the normalized matrix
+# This annotation functions shows mean values (or depends on the method set in ``value`` argument) of columns in the normalized matrix
 # which represents the enrichment of the signals to the targets.
 #
 # If rows are splitted, the enriched lines are calculated for each row cluster and there will also be multiple lines in this annotation viewport.
 #
-# It should only be placed as column annotation of the Enriched Heatmap.
+# It should only be placed as column annotation of the enriched heatmap.
 #
 # == values
 # A column annotation function which can be set to ``top_annotation`` argument in `EnrichedHeatmap`.
@@ -433,10 +457,9 @@ setMethod(f = "draw",
 # load(system.file("extdata", "chr21_test_data.RData", package = "EnrichedHeatmap"))
 # tss = promoters(genes, upstream = 0, downstream = 1)
 # mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
-#     extend = 5000, mean_mode = "w0", w = 50, trim = c(0, 0.01))
+#     extend = 5000, mean_mode = "w0", w = 50, keep = c(0, 0.99))
 # EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3",
 #     top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
-#     top_annotation_height = unit(2, "cm"),
 #     km = 3, row_title_rot = 0)
 #
 anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),

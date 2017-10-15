@@ -29,7 +29,6 @@ importFrom("GetoptLong", qq.options)
 importFrom("GetoptLong", qqcat)
 importFrom("grDevices", "col2rgb", "rgb")
 importFrom("matrixStats", colSds)
-importFrom("stats", "loess.control", "predict")
-importFrom("stats", loess)
+importFrom("stats", "loess.control", "predict", loess, as.dist)
 useDynLib(EnrichedHeatmap, .fixes = "EnrichedHeatmap_", .registration=TRUE)
 

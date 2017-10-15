@@ -7,7 +7,9 @@ Constructor method for EnrichedHeatmap class
 Constructor method for EnrichedHeatmap class
 }
 \usage{
-EnrichedHeatmap(mat, score_fun = enriched_score, row_order = NULL, pos_line = TRUE,
+EnrichedHeatmap(mat, top_annotation = HeatmapAnnotation(enriched = anno_enriched()),
+    top_annotation_height = unit(2, "cm"),
+    score_fun = enriched_score, row_order = NULL, pos_line = TRUE,
     pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = 0,
     axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE,
     show_row_dend = FALSE, show_row_names = FALSE, ...)
@@ -15,6 +17,8 @@ EnrichedHeatmap(mat, score_fun = enriched_score, row_order = NULL, pos_line = TR
 \arguments{
 
   \item{mat}{a matrix which is returned by \code{\link{normalizeToMatrix}}}
+  \item{top_annotation}{a specific annotation which is always put on top of the enriched heatmap and is constructed by \code{\link{anno_enriched}}}
+  \item{top_annotation_height}{the height of the top annotation}
   \item{score_fun}{a function which calculates enriched scores for rows in \code{mat}. This function can be self-defined, refer to \code{\link{enriched_score}} to find out how to design it. Note if row clustering is turned on, this argument is ignored.}
   \item{row_order}{row order. If it is specified, \code{score_fun} is ignored.}
   \item{pos_line}{whether draw vertical lines which represent the positions of \code{target}}
@@ -42,7 +46,7 @@ set with pre-defined values:
 }
 
 A \code{\link{EnrichedHeatmap-class}} object is also a \code{\link[ComplexHeatmap]{Heatmap-class}} object, thus, most of the 
-arguments in \code{\link[ComplexHeatmap]{Heatmap}} are usable in \code{\link{EnrichedHeatmap()}} such as
+arguments in \code{\link[ComplexHeatmap]{Heatmap}} are usable in \code{\link{EnrichedHeatmap}} such as
 to apply clustering on rows, or to split rows by data frame or k-means clustering. Users can also 
 add more than one heatmaps by \code{+} operator. For a detailed demonstration, please go to the vignette.
 }

@@ -110,7 +110,7 @@ setMethod(f = "show",
 #
 # == param
 # -object an `EnrichedHeatmapList-class` object
-# -padding padding of the plot. Elements correspond to bottom, left, top, right paddings.
+# -padding padding of the plot. The four values correspond to bottom, left, top, right paddings.
 # -newpage whether to create a new page
 # -... pass to `ComplexHeatmap::make_layout,HeatmapList-method` or `ComplexHeatmap::draw,HeatmapList-method`
 #
@@ -243,12 +243,11 @@ setMethod(f = "draw",
 #
 # == param
 # -ht_list the heatmap list returned by `draw,EnrichedHeatmapList-method`
-# -which the index of enrichment heamtap. The value can be an integer or a character
-# -newpage whether call `grid::newpage()` to create a new page
+# -which the index of enriched heamtap in the heatmap list. The value can be an integer index or a character index
+# -newpage whether call `grid::grid.newpage` to create a new page
 #
 # == details
-# The extracted plot is exactly the same as the one in the heatmap. When there are multiple
-# heamtaps, the annotation graphics can be arranged by `grid::grid.layout` for comparison.
+# The extracted plot is exactly the same as the one on the heatmap. 
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>

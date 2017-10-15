@@ -1,0 +1,118 @@
+<!--
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{Compare row ordering methods}
+-->
+
+Compare row ordering methods
+========================================
+
+**Author**: Zuguang Gu ( z.gu@dkfz.de )
+
+**Date**: `r Sys.Date()`
+
+-------------------------------------------------------------
+
+```{r, echo = FALSE, message = FALSE}
+library(knitr)
+knitr::opts_chunk$set(
+    error = FALSE,
+    warning = FALSE,
+    message = FALSE)
+options(markdown.HTML.options = setdiff(options('markdown.HTML.options')[[1]], "toc"))
+```
+
+
+```{r}
+library(EnrichedHeatmap)
+load(system.file("extdata", "neg_cr.RData", package = "EnrichedHeatmap"))
+all_genes = all_genes[unique(neg_cr$gene)]
+all_tss = promoters(all_genes, upstream = 0, downstream = 1)
+mat_neg_cr = normalizeToMatrix(neg_cr, all_tss, mapping_column = "gene", w = 50, mean_mode = "w0")
+```
+
+The object `mat_neg_cr` is a normalized matrix for regions showing significant
+negative correlation between methylation and gene expression. The negative
+correlated regions are normalized to upstream 5kb and downstream 5kb of gene
+TSS with 50bp window by `normalizeToMatrix()` function. The value in the
+matrix is how much a window is covered by negative correlated regions.
+
+In the normalized matrix, each row corresponds to one gene and each column
+corresponds to a window either on upstream of TSS or downstream of TSS. For
+the example of `mat_neg_cr` matrix, the first 1/2 columns correspond to the
+upstream of TSS and the last 1/2 columns correspond to downstream of TSS. Here
+we compare three different methods to order rows (which correspond to genes)
+in the normalized matrix.
+
+1. Rows are ordered by the enriched scores. For each row in the matrix, denote
+   values in a certain row as $x$, index 1, ..., $n_1$ are indices for
+   upstream windows, index $n_1+1$, ..., $n$ are indices for downstream
+   windows and $n_2 = n - n_1$, the enriched score is calculated as the sum of
+   $x$ weighted by distance to TSS.
+
+   $$ \sum_{i=1}^{n_1}{x_i \cdot i/n_1} + \sum_{i=n_1+1}^n{x_i \cdot (n - i + 1)/n_2}$$
+
+2. Rows are ordered by hierarchical clustering with Euclidean distance.
+3. Rows are ordered by hierarchical clustering with closeness distance. For
+   two rows in the normalized matrix, assume $a_1, a_2, ..., a_{n_1}$ are the
+   indices of window for one gene which overlap with negative correlated
+   regions and $b_1, b_2, ... b_{n_2}$ are the indices for the other gene
+   which overlap with negative correlated regions, the distance which is based
+   on closeness of the overlapped windows in the two genes is defined as:
+
+   $$ d_{closeness} = \frac{\sum_{i=1}^{n_1} \sum_{j=1}^{n_2} {|a_i - b_j|} }{n_1 \cdot n_2}$$
+
+Euclidean distance between rows keeps unchanged when columns in the matrix are
+permutated, while for closeness distance, the column order is also taken into
+account, which might be more proper for clustering normalized matrices.
+
+Following three plots show heatmaps under different row ordering methods.
+
+```{r, eval = FALSE}
+EnrichedHeatmap(mat_neg_cr, name = "neg_cr", col = c("white", "darkgreen"), 
+    top_annotation = HeatmapAnnotation(enrich = anno_enriched(gp = gpar(col = "darkgreen"))),
+	row_title = "by default enriched score")
+
+EnrichedHeatmap(mat_neg_cr, name = "neg_cr", col = c("white", "darkgreen"),
+    top_annotation = HeatmapAnnotation(enrich = anno_enriched(gp = gpar(col = "darkgreen"))),
+    cluster_rows = TRUE, row_title = "by hierarchcal clustering + Euclidean distance")
+
+EnrichedHeatmap(mat_neg_cr, name = "neg_cr", col = c("white", "darkgreen"),
+    top_annotation = HeatmapAnnotation(enrich = anno_enriched(gp = gpar(col = "darkgreen"))),
+	cluster_rows = TRUE, clustering_distance_rows = dist_by_closeness,
+	row_title = "by hierarchcal clustering + closeness distance")
+```
+
+```{r, echo = FALSE, fig.width = 8, fig.height = 6}
+gb1 = grid.grabExpr(draw(EnrichedHeatmap(mat_neg_cr, name = "neg_cr", col = c("white", "darkgreen"),
+    top_annotation = HeatmapAnnotation(enrich = anno_enriched(gp = gpar(col = "darkgreen"))),
+    row_title = "by default enriched score")))
+gb2 = grid.grabExpr(draw(EnrichedHeatmap(mat_neg_cr, name = "neg_cr", col = c("white", "darkgreen"),
+    top_annotation = HeatmapAnnotation(enrich = anno_enriched(gp = gpar(col = "darkgreen"))),
+    cluster_rows = TRUE, row_title = "by hierarchcal clustering + Euclidean distance")))
+load(system.file("extdata", "neg_cr_order_by_dist_closeness.RData", package = "EnrichedHeatmap"))
+gb3 = grid.grabExpr(draw(EnrichedHeatmap(mat_neg_cr, name = "neg_cr", col = c("white", "darkgreen"),
+    top_annotation = HeatmapAnnotation(enrich = anno_enriched(gp = gpar(col = "darkgreen"))),
+	cluster_rows = FALSE, row_order = row_order, 
+	row_title = "by hierarchcal clustering + closeness distance")))
+grid.newpage()
+pushViewport(viewport(x = 0, width = 1/3, just = "left"))
+grid.draw(gb1)
+popViewport()
+pushViewport(viewport(x = 1/3, width = 1/3, just = "left"))
+grid.draw(gb2)
+popViewport()
+pushViewport(viewport(x = 2/3, width = 1/3, just = "left"))
+grid.draw(gb3)
+popViewport()
+```
+
+Generally, I would not suggest to order rows by enrichment score because the enrichment
+pattern is already shown in the top annotation while clustering rows show more patterns
+from other aspects.
+
+The row order, clustering method, distance method can all be self-adjusted by
+`row_order`, `cluster_rows`, `clustering_method_rows`, `clustering_distance_rows`, `km` and `split`
+arguments in `EnrichedHeamtap()` function. For how to properly set values for
+these arguments, users can go to the help page of `EnrichedHeatmap()` or
+`Heatmap()` function.
+

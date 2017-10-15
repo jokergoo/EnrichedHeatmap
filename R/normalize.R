@@ -6,10 +6,10 @@
 # == param
 # -signal a `GenomicRanges::GRanges` object.
 # -target a `GenomicRanges::GRanges` object.
-# -extend extended base pairs to the upstream and downstream of ``target``. It can be a vector of length one or two.
+# -extend extended base pairs to the upstream and/or downstream of ``target``. It can be a vector of length one or two.
 #         Length one means same extension to the upstream and downstream.
 # -w window size for splitting upstream and downstream.
-# -value_column column index in ``signal`` that is mapped to colors. If it is not set, it assumes values for all all signal regiosn are 1.
+# -value_column column index in ``signal`` that is mapped to colors. If it is not set, it assumes values for all signal regiosn are 1.
 # -mapping_column mapping column to restrict overlapping between ``signal`` and ``target``. By default it tries to look for
 #           all regions in ``signal`` that overlap with every target.
 # -background values for windows that don't overlap with ``signal``. 
@@ -21,10 +21,10 @@
 # -k number of windows only when ``target_ratio = 1`` or ``extend == 0``, otherwise ignored.
 # -smooth whether apply smoothing on rows in the matrix. 
 # -smooth_fun the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric
-#    vector (may contains ``NA`` values) and returns a vector with same length. If the smoothing is failed, the function
+#    vector (may contain ``NA`` values) and returns a vector with same length. If the smoothing is failed, the function
 #    should call `base::stop` to throw errors so that `normalizeToMatrix` can catch how many rows are failed in smoothing. 
 #    See the default `default_smooth_fun` for example.
-# -keep values in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first
+# -keep percentiles in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first
 #       percentile is replaces with the first pencentile and values larger than the second percentile is replaced with the
 #       second percentile.
 #
@@ -33,15 +33,15 @@
 # and visualized as a heatmap by `EnrichedHeatmap` afterwards.
 #
 # Upstream and downstream also with the target body are splitted into a list of small windows and overlap
-# to ``signal``. Since regions in ``signal`` and small windows do not always 100 percent overlap, there are four different average modes:
+# to ``signal``. Since regions in ``signal`` and small windows do not always 100 percent overlap, there are four different averaging modes:
 # 
 # Following illustrates different settings for ``mean_mode`` (note there is one signal region overlapping with other signals):
 #
-#       40      50     20     values in signal
-#     ++++++   +++    +++++   signal
-#            30               values in signal
-#          ++++++             signal
-#       =================     window (17bp), there are 4bp not overlapping to any signal region.
+#       40      50     20     values in signal regions
+#     ++++++   +++    +++++   signal regions
+#            30               values in signal region
+#          ++++++             signal region
+#       =================     a window (17bp), there are 4bp not overlapping to any signal regions.
 #         4  6  3      3      overlap
 #
 #     absolute: (40 + 30 + 50 + 20)/4
@@ -77,7 +77,7 @@
 normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, 
 	value_column = NULL, mapping_column = NULL, background = ifelse(smooth, NA, 0), 
 	mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1), 
-	target_ratio = min(c(0.6, mean(width(target))/(sum(extend)) + mean(width(target)))), 
+	target_ratio = min(c(0.4, mean(width(target))/(sum(extend) + mean(width(target))))), 
 	k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun,
 	keep = c(0, 1)) {
 
@@ -374,12 +374,12 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 # -k number of partitions for each region. If it is set, all other arguments are ignored.
 # -direction where to start the splitting. See 'Details' section.
 # -short.keep if the the region can not be split equally under the window size, 
-#             whether to keep the windows that are smaller than the window size. See 'Details' section.
+#             the argument controls whether to keep the windows that are smaller than the window size. See 'Details' section.
 #
 # == details
 # Following illustrates the meaning of ``direction`` and ``short.keep``:
 #
-#     ----->----  one region, split by 3bp window (">" means the direction of the sequence)
+#     -->-->-->-  one region, split by 3bp window (">" means the direction of the sequence)
 #     aaabbbccc   direction = "normal",  short.keep = FALSE
 #     aaabbbcccd  direction = "normal",  short.keep = TRUE
 #      aaabbbccc  direction = "reverse", short.keep = FALSE

@@ -17,7 +17,11 @@ float closeness(NumericVector x1, NumericVector x2) {
 		}
 	}
 
-	return y/y_n;
+	if(y_n == 0) {
+		return 0;
+	} else {
+		return y/y_n;
+	}
 }
 
 // [[Rcpp::export]]

@@ -5,6 +5,7 @@ changes in version 1.7.1
 * add `dist_by_closeness()`
 * add `extract_anno_enriched()`
 * add ticks on axes
+* add a new vignette (compare row ordering methods)
 
 ==================================
 
