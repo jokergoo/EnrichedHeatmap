@@ -5,7 +5,7 @@ sudo: required
 # Be strict when checking our package
 warnings_are_errors: true
 
-r_packages:
+r-packages:
 - testthat
 - matrixStats
 - knitr
@@ -20,6 +20,7 @@ r_github_packages:
 - jokergoo/circlize
 - jokergoo/ComplexHeatmap
 - jimhester/covr
+- cran/png
 
 bioc_required: true
 
