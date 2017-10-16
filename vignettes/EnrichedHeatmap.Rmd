@@ -600,7 +600,8 @@ EnrichedHeatmap(..., width = ...) + EnrichedHeatmap(...)
 
 For more advanced settings, please directly go to [the vignettes in the **ComplexHeamtap** package](http://www.bioconductor.org/packages/devel/bioc/vignettes/ComplexHeatmap/inst/doc/s1.introduction.html).
 
-Together with above features, you can make very complex heatmaps. Following example is from a real-world dataset.
+Together with above features, you can make very complex heatmaps. Following example is from a real-world dataset
+and the details of making this plot can be found [in this vigentte](roadmal.html).
 
 <p><img src='roadmap.png' /></p>
 
