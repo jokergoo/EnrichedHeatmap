@@ -14,7 +14,7 @@ r-packages:
 
 bioc_packages:
 - GenomicRanges
-- gene_filter
+- genefilter
 
 r_github_packages:
 - jokergoo/circlize
