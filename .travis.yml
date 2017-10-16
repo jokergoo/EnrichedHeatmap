@@ -10,9 +10,11 @@ r-packages:
 - matrixStats
 - knitr
 - markdown
+- png
 
 bioc_packages:
 - GenomicRanges
+- gene_filter
 
 r_github_packages:
 - jokergoo/circlize
