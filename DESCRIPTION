@@ -7,7 +7,7 @@ Author: Zuguang Gu
 Maintainer: Zuguang Gu <z.gu@dkfz.de>
 Depends: R (>= 3.1.2), methods, grid, ComplexHeatmap (>= 1.15.1), GenomicRanges, IRanges, locfit
 Imports: matrixStats, stats, GetoptLong, Rcpp
-Suggests: testthat (>= 0.3), knitr, markdown, circlize (>= 0.4.1), genefilter
+Suggests: testthat (>= 0.3), knitr, markdown, circlize (>= 0.4.1), genefilter, RColorBrewer
 VignetteBuilder: knitr
 Description: Enriched heatmap is a special type of heatmap which 
   visualizes the enrichment of genomic signals on specific target regions.
