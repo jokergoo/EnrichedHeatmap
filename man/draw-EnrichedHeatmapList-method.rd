@@ -13,7 +13,11 @@ Draw a list of heatmaps
 \arguments{
 
   \item{object}{an \code{\link{EnrichedHeatmapList-class}} object}
+<<<<<<< HEAD
   \item{padding}{padding of the plot. The four values correspond to bottom, left, top, right paddings.}
+=======
+  \item{padding}{padding of the plot. Elements correspond to bottom, left, top, right paddings.}
+>>>>>>> bioc/master
   \item{newpage}{whether to create a new page}
   \item{...}{pass to \code{\link[ComplexHeatmap]{make_layout,HeatmapList-method}} or \code{\link[ComplexHeatmap]{draw,HeatmapList-method}}}
 

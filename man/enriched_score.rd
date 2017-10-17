@@ -17,6 +17,7 @@ enriched_score(x1, x2, x3)
 
 }
 \details{
+<<<<<<< HEAD
 The function calculates how the signal is enriched in the target by weighting
 the distance to the target.
 
@@ -38,6 +39,13 @@ function. It is also an example function for implementing customized scoreing fu
 Basically, to be a score function which calculates enriched score, it should accept three arguments
 which are the values in upstream windows, the target windows and downstream windows 
 The user-defined function should return a single value. Rows are sorted decreasingly by the enriched scores.
+=======
+The function calculates how the signal is enriched in the targets.
+The score is the sum of values weighted by the reciprocal of the distance to the targets.
+
+Basically, to be a score function which calculates enriched score, it should accept three arguments
+which are explained in **Arguments** section and return a single value. Rows are sorted decreasingly by the enriched scores.
+>>>>>>> bioc/master
 }
 \value{
 A numeric value.

@@ -16,14 +16,22 @@ makeWindows(query, w = NULL, k = NULL, direction = c("normal", "reverse"),
   \item{w}{window size, a value larger than 1 means the number of base pairs and a value between 0 and 1 is the percent to the current region.}
   \item{k}{number of partitions for each region. If it is set, all other arguments are ignored.}
   \item{direction}{where to start the splitting. See 'Details' section.}
+<<<<<<< HEAD
   \item{short.keep}{if the the region can not be split equally under the window size,  the argument controls whether to keep the windows that are smaller than the window size. See 'Details' section.}
+=======
+  \item{short.keep}{if the the region can not be splitted equally under the window size,  whether to keep the windows that are smaller than the window size. See 'Details' section.}
+>>>>>>> bioc/master
 
 }
 \details{
 Following illustrates the meaning of \code{direction} and \code{short.keep}:
 
   \preformatted{
+<<<<<<< HEAD
     -->-->-->-  one region, split by 3bp window (">" means the direction of the sequence)
+=======
+    ----->----  one region, split by 3bp window (">" means the direction of the sequence)
+>>>>>>> bioc/master
     aaabbbccc   direction = "normal",  short.keep = FALSE
     aaabbbcccd  direction = "normal",  short.keep = TRUE
      aaabbbccc  direction = "reverse", short.keep = FALSE

@@ -42,7 +42,10 @@ monospace;
 
 h1 {
    font-size:2.2em;
+<<<<<<< HEAD
    line-height: 150%;
+=======
+>>>>>>> bioc/master
 }
 
 h2 {

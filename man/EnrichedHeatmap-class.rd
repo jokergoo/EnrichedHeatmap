@@ -17,9 +17,12 @@ The \code{\link{EnrichedHeatmap-class}} provides following methods:
   \item \code{\link{EnrichedHeatmap}}: constructor method.
   \item \code{\link{draw,EnrichedHeatmap-method}}: draw a single heatmap.
 }}
+<<<<<<< HEAD
 \seealso{
 \code{\link{EnrichedHeatmapList-class}}
 }
+=======
+>>>>>>> bioc/master
 \author{
 Zuguang Gu <z.gu@dkfz.de>
 }
