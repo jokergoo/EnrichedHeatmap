@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
     warning = FALSE,
     message = FALSE)
 options(markdown.HTML.stylesheet = "custom.css")
-options(width = 120)
+options(width = 100)
 ```
 
 In this vignette we visualize comprehensive associations between various epigenomic signals from Roadmap
@@ -35,7 +35,7 @@ more details for the visualization part.
 
 First load R packages and pre-calculated R objects which we will explain in later sections.
 
-```{r}
+```{r, results = "hide"}
 library(EnrichedHeatmap)
 library(GetoptLong)
 library(circlize)
@@ -256,7 +256,8 @@ The expression difference between subgroup 1 and subgroup 2 samples is a major g
 vector which corresponds to high expression and low expression in subgroup 1.
 
 ```{r expr_split}
-expr_mean = rowMeans(expr[, SAMPLE$subgroup == "subgroup1"]) - rowMeans(expr[, SAMPLE$subgroup == "subgroup2"])
+expr_mean = rowMeans(expr[, SAMPLE$subgroup == "subgroup1"]) - 
+            rowMeans(expr[, SAMPLE$subgroup == "subgroup2"])
 expr_split = ifelse(expr_mean > 0, "high", "low")
 expr_split = factor(expr_split, levels = c("high", "low"))
 ```
@@ -271,8 +272,10 @@ The label of methylation groups are adjsuted that the first group always has low
 ```{r meth_split}
 set.seed(123)
 upstream_index = length(attr(meth_mat_mean, "upstream_index"))
-meth_split = kmeans(meth_mat_mean[, seq(round(upstream_index*0.8), round(upstream_index*1.4))], centers = 2)$cluster
-x = tapply(rowMeans(meth_mat_mean[, seq(round(upstream_index*0.8), round(upstream_index*1.4))]), meth_split, mean)
+meth_split = kmeans(meth_mat_mean[, seq(round(upstream_index*0.8), round(upstream_index*1.4))], 
+    centers = 2)$cluster
+x = tapply(rowMeans(meth_mat_mean[, seq(round(upstream_index*0.8), round(upstream_index*1.4))]), 
+    meth_split, mean)
 od = structure(order(x), names = names(x))
 meth_split = paste0("cluster", od[as.character(meth_split)])
 ```
@@ -408,8 +411,8 @@ constructed by `rowAnnotation()` function and appended to the heatmap list.
 ```{r}
 gl = width(gene[names(tss)])
 gl[gl > quantile(gl, 0.95)] = quantile(gl, 0.95)
-ht_list = ht_list + rowAnnotation(gene_len = row_anno_points(gl, size = unit(1, "mm"), gp = gpar(col = "#00000040")), 
-	width = unit(1.5, "cm"))
+ht_list = ht_list + rowAnnotation(gene_len = row_anno_points(gl, size = unit(1, "mm"), 
+    gp = gpar(col = "#00000040")), width = unit(1.5, "cm"))
 ```
 
 Add the heatmap which shows enrichment of CGI to TSS. Top annotation which show enrichment pattern is added
@@ -459,7 +462,8 @@ generate_diff_color_fun = function(x) {
 	colorRamp2(c(-max_q, 0, max_q), c("#3794bf", "#FFFFFF", "#df8640"))
 }
 
-ht_list = ht_list + EnrichedHeatmap(meth_mat_diff, name = "meth_diff", col = generate_diff_color_fun(meth_mat_diff),
+ht_list = ht_list + EnrichedHeatmap(meth_mat_diff, name = "meth_diff", 
+    col = generate_diff_color_fun(meth_mat_diff),
 	column_title = "meth_diff", column_title_gp = gpar(fontsize = 12),
 	top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(pos_col = "#df8640", 
 		neg_col = "#3794bf", lty = 1:n_row_cluster), yaxis_facing = "left")),
@@ -550,15 +554,20 @@ add_boxplot_of_gene_length = function(ht_list) {
 		rg = range(bx)
 		rg[1] = rg[1] - (rg[2] - rg[1])*0.1
 		rg[2] = rg[2] + (rg[2] - rg[1])*0.1
-		pushViewport(viewport(y = unit(1, "npc") + unit(1, "mm"), just = "bottom", height = unit(2, "cm"), yscale = rg))
+		pushViewport(viewport(y = unit(1, "npc") + unit(1, "mm"), just = "bottom", 
+            height = unit(2, "cm"), yscale = rg))
 		grid.rect(gp = gpar(col = "black"))
-		grid.segments(x_ind - w/2, bx[5, ], x_ind + w/2, bx[5, ], default.units = "native", gp = gpar(lty = 1:n))
-		grid.segments(x_ind - w/2, bx[1, ], x_ind + w/2, bx[1, ], default.units = "native", gp = gpar(lty = 1:n))
+		grid.segments(x_ind - w/2, bx[5, ], x_ind + w/2, bx[5, ], default.units = "native", 
+            gp = gpar(lty = 1:n))
+		grid.segments(x_ind - w/2, bx[1, ], x_ind + w/2, bx[1, ], default.units = "native", 
+            gp = gpar(lty = 1:n))
 		grid.segments(x_ind, bx[1, ], x_ind, bx[5, ], default.units = "native", gp = gpar(lty = 1:n))
-		grid.rect(x_ind, colMeans(bx[c(4, 2), ]), width = w, height = bx[4, ] - bx[2, ], default.units = "native", 
-			gp = gpar(fill = "white", lty = 1:n))
-		grid.segments(x_ind - w/2, bx[3, ], x_ind + w/2, bx[3, ], default.units = "native", gp = gpar(lty = 1:n))
-		grid.text("Gene length", y = unit(1, "npc") + unit(2.5, "mm"), gp = gpar(fontsize = 12), just = "bottom")
+		grid.rect(x_ind, colMeans(bx[c(4, 2), ]), width = w, height = bx[4, ] - bx[2, ], 
+            default.units = "native", gp = gpar(fill = "white", lty = 1:n))
+		grid.segments(x_ind - w/2, bx[3, ], x_ind + w/2, bx[3, ], default.units = "native", 
+            gp = gpar(lty = 1:n))
+		grid.text("Gene length", y = unit(1, "npc") + unit(2.5, "mm"), gp = gpar(fontsize = 12), 
+            just = "bottom")
 		upViewport()
 	})
 }
@@ -568,7 +577,8 @@ i = 0
 for(f in names(ht_list1@ht_list)) {
 	if(grepl("meth|H3K4me1|H3K4me3|H3K27ac|H3K27me3", f)) {
 		decorate_column_title(f, {
-			grid.rect(height = unit(0.8, "npc"), gp = gpar(fill = brewer.pal(8, "Set2")[as.integer(i/3)+1], col = NA))
+			grid.rect(height = unit(0.8, "npc"), gp = gpar(fill = brewer.pal(8, "Set2")[as.integer(i/3)+1], 
+                col = NA))
 			grid.text(ht_list1@ht_list[[f]]@column_title, gp = gpar(fontsize = 12))
 		})
 		i = i + 1
@@ -576,7 +586,8 @@ for(f in names(ht_list1@ht_list)) {
 }
 decorate_annotation("gene_len", slice = n_row_cluster, {
 	grid.segments(c(0, 200000), unit(0, "npc"), c(0, 200000), unit(-1, "mm"), default.units = "native")
-	grid.text("0kb", unit(0, "native") - unit(2, "mm"), unit(-2, "mm"), gp = gpar(fontsize = 8), just = c("left", "top"))
+	grid.text("0kb", unit(0, "native") - unit(2, "mm"), unit(-2, "mm"), gp = gpar(fontsize = 8), 
+        just = c("left", "top"))
 	grid.text("200kb", unit(200000, "native") + unit(1, "mm"), unit(-2, "mm"), gp = gpar(fontsize = 8), 
 		just = c("right", "top"))
 }) 
@@ -593,7 +604,8 @@ ht_list2 = draw(ht_list2,
 	split = split, heatmap_legend_side = "bottom", gap = unit(2, "mm"))
 for(f in names(ht_list2@ht_list)[-1]) {
 	decorate_column_title(f, {
-		grid.rect(height = unit(0.8, "npc"), gp = gpar(fill = brewer.pal(8, "Set2")[as.integer(i/3)+1], col = NA))
+		grid.rect(height = unit(0.8, "npc"), gp = gpar(fill = brewer.pal(8, "Set2")[as.integer(i/3)+1], 
+            col = NA))
 		grid.text(ht_list2@ht_list[[f]]@column_title, gp = gpar(fontsize = 12))
 	})
 	i = i + 1
