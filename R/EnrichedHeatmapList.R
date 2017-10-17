@@ -110,11 +110,7 @@ setMethod(f = "show",
 #
 # == param
 # -object an `EnrichedHeatmapList-class` object
-<<<<<<< HEAD
 # -padding padding of the plot. The four values correspond to bottom, left, top, right paddings.
-=======
-# -padding padding of the plot. Elements correspond to bottom, left, top, right paddings.
->>>>>>> bioc/master
 # -newpage whether to create a new page
 # -... pass to `ComplexHeatmap::make_layout,HeatmapList-method` or `ComplexHeatmap::draw,HeatmapList-method`
 #
@@ -223,7 +219,6 @@ setMethod(f = "draw",
             if(ht@heatmap_param$pos_line) {
                 decorate_heatmap_body(heatmap_name, {
                     if(n1 && n2 && n3) {
-<<<<<<< HEAD
                         grid.lines(rep((n1+0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
                         grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
                     } else if(n1 && !n2 && n3) {
@@ -232,16 +227,6 @@ setMethod(f = "draw",
                         grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
                     } else if(n1 && n2 && !n3) {
                         grid.lines(rep((n1+0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
-=======
-                        grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
-                        grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
-                    } else if(n1 && !n2 && n3) {
-                        grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
-                    } else if(!n1 && n2 && n3) {
-                        grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
-                    } else if(n1 && n2 && !n3) {
-                        grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = ht@heatmap_param$pos_line_gp)
->>>>>>> bioc/master
                     }
                 }, slice = k)
             }
@@ -251,7 +236,6 @@ setMethod(f = "draw",
     return(invisible(object))
 })
 
-<<<<<<< HEAD
 
 
 # == title
@@ -356,5 +340,3 @@ calc_minor_ticks = function(mat, n = 20) {
     }
     return(pos)
 }
-=======
->>>>>>> bioc/master

@@ -11,13 +11,8 @@ getSignalsFromList(lt, fun = function(x) mean(x, na.rm = TRUE))
 }
 \arguments{
 
-<<<<<<< HEAD
   \item{lt}{a list of normalized matrices which are returned by \code{\link{normalizeToMatrix}}. Matrices in the list should be generated with same settings (e.g. they should use same target regions, same extension to targets and same number of windows).}
   \item{fun}{a user-defined function to summarize signals. If we assume elements in \code{lt} correspond to different samples,  the user-defined function calculates e.g. mean signal for each window.}
-=======
-  \item{lt}{a list of objects which are returned by \code{\link{normalizeToMatrix}}. Objects in the list should come from same settings.}
-  \item{fun}{a self-defined function which gives mean signals across samples. If we assume the objects in the list correspond to different samples, then different regions in the targets are the first dimension, different positions upstream or downstream of the targets are the second dimension, and different samples are the third dimension. This self-defined function can have one argument which is the vector containing values in different samples in a specific position to a specific target region. Or it can have a second argument which is the index for  the current target.}
->>>>>>> bioc/master
 
 }
 \details{

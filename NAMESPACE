@@ -6,13 +6,9 @@ export(EnrichedHeatmapList)
 export(anno_enriched)
 export(copyAttr)
 export(default_smooth_fun)
-<<<<<<< HEAD
 export(dist_by_closeness)
 export(enriched_score)
 export(extract_anno_enriched)
-=======
-export(enriched_score)
->>>>>>> bioc/master
 export(getSignalsFromList)
 export(makeWindows)
 export(normalizeToMatrix)
@@ -25,28 +21,14 @@ exportMethods(draw)
 import(ComplexHeatmap)
 import(GenomicRanges)
 import(IRanges)
-<<<<<<< HEAD
 import(Rcpp)
 import(grid)
 import(locfit)
 import(methods)
-=======
-import(grid)
-import(locfit)
->>>>>>> bioc/master
 importFrom("GetoptLong", qq.options)
 importFrom("GetoptLong", qqcat)
 importFrom("grDevices", "col2rgb", "rgb")
 importFrom("matrixStats", colSds)
-<<<<<<< HEAD
 importFrom("stats", "loess.control", "predict", loess, as.dist)
 useDynLib(EnrichedHeatmap, .fixes = "EnrichedHeatmap_", .registration=TRUE)
-=======
-importFrom("methods", "new", "selectMethod", "slot", "slot<-", "slotNames")
-importFrom("methods", setClass)
-importFrom("methods", setGeneric)
-importFrom("methods", setMethod)
-importFrom("stats", "loess.control", "predict")
-importFrom("stats", loess)
->>>>>>> bioc/master
 

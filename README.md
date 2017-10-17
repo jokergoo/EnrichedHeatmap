@@ -38,11 +38,7 @@ Like other tools, the task involves two steps:
 mat1 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
     extend = 5000, mean_mode = "w0", w = 50)
 mat2 = normalizeToMatrix(meth, tss, value_column = "meth", mean_mode = "absolute",
-<<<<<<< HEAD
     extend = 5000, w = 50, background = NA, smooth = TRUE)
-=======
-    extend = 5000, w = 50, empty_value = NA, smooth = TRUE)
->>>>>>> bioc/master
 ```
 
 ```{r}
@@ -51,21 +47,11 @@ lgd = Legend(at = c("cluster1", "cluster2", "cluster3"), title = "Clusters",
     type = "lines", legend_gp = gpar(col = 2:4))
 ht_list = Heatmap(partition, col = structure(2:4, names = as.character(1:3)), name = "partition",
               show_row_names = FALSE, width = unit(3, "mm")) +
-<<<<<<< HEAD
           EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", split = partition,
               top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
               column_title = "H3K4me3") + 
           EnrichedHeatmap(mat2, name = "methylation",
               top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
-=======
-          EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", split = partition, width = 1,
-              top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
-              top_annotation_height = unit(2, "cm"), row_title_rot = 0,
-              column_title = "H3K4me3", combined_name_fun = NULL) + 
-          EnrichedHeatmap(mat2, name = "methylation", width = 1,
-              top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
-              top_annotation_height = unit(2, "cm"),
->>>>>>> bioc/master
               column_title = "Methylation") +
           Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
               show_row_names = FALSE, width = unit(5, "mm"))
@@ -76,11 +62,7 @@ draw(ht_list, main_heatmap = "H3K4me3", gap = unit(c(2, 10, 2), "mm"))
 
 Actually you can generate rather complex heatmaps:
 
-<<<<<<< HEAD
 <img width="1043" alt="screen shot 2017-10-13 at 10 42 42" src="https://user-images.githubusercontent.com/449218/31608873-50c497d6-b272-11e7-8d81-cd88156d18aa.png">
-=======
-![image](https://cloud.githubusercontent.com/assets/449218/15091050/e94e1070-146e-11e6-83da-7708009b11b0.png)
->>>>>>> bioc/master
 
 
 ### License

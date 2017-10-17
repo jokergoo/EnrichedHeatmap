@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 changes in version 1.7.1
 
 * show_row_names is put in the function argument list
@@ -10,8 +9,6 @@ changes in version 1.7.1
 
 ==================================
 
-=======
->>>>>>> bioc/master
 changes in version 1.5.1
 
 * anno_enriched(): can visualize positive signals and negative signals separatedly

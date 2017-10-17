@@ -6,7 +6,6 @@
 # == param
 # -signal a `GenomicRanges::GRanges` object.
 # -target a `GenomicRanges::GRanges` object.
-<<<<<<< HEAD
 # -extend extended base pairs to the upstream and/or downstream of ``target``. It can be a vector of length one or two.
 #         Length one means same extension to the upstream and downstream.
 # -w window size for splitting upstream and downstream.
@@ -16,45 +15,24 @@
 # -background values for windows that don't overlap with ``signal``. 
 # -mean_mode when a window is not perfectly overlapped to ``signal``, how to summarize 
 #        values to the window. See 'Details' section for a detailed explanation.
-=======
-# -extend extended base pairs to the upstream and downstream of ``target``. It can be a vector of length one or two.
-#         If it is length one, it means extension to the upstream and downstream are the same.
-# -w window size for splitting upstream and downstream.
-# -value_column column index in ``signal`` that will be mapped to colors. If it is ``NULL``, an internal column
-#         which all contains 1 will be used.
-# -mapping_column mapping column to restrict overlapping between ``signal`` and ``target``. By default it tries to look for
-#           all regions in ``signal`` that overlap with every target.
-# -empty_value values for small windows that don't overlap with ``signal``. 
-# -mean_mode when a window is not perfectly overlapped to ``signal``, how to summarize 
-#        values to this window. See 'Details' section for a detailed explanation.
->>>>>>> bioc/master
 # -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
 #               is enforced to ``FALSE``.
 # -target_ratio  the ratio of ``target`` in the full heatmap. If the value is 1, ``extend`` will be reset to 0.
 # -k number of windows only when ``target_ratio = 1`` or ``extend == 0``, otherwise ignored.
 # -smooth whether apply smoothing on rows in the matrix. 
 # -smooth_fun the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric
-<<<<<<< HEAD
 #    vector (may contain ``NA`` values) and returns a vector with same length. If the smoothing is failed, the function
 #    should call `base::stop` to throw errors so that `normalizeToMatrix` can catch how many rows are failed in smoothing. 
 #    See the default `default_smooth_fun` for example.
 # -keep percentiles in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first
 #       percentile is replaces with the first pencentile and values larger than the second percentile is replaced with the
 #       second percentile.
-=======
-#    vector (may contains ``NA`` values) and returns a vector with same length. If the smoothing is failed, the function
-#    should call `base::stop` to throw errors so that `normalizeToMatrix` can catch how many rows are failed in smoothing. 
-#    See the default `default_smooth_fun` for example.
-# -trim percent of extreme values to remove. IF it is a vector of length 2, it corresponds to the lower quantile and higher quantile.
-#        e.g. ``c(0.01, 0.01)`` means to trim outliers less than 1st quantile and larger than 99th quantile.
->>>>>>> bioc/master
 #
 # == details
 # In order to visualize associations between ``signal`` and ``target``, the data is transformed into a matrix
 # and visualized as a heatmap by `EnrichedHeatmap` afterwards.
 #
 # Upstream and downstream also with the target body are splitted into a list of small windows and overlap
-<<<<<<< HEAD
 # to ``signal``. Since regions in ``signal`` and small windows do not always 100 percent overlap, there are four different averaging modes:
 # 
 # Following illustrates different settings for ``mean_mode`` (note there is one signal region overlapping with other signals):
@@ -64,17 +42,6 @@
 #            30               values in signal region
 #          ++++++             signal region
 #       =================     a window (17bp), there are 4bp not overlapping to any signal regions.
-=======
-# to ``signal``. Since regions in ``signal`` and small windows do not always 100 percent overlap, there are four different average modes:
-# 
-# Following illustrates different settings for ``mean_mode`` (note there is one signal region overlapping with other signals):
-#
-#       40      50     20     values in signal
-#     ++++++   +++    +++++   signal
-#            30               values in signal
-#          ++++++             signal
-#       =================     window (17bp), there are 4bp not overlapping to any signal region.
->>>>>>> bioc/master
 #         4  6  3      3      overlap
 #
 #     absolute: (40 + 30 + 50 + 20)/4
@@ -82,22 +49,6 @@
 #     w0:       (40*4 + 30*6 + 50*3 + 20*3)/(4 + 6 + 3 + 3 + 4)
 #     coverage: (40*4 + 30*6 + 50*3 + 20*3)/17
 #
-<<<<<<< HEAD
-=======
-# To explain it more clearly, let's consider three scenarios:
-#
-# First, we want to calculate mean methylation from 3 CpG sites in a 20bp window. Since methylation
-# is only measured at CpG site level, the mean value should only be calculated from the 3 CpG sites while not the non-CpG sites. In this
-# case, ``absolute`` mode should be used here.
-#
-# Second, we want to calculate mean coverage in a 20bp window. Let's assume coverage is 5 in 1bp ~ 5bp, 10 in 11bp ~ 15bp and 20 in 16bp ~ 20bp.
-# Since converage is kind of attribute for all bases, all 20 bp should be taken into account. Thus, here ``w0`` mode should be used
-# which also takes account of the 0 coverage in 6bp ~ 10bp. The mean coverage will be caculated as ``(5*5 + 10*5 + 20*5)/(5+5+5+5)``.
-#
-# Third, genes have multiple transcripts and we want to calculate how many transcripts eixst in a certain position in the gene body.
-# In this case, values associated to each transcript are binary (either 1 or 0) and ``coverage`` mean mode should be used.
-#
->>>>>>> bioc/master
 # == value
 # A matrix with following additional attributes:
 #
@@ -124,18 +75,11 @@
 # normalizeToMatrix(signal, target, extend = 10, w = 2, value_column = "score")
 #
 normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, 
-<<<<<<< HEAD
 	value_column = NULL, mapping_column = NULL, background = ifelse(smooth, NA, 0), 
 	mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1), 
 	target_ratio = min(c(0.4, mean(width(target))/(sum(extend) + mean(width(target))))), 
 	k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun,
 	keep = c(0, 1)) {
-=======
-	value_column = NULL, mapping_column = NULL, empty_value = ifelse(smooth, NA, 0), 
-	mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1), 
-	target_ratio = ifelse(all(extend == 0), 1, 0.1), k = min(c(20, min(width(target)))), 
-	smooth = FALSE, smooth_fun = default_smooth_fun, trim = 0) {
->>>>>>> bioc/master
 
 	signal_name = deparse(substitute(signal))
 	target_name = deparse(substitute(target))
@@ -151,52 +95,6 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 
 	target_is_single_point = all(width(target) <= 1)
 
-<<<<<<< HEAD
-=======
-	# if(s > 1) {
-	# 	n = length(target)
-	# 	if(s > n) s = n
-	# 	x = seq(1, n, by = s)
-	# 	if(x < n) x = c(x, n)
-	# 	start_index = x[-length(x)]
-	# 	end_index = x[-1] - 1
-	# 	end_index[length(end_index)] = x[length(x)]
-
-	# 	lt = lapply(seq_along(start_index), function(i) {
-	# 		normalizeToMatrix(signal, target[ start_index[i]:end_index[i] ], extend = extend, w = w, 
-	# 			value_column = value_column, mapping_column = mapping_column,
-	# 			empty_value = empty_value, mean_mode = mean_mode, include_target = include_target,
-	# 			target_ratio = target_ratio, smooth = smooth, s = 1, trim = 0)
-	# 	})
-
-	# 	upstream_index = attr(lt[[1]], "upstream_index")
-	# 	target_index = attr(lt[[1]], "target_index")
-	# 	downstream_index = attr(lt[[1]], "downstream_index")
-	# 	extend = attr(lt[[1]], "extend")
-	# 	smooth = attr(lt[[1]], "smooth")
-
-	# 	mat = do.call("rbind", lt)
-
-	# 	attr(mat, "upstream_index") = upstream_index
-	# 	attr(mat, "target_index") = target_index
-	# 	attr(mat, "downstream_index") = downstream_index
-	# 	attr(mat, "extend") = extend
-	# 	attr(mat, "smooth") = smooth
-	# 	attr(mat, "signal_name") = signal_name
-	# 	attr(mat, "target_name") = target_name
-	# 	attr(mat, "target_is_single_point") = target_is_single_point
-
-	# 	if(trim > 0) {
-	#   		q1 = quantile(mat, trim/2, na.rm = TRUE)
-	#   		q2 = quantile(mat, 1 - trim/2, na.rm = TRUE)
-	#   		mat[mat <= q1] = q1
-	#   		mat[mat >= q2] = q2
-	#   	}
-	#   	class(mat) = c("normalizedMatrix", "matrix")
-	# 	return(mat)
-	# }
-
->>>>>>> bioc/master
 	if(target_is_single_point) {
 		if(include_target) {
 			warning("Width of `target` are all 1, `include_target` is set to `FALSE`.")
@@ -229,28 +127,17 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
   	if(target_is_single_point) {
   		# do not need to separate upstream and downstream
   		# and it makes the boundary between upstream and downstream smoothing
-<<<<<<< HEAD
   		suppressWarnings(both <- promoters(target, upstream = extend[1], downstream = extend[2] + 1))
 
 		mat_both = makeMatrix(signal, both, w = w, value_column = value_column, mapping_column = mapping_column, 
 			background = background, mean_mode = mean_mode)
-=======
-  		suppressWarnings(both <- promoters(target, upstream = extend[1], downstream = extend[2]))
-
-		mat_both = makeMatrix(signal, both, w = w, value_column = value_column, mapping_column = mapping_column, 
-			empty_value = empty_value, mean_mode = mean_mode)
->>>>>>> bioc/master
 		i = round(extend[1]/(extend[1] + extend[2]) * ncol(mat_both))  # assume
 		# if(i < 2 | ncol(mat_both) - i < 2) {
 		# 	stop("Maybe `w` is too large or one of `extend` is too small.")
 		# }
 		mat_upstream = mat_both[, .seq(1, i), drop = FALSE]
 		mat_downstream = mat_both[, .seq(i+1, ncol(mat_both)), drop = FALSE]
-<<<<<<< HEAD
 
-=======
-	  
->>>>>>> bioc/master
   	} else {
 		# extend and normalize in upstream 
 		if(extend[1] <= 0) {
@@ -258,11 +145,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 		} else {
 			suppressWarnings(upstream <- promoters(target, upstream = extend[1], downstream = 0))
 			mat_upstream = makeMatrix(signal, upstream, w = w, value_column = value_column, mapping_column = mapping_column, 
-<<<<<<< HEAD
 				background = background, mean_mode = mean_mode)
-=======
-				empty_value = empty_value, mean_mode = mean_mode)
->>>>>>> bioc/master
 		}
 
 		# extend and normalize in downstream
@@ -273,19 +156,11 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 		if(extend[2] <= 0) {
 			mat_downstream = matrix(0, nrow = length(target), ncol = 0)
 		} else {
-<<<<<<< HEAD
 			suppressWarnings(downstream <- promoters(end_target, upstream = 0, downstream = extend[2] ))
 			names(downstream) = names(target)
 		  
 			mat_downstream = makeMatrix(signal, downstream, w = w, value_column = value_column, mapping_column = mapping_column, 
 				background = background, mean_mode = mean_mode)
-=======
-			suppressWarnings(downstream <- promoters(end_target, upstream = 0, downstream = extend[2]))
-			names(downstream) = names(target)
-		  
-			mat_downstream = makeMatrix(signal, downstream, w = w, value_column = value_column, mapping_column = mapping_column, 
-				empty_value = empty_value, mean_mode = mean_mode)
->>>>>>> bioc/master
 		}
 	}
 
@@ -294,11 +169,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 			k = round((ncol(mat_upstream) + ncol(mat_downstream)) * target_ratio/(1-target_ratio))
 			if(k < 1) k = 1
 		} 
-<<<<<<< HEAD
 		mat_target = makeMatrix(signal, target, k = k, value_column = value_column, mapping_column = mapping_column, background = background, mean_mode = mean_mode)
-=======
-		mat_target = makeMatrix(signal, target, k = k, value_column = value_column, mapping_column = mapping_column, empty_value = empty_value, mean_mode = mean_mode)
->>>>>>> bioc/master
 	} else {
 		mat_target = matrix(0, nrow = length(target), ncol = 0)
 	}
@@ -326,15 +197,9 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 		
 		if(!is.null(failed_rows)) {
 			if(length(failed_rows) == 1) {
-<<<<<<< HEAD
 				msg = paste(strwrap(paste0("Smoothing is failed for one row because there are very few signals overlapped to it. Please use `attr(mat, 'failed_rows')` to get the index of the failed row and consider to remove it.\n")), collapse = "\n")
 			} else {
 				msg = paste(strwrap(paste0("Smoothing are failed for ", length(failed_rows), " rows because there are very few signals overlapped to them. Please use `attr(mat, 'failed_rows')` to get the index of failed rows and consider to remove them.\n")), collapse = "\n")
-=======
-				msg = paste(strwrap(paste0("Smoothig is failed for one row because there are very few signals overlapped to it. Please use `attr(mat, 'failed_rows')` to get the index of the failed row and consider to remove it.\n")), collapse = "\n")
-			} else {
-				msg = paste(strwrap(paste0("Smoothig are failed for ", length(failed_rows), " rows because there are very few signals overlapped to them. Please use `attr(mat, 'failed_rows')` to get the index of failed rows and consider to remove them.\n")), collapse = "\n")
->>>>>>> bioc/master
 			}
 			msg = paste0("\n", msg, "\n")
 			warning(msg)
@@ -354,11 +219,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	attr(mat, "target_name") = target_name
 	attr(mat, "target_is_single_point") = target_is_single_point
 	attr(mat, "failed_rows") = failed_rows
-<<<<<<< HEAD
 	attr(mat, "background") = background
-=======
-	attr(mat, "empty_value") = empty_value
->>>>>>> bioc/master
 
 	.paste0 = function(a, b) {
 		if(length(a) == 0 || length(b) == 0) {
@@ -375,14 +236,8 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
   	} else {
   		colnames(mat) = c(.paste0("u", seq_along(upstream_index)), .paste0("d", seq_along(downstream_index)))
   	}
-<<<<<<< HEAD
 	q1 = quantile(mat, keep[1], na.rm = TRUE)
 	q2 = quantile(mat, keep[2], na.rm = TRUE)
-=======
-  	if(length(trim) == 1) trim = c(trim, trim)
-	q1 = quantile(mat, trim[1], na.rm = TRUE)
-	q2 = quantile(mat, 1 - trim[2], na.rm = TRUE)
->>>>>>> bioc/master
 	mat[mat <= q1] = q1
 	mat[mat >= q2] = q2
   	
@@ -404,11 +259,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 # target = GRanges(seqnames = "chr1", ranges =IRanges(start = 1, end = 10))
 # makeMatrix(gr, target, w = 2)
 #
-<<<<<<< HEAD
 makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mapping_column = NULL, background = 0,
-=======
-makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mapping_column = mapping_column, empty_value = 0,
->>>>>>> bioc/master
     mean_mode = c("absolute", "weighted", "w0", "coverage"), direction = c("normal", "reverse")) {
   
 	if(is.null(value_column)) {
@@ -475,17 +326,10 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 			w = width(mintersect)
 			x = tapply(w*v, mtch[, 2], sum, na.rm = TRUE) / tapply(w, mtch[, 2], sum, na.rm = TRUE)
 		}
-<<<<<<< HEAD
 		v2 = rep(background, length(target_windows))
 		v2[ as.numeric(names(x)) ] = x
 	} else {
 		v2 = rep(background, length(target_windows))
-=======
-		v2 = rep(empty_value, length(target_windows))
-		v2[ as.numeric(names(x)) ] = x
-	} else {
-		v2 = rep(empty_value, length(target_windows))
->>>>>>> bioc/master
 	}
 
 	target_windows$..value = v2
@@ -510,11 +354,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 		stop("numbers of columns are not the same.")
 	}
   
-<<<<<<< HEAD
 	mat = matrix(background, nrow = length(target), ncol = dim(column_index)[1])
-=======
-	mat = matrix(empty_value, nrow = length(target), ncol = dim(column_index)[1])
->>>>>>> bioc/master
 	mat[ target_windows$.i_query + (as.vector(column_index) - 1)* nrow(mat) ] = target_windows$..value
 
 	# findOverlaps may use a lot of memory
@@ -533,22 +373,13 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 #    is the percent to the current region.
 # -k number of partitions for each region. If it is set, all other arguments are ignored.
 # -direction where to start the splitting. See 'Details' section.
-<<<<<<< HEAD
 # -short.keep if the the region can not be split equally under the window size, 
 #             the argument controls whether to keep the windows that are smaller than the window size. See 'Details' section.
-=======
-# -short.keep if the the region can not be splitted equally under the window size, 
-#             whether to keep the windows that are smaller than the window size. See 'Details' section.
->>>>>>> bioc/master
 #
 # == details
 # Following illustrates the meaning of ``direction`` and ``short.keep``:
 #
-<<<<<<< HEAD
 #     -->-->-->-  one region, split by 3bp window (">" means the direction of the sequence)
-=======
-#     ----->----  one region, split by 3bp window (">" means the direction of the sequence)
->>>>>>> bioc/master
 #     aaabbbccc   direction = "normal",  short.keep = FALSE
 #     aaabbbcccd  direction = "normal",  short.keep = TRUE
 #      aaabbbccc  direction = "reverse", short.keep = FALSE
@@ -755,12 +586,9 @@ print.normalizedMatrix = function(x, ...) {
 	signal_name = attr(x, "signal_name")
 	target_name = attr(x, "target_name")
 	target_is_single_point = attr(x, "target_is_single_point")
-<<<<<<< HEAD
 	if(is.null(target_is_single_point)) {
 		target_is_single_point = FALSE
 	}
-=======
->>>>>>> bioc/master
 
 	op = qq.options(READ.ONLY = FALSE)
     on.exit(qq.options(op))
@@ -769,19 +597,11 @@ print.normalizedMatrix = function(x, ...) {
 	qqcat("Normalize @{signal_name} to @{target_name}:\n")
 	qqcat("  Upstream @{extend[1]} bp (@{length(upstream_index)} window@{ifelse(length(upstream_index) > 1, 's', '')})\n")
 	qqcat("  Downstream @{extend[2]} bp (@{length(downstream_index)} window@{ifelse(length(upstream_index) > 1, 's', '')})\n")
-<<<<<<< HEAD
 	if(target_is_single_point) {
 			qqcat("  Include target regions (width = 1)\n")
 	} else {
 		if(length(target_index) == 0) {
 			qqcat("  Not include target regions\n")
-=======
-	if(length(target_index) == 0) {
-		qqcat("  Not include target regions\n")
-	} else {
-		if(target_is_single_point) {
-			qqcat("  Include target regions (width = 1)\n")
->>>>>>> bioc/master
 		} else {
 			qqcat("  Include target regions (@{length(target_index)} window@{ifelse(length(target_index) > 1, 's', '')})\n")
 		}
@@ -797,20 +617,14 @@ print.normalizedMatrix = function(x, ...) {
 # -y object 2
 #
 # == details
-<<<<<<< HEAD
 # The `normalizeToMatrix` object is actually a matrix but with more additional attributes attached.
 # When manipulating such matrix, there are some circumstances that the attributes are lost.
 # This function is used to copy these specific attributes when dealing with the matrix.
-=======
-# The `normalizeToMatrix` object actually is a matrix but with more additional attributes attached.
-# This function is used to copy these new attributes when dealing with the matrix.
->>>>>>> bioc/master
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
 # == example
-<<<<<<< HEAD
 # gr = GRanges(seqnames = c("chr5", "chr5"),
 # 	ranges = IRanges(start = c(98, 98),
 # 	                 end = c(104, 104)))
@@ -822,9 +636,6 @@ print.normalizedMatrix = function(x, ...) {
 # mat2 = mat1[]
 # # copy attributes to mat2 and now mat3 can be used for EnrichedHeatmap()
 # mat3 = copyAttr(mat1, mat2)
-=======
-# NULL
->>>>>>> bioc/master
 copyAttr = function(x, y) {
 	if(!identical(ncol(x), ncol(y))) {
 		stop("x and y should have same number of columns.\n")
@@ -845,20 +656,10 @@ copyAttr = function(x, y) {
 # Get signals from a list
 #
 # == param
-<<<<<<< HEAD
 # -lt a list of normalized matrices which are returned by `normalizeToMatrix`. Matrices in the list should be generated with same settings (e.g. they
 #     should use same target regions, same extension to targets and same number of windows).
 # -fun a user-defined function to summarize signals. If we assume elements in ``lt`` correspond to different samples, 
 #      the user-defined function calculates e.g. mean signal for each window.
-=======
-# -lt a list of objects which are returned by `normalizeToMatrix`. Objects in the list should come from same settings.
-# -fun a self-defined function which gives mean signals across samples. If we assume the objects in the list correspond
-#        to different samples, then different regions in the targets are the first dimension, different positions
-#        upstream or downstream of the targets are the second dimension, and different samples are the third dimension.
-#        This self-defined function can have one argument which is the vector containing values in different samples
-#        in a specific position to a specific target region. Or it can have a second argument which is the index for 
-#        the current target.
->>>>>>> bioc/master
 #
 # == details
 # Let's assume you have a list of histone modification signals for different samples and you want
@@ -954,21 +755,13 @@ getSignalsFromList = function(lt, fun = function(x) mean(x, na.rm = TRUE)) {
 }
 
 # == title
-<<<<<<< HEAD
 # Default smoothing function
-=======
-# Default smooth function
->>>>>>> bioc/master
 #
 # == param
 # -x input numeric vector
 #
 # == details
-<<<<<<< HEAD
 # The smoothing function is applied to every row in the normalized matrix. For this default smoothing function,
-=======
-# The smooth function is applied to every row in the normalized matrix. For this default smooth function,
->>>>>>> bioc/master
 # `locfit::locfit` is first tried on the vector. If there is error, `stats::loess` smoothing is tried afterwards.
 # If both smoothing are failed, there will be an error.
 #
