@@ -21,8 +21,6 @@ r_github_packages:
 - jokergoo/ComplexHeatmap
 - jimhester/covr
 - cran/png
-=======
->>>>>>> bioc/master
 
 bioc_required: true
 
