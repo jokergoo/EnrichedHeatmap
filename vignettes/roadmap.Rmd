@@ -611,10 +611,6 @@ for(f in names(ht_list2@ht_list)[-1]) {
 }
 ```
 
-Note rows in the two heatmap list are all the same.
-
-To put the two heatmap lists into one single page, please directly refer to [this script](figure1.R).
-
 Following code only extracts the annotation graphics. We put all the annotation graphics in a layout so that
 it is easily to compare between them.
 
