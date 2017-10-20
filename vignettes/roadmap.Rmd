@@ -217,7 +217,7 @@ hm_mat_mean_2 = getSignalsFromList(hm_list[SAMPLE$subgroup == "subgroup2"], mean
 hm_mat_diff = hm_mat_mean_1 - hm_mat_mean_2
 ```
 
-Each row in the normalized matrix is a single gene, the correlation between histone modification and gene expression can
+The correlation between histone modification and gene expression can
 also be calculated on the third dimension of the array. In the user-defined function `fun`, `x` is the vector for gene i
 and window j in the array, and `i` is the index of current gene.
 
@@ -245,11 +245,11 @@ mat_cgi = normalizeToMatrix(cgi, tss, ...)
 
 The ordering of genes and sometimes separating genes into several groups are important to strenghen the effect of
 visualization of the patterns. Especially when we have multiple heatmaps which share same row order, a proper way
-to order genes is more important to reveal patterns for all heatmaps.
+to order genes is more important to highlight patterns for all heatmaps.
 
-To method to order genes depends on what patterns you want to reveal. In this analysis, the message we want to show
+Which method to order genes depends on what pattern you want to reveal. In this analysis, the message we want to show
 from the heatmaps are 1. the enrichment of significant negative correlated regions (negCRs) around TSS; 2. the difference between
-subgroup 1 and subgroup 2 and 3. the different methylation patterns for different genes. The following procedures shows how we
+subgroup 1 and subgroup 2; and 3. the different methylation patterns for different genes. The following procedures shows how we
 group genes and how we order genes for better showing these patterns.
 
 The expression difference between subgroup 1 and subgroup 2 samples is a major grouping factor. We construct a category
@@ -296,7 +296,7 @@ tb["cluster2|high"]/sum(tb)
 ```
 
 The proprotion of "cluster2|high" group is too small and also we don't want to make too many
-row clusters, in order to make the plot more clear, "cluster2|high" is removed from following analysis.
+row clusters, in order to make the plot more clear, "cluster2|high" is removed from the analysis.
 
 Also all related variables should be subsetted to remove "cluster2\|high" genes.
 
@@ -318,7 +318,7 @@ combined_split = combined_split[l]
 n_row_cluster = length(unique(combined_split))
 ```
 
-Next we calculate row order, following is a way which show clear patterns for all signals.
+Next we calculate row order, following is a way which shows clear patterns for all signals.
 
 From heatmaps which we show later, there is a clear pattern that the negCRs are enriched
 at consistent positions downstream of TSS. To show this specific pattern, we designed a specific distance metric
@@ -415,7 +415,7 @@ ht_list = ht_list + rowAnnotation(gene_len = row_anno_points(gl, size = unit(1, 
     gp = gpar(col = "#00000040")), width = unit(1.5, "cm"))
 ```
 
-Add the heatmap which shows enrichment of CGI to TSS. Top annotation which show enrichment pattern is added
+Add the heatmap which shows enrichment of CGI to TSS. Top annotation which shows enrichment pattern is added
 by `anno_enriched()` function.
 
 ```{r}
@@ -485,7 +485,6 @@ for(i in seq_along(hist_mat_corr_list)) {
 		ht_list = NULL
 	}
 
-	anno_line_col = ifelse(mean(hist_mat_corr_list[[i]], na.rm = TRUE) > 0, "red", "darkgreen")
 	ht_list = ht_list + EnrichedHeatmap(hist_mat_corr_list[[i]], col = cor_col_fun, 
 		name = qq("@{mark_name[i]}_corr"), column_title = qq("@{mark_name[i]}_corr"), 
 		top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(pos_col = "red",
@@ -525,7 +524,7 @@ split[combined_split == "cluster1|low"] = "cluster2"
 split[combined_split == "cluster2|low"] = "cluster3"
 ```
 
-For each heatmap list, a single column heatmap (or bar) is attached to the most right side to represent difference
+For each heatmap list, a single column heatmap (or bar) is attached to the most left side to represent difference
 of expression between subgroups.
 
 ```{r}
@@ -593,7 +592,7 @@ decorate_annotation("gene_len", slice = n_row_cluster, {
 }) 
 ```
 
-`split` and `row_order` are set to the second heatmap list.
+`split` and `row_order` are set to the second heatmap list as well.
 
 ```{r, fig.width = 14, fig.height = 8}
 ht_list2 = Heatmap(expr_split, show_row_names = FALSE, name = "expr_diff", 
