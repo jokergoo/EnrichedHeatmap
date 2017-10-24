@@ -555,10 +555,28 @@ makeWindows = function(query, w = NULL, k = NULL, direction = c("normal", "rever
 	return(x)
 }
 
+# == title
+# Bind matrix by rows
+#
+# == param
+# -... matrices
+# -deparse.level
+#
+# == value
+# A ``normalizedMatrix`` class object.
+#
+# == author
+# z.gu@dkfz.de
+#
 rbind.normalizedMatrix = function(..., deparse.level = 1) {
 	mat_list = list(...)
+	mat_list = mat_list[sapply(mat_list, function(x) !is.null(x))]
+	mat_list2 = lapply(mat_list, function(x) {
+		attributes(x) = attributes(x)["dim"]
+		x
+	})
 	rbind_matrix = selectMethod("rbind", signature = "matrix")
-	mat = do.call("rbind_matrix", mat_list)
+	mat = do.call("rbind_matrix", mat_list2)
 	mat = copyAttr(mat_list[[1]], mat)
 	return(mat)
 }

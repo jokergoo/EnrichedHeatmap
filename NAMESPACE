@@ -1,6 +1,7 @@
 export('+.AdditiveUnit')
 export('[.normalizedMatrix')
 export('print.normalizedMatrix')
+export('rbind.normalizedMatrix')
 export(EnrichedHeatmap)
 export(EnrichedHeatmapList)
 export(anno_enriched)
