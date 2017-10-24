@@ -24,6 +24,7 @@ If you want the latest version, install it directly from GitHub:
 
 ```{r}
 library(devtools)
+install_github("jokergoo/ComplexHeatmap")
 install_github("jokergoo/EnrichedHeatmap")
 ```
 
