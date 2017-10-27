@@ -28,6 +28,7 @@
 # -keep percentiles in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first
 #       percentile is replaces with the first pencentile and values larger than the second percentile is replaced with the
 #       second percentile.
+# -trim deprecated, please use ``keep`` instead.
 #
 # == details
 # In order to visualize associations between ``signal`` and ``target``, the data is transformed into a matrix
@@ -80,7 +81,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1), 
 	target_ratio = min(c(0.4, mean(width(target))/(sum(extend) + mean(width(target))))), 
 	k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun,
-	keep = c(0, 1)) {
+	keep = c(0, 1), trim = NULL) {
 
 	signal_name = deparse(substitute(signal))
 	target_name = deparse(substitute(target))
@@ -120,6 +121,13 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	if(!missing(empty_value) && missing(background)) {
 		if(!is.null(empty_value)) {
 			background = empty_value
+		}
+	}
+
+	if(!missing(trim) && missing(keep)) {
+		if(!is.null(trim)) {
+			if(length(trim) == 1) trim = rep(trim, 2)
+			keep = c(trim[1], 1 - trim[2])
 		}
 	}
 

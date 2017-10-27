@@ -12,7 +12,7 @@ normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50,
     mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1),
     target_ratio = min(c(0.4, mean(width(target))/(sum(extend) + mean(width(target))))),
     k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun,
-    keep = c(0, 1))
+    keep = c(0, 1), trim = NULL)
 }
 \arguments{
 
@@ -31,6 +31,7 @@ normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50,
   \item{smooth}{whether apply smoothing on rows in the matrix. }
   \item{smooth_fun}{the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric vector (may contain \code{NA} values) and returns a vector with same length. If the smoothing is failed, the function should call \code{\link[base]{stop}} to throw errors so that \code{\link{normalizeToMatrix}} can catch how many rows are failed in smoothing.  See the default \code{\link{default_smooth_fun}} for example.}
   \item{keep}{percentiles in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first percentile is replaces with the first pencentile and values larger than the second percentile is replaced with the second percentile.}
+  \item{trim}{deprecated, please use \code{keep} instead.}
 
 }
 \details{
