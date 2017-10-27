@@ -8,7 +8,7 @@ Normalize associations between genomic signals and target regions into a matrix
 }
 \usage{
 normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50,
-    value_column = NULL, mapping_column = NULL, background = ifelse(smooth, NA, 0),
+    value_column = NULL, mapping_column = NULL, background = ifelse(smooth, NA, 0), empty_value = NULL,
     mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1),
     target_ratio = min(c(0.4, mean(width(target))/(sum(extend) + mean(width(target))))),
     k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun,
@@ -23,6 +23,7 @@ normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50,
   \item{value_column}{column index in \code{signal} that is mapped to colors. If it is not set, it assumes values for all signal regiosn are 1.}
   \item{mapping_column}{mapping column to restrict overlapping between \code{signal} and \code{target}. By default it tries to look for all regions in \code{signal} that overlap with every target.}
   \item{background}{values for windows that don't overlap with \code{signal}. }
+  \item{empty_value}{deprecated, please use \code{background} instead.}
   \item{mean_mode}{when a window is not perfectly overlapped to \code{signal}, how to summarize  values to the window. See 'Details' section for a detailed explanation.}
   \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target} is enforced to \code{FALSE}.}
   \item{target_ratio}{the ratio of \code{target} in the full heatmap. If the value is 1, \code{extend} will be reset to 0.}
