@@ -13,6 +13,7 @@
 # -mapping_column mapping column to restrict overlapping between ``signal`` and ``target``. By default it tries to look for
 #           all regions in ``signal`` that overlap with every target.
 # -background values for windows that don't overlap with ``signal``. 
+# -empty_value deprecated, please use ``background`` instead.
 # -mean_mode when a window is not perfectly overlapped to ``signal``, how to summarize 
 #        values to the window. See 'Details' section for a detailed explanation.
 # -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
@@ -75,7 +76,7 @@
 # normalizeToMatrix(signal, target, extend = 10, w = 2, value_column = "score")
 #
 normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, 
-	value_column = NULL, mapping_column = NULL, background = ifelse(smooth, NA, 0), 
+	value_column = NULL, mapping_column = NULL, background = ifelse(smooth, NA, 0), empty_value = NULL, 
 	mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1), 
 	target_ratio = min(c(0.4, mean(width(target))/(sum(extend) + mean(width(target))))), 
 	k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun,
@@ -113,6 +114,12 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 		if(extend[2] %% w > 0) {
 			warning("Length of downstream extension is not completely divisible by `w`.")
 			extend[2] = extend[2] - extend[2] %% w
+		}
+	}
+
+	if(!missing(empty_value) && missing(background)) {
+		if(!is.null(empty_value)) {
+			background = empty_value
 		}
 	}
 
