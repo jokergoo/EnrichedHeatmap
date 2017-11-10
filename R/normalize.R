@@ -743,15 +743,15 @@ getSignalsFromList = function(lt, fun = function(x) mean(x, na.rm = TRUE)) {
 	}
 
 	n = length(lt)
-	if(n > 1) {
-		for(i in seq_len(n-1)) {
-			attr1 = attr(lt[[i]], c("upstream_index", "target_index", "downstream_index", "extend"))
-			attr2 = attr(lt[[i+1]], c("upstream_index", "target_index", "downstream_index", "extend"))
-			if(!identical(attr1, attr2)) {
-				stop("Objects in `lt` should have same settings.")
-			}
-		}
-	}
+	# if(n > 1) {
+	#	for(i in seq_len(n-1)) {
+	#		attr1 = attr(lt[[i]], c("upstream_index", "target_index", "downstream_index", "extend"))
+	#		attr2 = attr(lt[[i+1]], c("upstream_index", "target_index", "downstream_index", "extend"))
+	#		if(!identical(attr1, attr2)) {
+	#			stop("Objects in `lt` should have same settings.")
+	#		}
+	#	}
+	#}
 
 	for(i in seq_len(n)) {
 		tm = lt[[i]]
