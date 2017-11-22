@@ -7,13 +7,11 @@ Enriched scores
 Enriched scores
 }
 \usage{
-enriched_score(x1, x2, x3)
+enriched_score(mat)
 }
 \arguments{
 
-  \item{x1}{a vector corresponding to values in upstream windows}
-  \item{x2}{a vector corresponding to values in target windows}
-  \item{x3}{a vector corresponding to values in downstream windows}
+  \item{mat}{a normalized matrix from \code{\link{normalizeToMatrix}}}
 
 }
 \details{
@@ -38,14 +36,16 @@ function. It is also an example function for implementing customized scoreing fu
 Basically, to be a score function which calculates enriched score, it should accept three arguments
 which are the values in upstream windows, the target windows and downstream windows 
 The user-defined function should return a single value. Rows are sorted decreasingly by the enriched scores.
+
 }
 \value{
-A numeric value.
+A numeric vector
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>
 }
 \examples{
-enriched_score(c(1, 2, 3), c(1, 2, 1), c(3, 2, 1))
-enriched_score(c(3, 2, 1), c(2, 1, 2), c(1, 2, 3))
+# There is no example
+NULL
+
 }

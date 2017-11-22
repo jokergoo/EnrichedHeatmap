@@ -1,3 +1,11 @@
+changes in version 1.9.2
+
+* improvement on vignettes
+* enriched_scores() directly applied to the normalized matrix
+* row dendrogram is reordered by enriched scores if cluster_row is set to TRUE
+
+==================================
+
 changes in version 1.7.1
 
 * show_row_names is put in the function argument list

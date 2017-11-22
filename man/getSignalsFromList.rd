@@ -12,7 +12,7 @@ getSignalsFromList(lt, fun = function(x) mean(x, na.rm = TRUE))
 \arguments{
 
   \item{lt}{a list of normalized matrices which are returned by \code{\link{normalizeToMatrix}}. Matrices in the list should be generated with same settings (e.g. they should use same target regions, same extension to targets and same number of windows).}
-  \item{fun}{a user-defined function to summarize signals. If we assume elements in \code{lt} correspond to different samples,  the user-defined function calculates e.g. mean signal for each window.}
+  \item{fun}{a user-defined function to summarize signals.}
 
 }
 \details{
@@ -27,26 +27,29 @@ which contain positions of histone modifications, \code{tss} is a \code{GRanges}
         mat_list[[i]] = normalizeToMatrix(hm_gr_list[[i]], tss, value_column = "density")
     \}  }
 
-Applying \code{getSignalsFromList()} to \code{mat_list}, it gives a new normalized matrix which contains mean signals and can
+If we compress the list of matrices as a three-dimension array where the first dimension corresponds to genes,
+the second dimension corresponds to windows and the third dimension corresponds to samples, the mean signal
+across all sample can be calculated on the third dimension. Here \code{\link{getSignalsFromList}} simplifies this job.
+
+Applying \code{getSignalsFromList()} to \code{mat_list}, it gives a new normalized matrix which contains mean signals across all samples and can
 be directly used in \code{EnrichedHeatmap()}.
 
   \preformatted{
-    mat = getSignalsFromList(mat_list)
-    EnrichedHeatmap(mat)  }
+    mat_mean = getSignalsFromList(mat_list)
+    EnrichedHeatmap(mat_mean)  }
 
-Next let's consider a second scenario: we want to see the correlation between histone modification and gene expression.
-In this case, \code{fun} can have a second argument so that users can correspond histone signals to the expression of the
-associated gene. In following code, \code{expr} is a matrix of expression, columns in \code{expr} correspond to elements in \code{hm_gr_list},
-rows in \code{expr} are same as \code{tss}.
+The correlation between histone modification and gene expression can
+also be calculated on the third dimension of the array. In the user-defined function \code{fun}, \code{x} is the vector for gene i
+and window j in the array, and \code{i} is the index of current gene.
 
   \preformatted{
-    mat = getSignalsFromList(mat_list, 
+    mat_corr = getSignalsFromList(mat_list, 
         fun = function(x, i) cor(x, expr[i, ], method = "spearman"))  }
 
-Then \code{mat} here can be used to visualize how gene expression is correlated to histone modification around TSS.
+Then \code{mat_corr} here can be used to visualize how gene expression is correlated to histone modification around TSS.
 
   \preformatted{
-    EnrichedHeatmap(mat)  }
+    EnrichedHeatmap(mat_corr)  }
 }
 \value{
 A \code{\link{normalizeToMatrix}} object which can be directly used for \code{\link{EnrichedHeatmap}}.

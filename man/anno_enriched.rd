@@ -8,8 +8,8 @@ Annotation function to show the enrichment
 }
 \usage{
 anno_enriched(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
-    yaxis = TRUE, ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"), yaxis_side = "right",
-    yaxis_facing = ifelse(yaxis_side == "right", "right", "left"),
+    yaxis = TRUE, ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"),
+    yaxis_side = "right", yaxis_facing = ifelse(yaxis_side == "right", "right", "left"),
     yaxis_gp = gpar(fontsize = 8), show_error = FALSE)
 }
 \arguments{
@@ -28,7 +28,7 @@ anno_enriched(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 
 }
 \details{
 This annotation functions shows mean values (or depends on the method set in \code{value} argument) of columns in the normalized matrix
-which represents the enrichment of the signals to the targets.
+which summarises the enrichment of the signals to the targets.
 
 If rows are splitted, the enriched lines are calculated for each row cluster and there will also be multiple lines in this annotation viewport.
 

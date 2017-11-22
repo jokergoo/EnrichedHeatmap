@@ -23,7 +23,7 @@ makeWindows(query, w = NULL, k = NULL, direction = c("normal", "reverse"),
 Following illustrates the meaning of \code{direction} and \code{short.keep}:
 
   \preformatted{
-    -->-->-->-  one region, split by 3bp window (">" means the direction of the sequence)
+    -->-->-->-  one region, split by 3bp window (">" represents the direction of the sequence)
     aaabbbccc   direction = "normal",  short.keep = FALSE
     aaabbbcccd  direction = "normal",  short.keep = TRUE
      aaabbbccc  direction = "reverse", short.keep = FALSE
@@ -43,7 +43,7 @@ Zuguang gu <z.gu@dkfz.de>
 \examples{
 query = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 11, 21), end = c(10, 20, 30)))
 makeWindows(query, w = 2)
-makeWindows(query, w = 0.2)
+makeWindows(query, w = 0.5)
 makeWindows(query, w = 3)
 makeWindows(query, w = 3, direction = "reverse")
 makeWindows(query, w = 3, short.keep = TRUE)

@@ -25,6 +25,7 @@ knitr::opts_chunk$set(
 options(markdown.HTML.stylesheet = "custom.css")
 
 options(width = 100)
+suppressPackageStartupMessages(library(circlize))
 ```
 
 Enriched heatmap is a special type of heatmap which visualizes the enrichment
@@ -483,7 +484,7 @@ contains correlation between H3K4me1 signal and gene expression in (-5kb, 10kb)
 of the gene TSS.
 
 ```{r}
-load(paste0(system.file("extdata", "H3K4me1_corr_normalize_to_tss.RData", package = "EnrichedHeatmap")))
+load(system.file("extdata", "H3K4me1_corr_normalize_to_tss.RData", package = "EnrichedHeatmap"))
 mat_H3K4me1
 ```
 
@@ -601,7 +602,7 @@ EnrichedHeatmap(..., width = ...) + EnrichedHeatmap(...)
 For more advanced settings, please directly go to [the vignettes in the **ComplexHeamtap** package](http://www.bioconductor.org/packages/devel/bioc/vignettes/ComplexHeatmap/inst/doc/s1.introduction.html).
 
 Together with above features, you can make very complex heatmaps. Following example is from a real-world dataset
-and the details of making this plot can be found [in this vigentte](roadmal.html).
+and the details of making this plot can be found [in this vigentte](roadmap.html).
 
 <p><img src='roadmap.png' /></p>
 
@@ -620,30 +621,33 @@ for(i in seq_along(hm_gr_list)) {
 }
 ```
 
-Applying `getSignalsFromList()` to `mat_list`, it gives a new normalized matrix which contains mean signals and can
+If we compress the list of matrices as a three-dimension array where the first dimension corresponds to genes,
+the second dimension corresponds to windows and the third dimension corresponds to samples, the mean signal
+across all sample can be calculated on the third dimension. Here `getSignalsFromList()` simplifies this job.
+
+Applying `getSignalsFromList()` to `mat_list`, it gives a new normalized matrix which contains mean signals across all samples and can
 be directly used in `EnrichedHeatmap()`.
 
 ```{r, eval = FALSE}
 # code not run
-mat = getSignalsFromList(mat_list)
-EnrichedHeatmap(mat)
+mat_mean = getSignalsFromList(mat_list)
+EnrichedHeatmap(mat_mean)
 ```
 
-Next let's consider a second scenario: we want to see the correlation between histone modification and gene expression.
-In this case, `fun` can have a second argument so that users can correspond histone signals to the expression of the
-associated gene. In following code, `expr` is a matrix of expression, columns in `expr` correspond to elements in `hm_gr_list`,
-rows in `expr` are same as `tss`.
+The correlation between histone modification and gene expression can
+also be calculated on the third dimension of the array. In the user-defined function `fun`, `x` is the vector for gene i
+and window j in the array, and `i` is the index of current gene.
 
 ```{r, eval = FALSE}
 # code not run
-mat = getSignalsFromList(mat_list, fun = function(x, i) cor(x, expr[i, ], method = "spearman"))
+mat_corr = getSignalsFromList(mat_list, fun = function(x, i) cor(x, expr[i, ], method = "spearman"))
 ```
 
-Then `mat` here can be used to visualize how gene expression is correlated to histone modification around TSS.
+Then `mat_corr` here can be used to visualize how gene expression is correlated to histone modification around TSS.
 
 ```{r, eval = FALSE}
 # code not run
-EnrichedHeatmap(mat)
+EnrichedHeatmap(mat_corr)
 ```
 
 ## Use your own matrix

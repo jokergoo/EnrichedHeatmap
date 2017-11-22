@@ -25,9 +25,7 @@ EnrichedHeatmap = setClass("EnrichedHeatmap",
 # Enriched scores
 #
 # == param
-# -x1 a vector corresponding to values in upstream windows
-# -x2 a vector corresponding to values in target windows
-# -x3 a vector corresponding to values in downstream windows
+# -mat a normalized matrix from `normalizeToMatrix`
 #
 # == details
 # The function calculates how the signal is enriched in the target by weighting
@@ -45,59 +43,64 @@ EnrichedHeatmap = setClass("EnrichedHeatmap",
 # of the target, it has higher weight. The second term weight the distance to the center point
 # of the target and similar, if it is closer to the center position, it has higher weight.
 #
-# == seealso
-# This `enriched_score` is the default scoring function for ``score_fun`` argument in `EnrichedHeatmap`
-# function. It is also an example function for implementing customized scoreing function.
-# Basically, to be a score function which calculates enriched score, it should accept three arguments
-# which are the values in upstream windows, the target windows and downstream windows 
-# The user-defined function should return a single value. Rows are sorted decreasingly by the enriched scores.
-#
 # == value
-# A numeric value.
+# A numeric vector
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
-# == example
-# enriched_score(c(1, 2, 3), c(1, 2, 1), c(3, 2, 1))
-# enriched_score(c(3, 2, 1), c(2, 1, 2), c(1, 2, 3))
-#
-enriched_score = function(x1, x2, x3) {
-	n1 = length(x1)
-	n2 = length(x2)
-	n3 = length(x3)
+enriched_score = function(mat) {
 
-	x1_index = seq_along(x1)
-	x2_index = seq_along(x2)
-	x3_index = seq_along(x3)
+	calc_score = function(x1, x2, x3) {
+		n1 = length(x1)
+		n2 = length(x2)
+		n3 = length(x3)
 
-	l1 = !is.na(x1)
-	x1 = x1[l1]
-	x1_index = x1_index[l1]
+		x1_index = seq_along(x1)
+		x2_index = seq_along(x2)
+		x3_index = seq_along(x3)
 
-	l2 = !is.na(x2)
-	x2 = x2[l2]
-	x2_index = x2_index[l2]
+		l1 = !is.na(x1)
+		x1 = x1[l1]
+		x1_index = x1_index[l1]
 
-	l3 = !is.na(x3)
-	x3 = x3[l3]
-	x3_index = x3_index[l3]
+		l2 = !is.na(x2)
+		x2 = x2[l2]
+		x2_index = x2_index[l2]
 
-	if(length(n1) && length(n2)) {
-		sum(x1 * x1_index/n1) + 
+		l3 = !is.na(x3)
+		x3 = x3[l3]
+		x3_index = x3_index[l3]
+
+		if(length(n1) && length(n2)) {
+			sum(x1 * x1_index/n1) + 
+				sum(x2 * abs(n2/2 - abs(x2_index - n2/2))) + 
+				sum(x3 * rev(x3_index)/n3)
+		} else if(!length(n1) && length(n2)) {
 			sum(x2 * abs(n2/2 - abs(x2_index - n2/2))) + 
-			sum(x3 * rev(x3_index)/n3)
-	} else if(!length(n1) && length(n2)) {
-		sum(x2 * abs(n2/2 - abs(x2_index - n2/2))) + 
-			sum(x3 * rev(x3_index)/n3)
-	} else if(length(n1) && !length(n2)) {
-		sum(x1 * x1_index/n1) + 
+				sum(x3 * rev(x3_index)/n3)
+		} else if(length(n1) && !length(n2)) {
+			sum(x1 * x1_index/n1) + 
+				sum(x2 * abs(n2/2 - abs(x2_index - n2/2)))
+		} else {
 			sum(x2 * abs(n2/2 - abs(x2_index - n2/2)))
-	} else {
-		sum(x2 * abs(n2/2 - abs(x2_index - n2/2)))
+		}
 	}
 
+	upstream_index = attr(mat, "upstream_index")
+	downstream_index = attr(mat, "downstream_index")
+	target_index = attr(mat, "target_index")
+
+	score = apply(mat, 1, function(x) {
+				x1 = x[upstream_index]
+				x2 = x[target_index]
+				x3 = x[downstream_index]
+				
+				calc_score(x1, x2, x3)
+			})
+	return(score)
 }
+
 
 # == title
 # Constructor method for EnrichedHeatmap class
@@ -106,9 +109,7 @@ enriched_score = function(x1, x2, x3) {
 # -mat a matrix which is returned by `normalizeToMatrix`
 # -top_annotation a specific annotation which is always put on top of the enriched heatmap and is constructed by `anno_enriched`
 # -top_annotation_height the height of the top annotation
-# -score_fun a function which calculates enriched scores for rows in ``mat``. This function can be self-defined, refer to
-#            `enriched_score` to find out how to design it. Note if row clustering is turned on, this argument is ignored.
-# -row_order row order. If it is specified, ``score_fun`` is ignored.
+# -row_order row order. Default rows are ordered by enriched scores calculated from `enriched_score`
 # -pos_line whether draw vertical lines which represent the positions of ``target``
 # -pos_line_gp graphic parameters for the position lines
 # -axis_name names for axis which is below the heatmap. If the targets are single points, ``axis_name`` is a vector
@@ -120,6 +121,7 @@ enriched_score = function(x1, x2, x3) {
 # -border whether show border of the heatmap
 # -cluster_rows clustering on rows are turned off by default
 # -show_row_dend whether show dendrograms on rows if apply hierarchical clustering on rows
+# -row_dend_reorder weight for reordering the row dendrogram. It is reordered by enriched scores by default.
 # -show_row_names whether show row names
 # -... pass to `ComplexHeatmap::Heatmap`
 #
@@ -127,8 +129,6 @@ enriched_score = function(x1, x2, x3) {
 # `EnrichedHeatmap-class` is inherited from `ComplexHeatmap::Heatmap-class`. Following parameters are 
 # set with pre-defined values:
 #
-# -``row_order`` the rows are sorted by the enriched score which is calculated by ``score_fun``.
-#            The sorting is applied decreasingly.
 # -``cluster_columns`` enforced to be ``FALSE``
 # -``show_column_names`` enforced to be ``FALSE``
 # -``bottom_annotation`` enforced to be ``NULL`` 
@@ -148,15 +148,16 @@ enriched_score = function(x1, x2, x3) {
 # == example
 # load(system.file("extdata", "chr21_test_data.RData", package = "EnrichedHeatmap"))
 # mat3 = normalizeToMatrix(meth, cgi, value_column = "meth", mean_mode = "absolute",
-#     extend = 5000, w = 50, background = 0.5)
+#     extend = 5000, w = 50, smooth = TRUE)
 # EnrichedHeatmap(mat3, name = "methylation", column_title = "methylation near CGI")
 # EnrichedHeatmap(mat3, name = "meth1") + EnrichedHeatmap(mat3, name = "meth2")
 # # for more examples, please go to the vignette
 EnrichedHeatmap = function(mat, top_annotation = HeatmapAnnotation(enriched = anno_enriched()),
 	top_annotation_height = unit(2, "cm"),
-	score_fun = enriched_score, row_order = NULL, pos_line = TRUE, 
+	row_order = order(enriched_score(mat), decreasing = TRUE), pos_line = TRUE, 
 	pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = 0, 
 	axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, 
+	row_dend_reorder = -enriched_score(mat),
 	show_row_dend = FALSE, show_row_names = FALSE, ...) {
 
 	upstream_index = attr(mat, "upstream_index")
@@ -166,22 +167,7 @@ EnrichedHeatmap = function(mat, top_annotation = HeatmapAnnotation(enriched = an
 	if(is.null(upstream_index) || is.null(downstream_index)) {
 		stop("`mat` should be generated by `normalizeToMatrix()`.")
 	}
-
-	# in the arguments of this function, it cannot be set as `score_fun = score_fun`
-	if(is.null(row_order)) {
-		score = apply(mat, 1, function(x) {
-				x1 = x[upstream_index]
-				x2 = x[target_index]
-				x3 = x[downstream_index]
-				
-				score_fun(x1, x2, x3)
-			})
-
-		od = order(score, decreasing = TRUE)
-	} else {
-		od = row_order
-	}
-
+	
 	n1 = length(upstream_index)
 	n2 = length(target_index)
 	n3 = length(downstream_index)
@@ -341,9 +327,9 @@ EnrichedHeatmap = function(mat, top_annotation = HeatmapAnnotation(enriched = an
 
 	class(mat) = NULL
 
-	ht = Heatmap(mat, row_order = od, cluster_columns = FALSE, cluster_rows = cluster_rows,
+	ht = Heatmap(mat, row_order = row_order, cluster_columns = FALSE, cluster_rows = cluster_rows,
 			show_row_names = show_row_names, show_column_names = FALSE, bottom_annotation = NULL, 
-			column_title_side = "top", show_row_dend = show_row_dend, 
+			column_title_side = "top", show_row_dend = show_row_dend, row_dend_reorder = row_dend_reorder,
 			top_annotation = top_annotation, top_annotation_height = top_annotation_height, ...)
 
 	# additional parameters specific for `EnrichedHeatmap` class
@@ -441,7 +427,7 @@ setMethod(f = "draw",
 #
 # == details
 # This annotation functions shows mean values (or depends on the method set in ``value`` argument) of columns in the normalized matrix
-# which represents the enrichment of the signals to the targets.
+# which summarises the enrichment of the signals to the targets.
 #
 # If rows are splitted, the enriched lines are calculated for each row cluster and there will also be multiple lines in this annotation viewport.
 #
@@ -463,8 +449,8 @@ setMethod(f = "draw",
 #     km = 3, row_title_rot = 0)
 #
 anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
-	yaxis = TRUE, ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"), yaxis_side = "right", 
-	yaxis_facing = ifelse(yaxis_side == "right", "right", "left"), 
+	yaxis = TRUE, ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"), 
+	yaxis_side = "right", yaxis_facing = ifelse(yaxis_side == "right", "right", "left"), 
 	yaxis_gp = gpar(fontsize = 8), show_error = FALSE) {
 
 	# in case of lazy loading

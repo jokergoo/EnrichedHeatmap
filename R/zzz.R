@@ -6,12 +6,8 @@
 Bioconductor page: http://bioconductor.org/packages/EnrichedHeatmap/
 Github page: https://github.com/jokergoo/EnrichedHeatmap
 Documentation: http://bioconductor.org/packages/EnrichedHeatmap/
-
-If you use it in published research, please cite:
-Gu, Z. Complex heatmaps reveal patterns and correlations in multidimensional 
-  genomic data. Bioinformatics 2016.
 ========================================
 ")	
-    suppressPackageStartupMessages(require(ComplexHeatmap))
+    # suppressPackageStartupMessages(require(ComplexHeatmap))
     packageStartupMessage(msg)
 }

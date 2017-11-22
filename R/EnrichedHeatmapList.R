@@ -243,11 +243,11 @@ setMethod(f = "draw",
 #
 # == param
 # -ht_list the heatmap list returned by `draw,EnrichedHeatmapList-method`
-# -which the index of enriched heamtap in the heatmap list. The value can be an integer index or a character index
+# -which the index of enriched heamtap in the heatmap list. The value can be an integer index or a character index (which are names of heatmaps)
 # -newpage whether call `grid::grid.newpage` to create a new page
 #
 # == details
-# The extracted plot is exactly the same as the one on the heatmap. 
+# The extracted plot is exactly the same as that on the heatmap. 
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>

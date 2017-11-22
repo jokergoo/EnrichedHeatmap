@@ -8,8 +8,8 @@
 # -target a `GenomicRanges::GRanges` object.
 # -extend extended base pairs to the upstream and/or downstream of ``target``. It can be a vector of length one or two.
 #         Length one means same extension to the upstream and downstream.
-# -w window size for splitting upstream and downstream.
-# -value_column column index in ``signal`` that is mapped to colors. If it is not set, it assumes values for all signal regiosn are 1.
+# -w window size for splitting upstream and downstream, measured in base pairs
+# -value_column column index in ``signal`` that is mapped to colors. If it is not set, it assumes values for all signal regions are 1.
 # -mapping_column mapping column to restrict overlapping between ``signal`` and ``target``. By default it tries to look for
 #           all regions in ``signal`` that overlap with every target.
 # -background values for windows that don't overlap with ``signal``. 
@@ -18,7 +18,7 @@
 #        values to the window. See 'Details' section for a detailed explanation.
 # -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
 #               is enforced to ``FALSE``.
-# -target_ratio  the ratio of ``target`` in the full heatmap. If the value is 1, ``extend`` will be reset to 0.
+# -target_ratio  the ratio of ``target`` columns in the normalized matrix. If the value is 1, ``extend`` will be reset to 0.
 # -k number of windows only when ``target_ratio = 1`` or ``extend == 0``, otherwise ignored.
 # -smooth whether apply smoothing on rows in the matrix. 
 # -smooth_fun the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric
@@ -59,7 +59,7 @@
 # -``downstream_index`` column index corresponding to downstream of ``target``
 # -``extend`` extension on upstream and downstream
 # -``smooth`` whether smoothing was applied on the matrix
-# -``failed_rows`` index of rows which are failed for smoothing
+# -``failed_rows`` index of rows which are failed after smoothing
 #
 # The matrix is wrapped into a simple ``normalizeToMatrix`` class.
 #
@@ -68,7 +68,7 @@
 #
 # == example
 # signal = GRanges(seqnames = "chr1", 
-# 	  ranges = IRanges(start = c(1, 4, 7, 11, 14, 17, 21, 24, 27),
+#     ranges = IRanges(start = c(1, 4, 7, 11, 14, 17, 21, 24, 27),
 #                      end = c(2, 5, 8, 12, 15, 18, 22, 25, 28)),
 #     score = c(1, 2, 3, 1, 2, 3, 1, 2, 3))
 # target = GRanges(seqnames = "chr1", ranges = IRanges(start = 10, end = 20))
@@ -394,7 +394,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 # == details
 # Following illustrates the meaning of ``direction`` and ``short.keep``:
 #
-#     -->-->-->-  one region, split by 3bp window (">" means the direction of the sequence)
+#     -->-->-->-  one region, split by 3bp window (">" represents the direction of the sequence)
 #     aaabbbccc   direction = "normal",  short.keep = FALSE
 #     aaabbbcccd  direction = "normal",  short.keep = TRUE
 #      aaabbbccc  direction = "reverse", short.keep = FALSE
@@ -413,7 +413,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 # == example
 # query = GRanges(seqnames = "chr1", ranges = IRanges(start = c(1, 11, 21), end = c(10, 20, 30)))
 # makeWindows(query, w = 2)
-# makeWindows(query, w = 0.2)
+# makeWindows(query, w = 0.5)
 # makeWindows(query, w = 3)
 # makeWindows(query, w = 3, direction = "reverse")
 # makeWindows(query, w = 3, short.keep = TRUE)
@@ -691,8 +691,7 @@ copyAttr = function(x, y) {
 # == param
 # -lt a list of normalized matrices which are returned by `normalizeToMatrix`. Matrices in the list should be generated with same settings (e.g. they
 #     should use same target regions, same extension to targets and same number of windows).
-# -fun a user-defined function to summarize signals. If we assume elements in ``lt`` correspond to different samples, 
-#      the user-defined function calculates e.g. mean signal for each window.
+# -fun a user-defined function to summarize signals.
 #
 # == details
 # Let's assume you have a list of histone modification signals for different samples and you want
@@ -705,23 +704,26 @@ copyAttr = function(x, y) {
 #         mat_list[[i]] = normalizeToMatrix(hm_gr_list[[i]], tss, value_column = "density")
 #     }
 #
-# Applying ``getSignalsFromList()`` to ``mat_list``, it gives a new normalized matrix which contains mean signals and can
+# If we compress the list of matrices as a three-dimension array where the first dimension corresponds to genes,
+# the second dimension corresponds to windows and the third dimension corresponds to samples, the mean signal
+# across all sample can be calculated on the third dimension. Here `getSignalsFromList` simplifies this job.
+#
+# Applying ``getSignalsFromList()`` to ``mat_list``, it gives a new normalized matrix which contains mean signals across all samples and can
 # be directly used in ``EnrichedHeatmap()``.
 #
-#     mat = getSignalsFromList(mat_list)
-#     EnrichedHeatmap(mat)
+#     mat_mean = getSignalsFromList(mat_list)
+#     EnrichedHeatmap(mat_mean)
 #
-# Next let's consider a second scenario: we want to see the correlation between histone modification and gene expression.
-# In this case, ``fun`` can have a second argument so that users can correspond histone signals to the expression of the
-# associated gene. In following code, ``expr`` is a matrix of expression, columns in ``expr`` correspond to elements in ``hm_gr_list``,
-# rows in ``expr`` are same as ``tss``.
+# The correlation between histone modification and gene expression can
+# also be calculated on the third dimension of the array. In the user-defined function ``fun``, ``x`` is the vector for gene i
+# and window j in the array, and ``i`` is the index of current gene.
 # 
-#     mat = getSignalsFromList(mat_list, 
+#     mat_corr = getSignalsFromList(mat_list, 
 #         fun = function(x, i) cor(x, expr[i, ], method = "spearman"))
 #
-# Then ``mat`` here can be used to visualize how gene expression is correlated to histone modification around TSS.
+# Then ``mat_corr`` here can be used to visualize how gene expression is correlated to histone modification around TSS.
 #
-#     EnrichedHeatmap(mat)
+#     EnrichedHeatmap(mat_corr)
 #
 #
 # == value

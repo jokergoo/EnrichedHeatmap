@@ -19,14 +19,14 @@ normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50,
   \item{signal}{a \code{\link[GenomicRanges]{GRanges}} object.}
   \item{target}{a \code{\link[GenomicRanges]{GRanges}} object.}
   \item{extend}{extended base pairs to the upstream and/or downstream of \code{target}. It can be a vector of length one or two. Length one means same extension to the upstream and downstream.}
-  \item{w}{window size for splitting upstream and downstream.}
-  \item{value_column}{column index in \code{signal} that is mapped to colors. If it is not set, it assumes values for all signal regiosn are 1.}
+  \item{w}{window size for splitting upstream and downstream, measured in base pairs}
+  \item{value_column}{column index in \code{signal} that is mapped to colors. If it is not set, it assumes values for all signal regions are 1.}
   \item{mapping_column}{mapping column to restrict overlapping between \code{signal} and \code{target}. By default it tries to look for all regions in \code{signal} that overlap with every target.}
   \item{background}{values for windows that don't overlap with \code{signal}. }
   \item{empty_value}{deprecated, please use \code{background} instead.}
   \item{mean_mode}{when a window is not perfectly overlapped to \code{signal}, how to summarize  values to the window. See 'Details' section for a detailed explanation.}
   \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target} is enforced to \code{FALSE}.}
-  \item{target_ratio}{the ratio of \code{target} in the full heatmap. If the value is 1, \code{extend} will be reset to 0.}
+  \item{target_ratio}{the ratio of \code{target} columns in the normalized matrix. If the value is 1, \code{extend} will be reset to 0.}
   \item{k}{number of windows only when \code{target_ratio = 1} or \code{extend == 0}, otherwise ignored.}
   \item{smooth}{whether apply smoothing on rows in the matrix. }
   \item{smooth_fun}{the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric vector (may contain \code{NA} values) and returns a vector with same length. If the smoothing is failed, the function should call \code{\link[base]{stop}} to throw errors so that \code{\link{normalizeToMatrix}} can catch how many rows are failed in smoothing.  See the default \code{\link{default_smooth_fun}} for example.}
@@ -65,7 +65,7 @@ A matrix with following additional attributes:
   \item{\code{downstream_index}}{column index corresponding to downstream of \code{target}}
   \item{\code{extend}}{extension on upstream and downstream}
   \item{\code{smooth}}{whether smoothing was applied on the matrix}
-  \item{\code{failed_rows}}{index of rows which are failed for smoothing}
+  \item{\code{failed_rows}}{index of rows which are failed after smoothing}
 }
 
 The matrix is wrapped into a simple \code{normalizeToMatrix} class.
@@ -75,7 +75,7 @@ Zuguang Gu <z.gu@dkfz.de>
 }
 \examples{
 signal = GRanges(seqnames = "chr1", 
-	  ranges = IRanges(start = c(1, 4, 7, 11, 14, 17, 21, 24, 27),
+    ranges = IRanges(start = c(1, 4, 7, 11, 14, 17, 21, 24, 27),
                      end = c(2, 5, 8, 12, 15, 18, 22, 25, 28)),
     score = c(1, 2, 3, 1, 2, 3, 1, 2, 3))
 target = GRanges(seqnames = "chr1", ranges = IRanges(start = 10, end = 20))
