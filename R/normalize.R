@@ -785,7 +785,7 @@ getSignalsFromList = function(lt, fun = function(x) mean(x, na.rm = TRUE)) {
 	} else {
 		stop("`fun` can only have one or two arguments.")
 	}
-	m = copyAttr(m, lt[[1]])
+	m = copyAttr(lt[[1]], m)
 	return(m)
 }
 
