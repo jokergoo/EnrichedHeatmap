@@ -86,6 +86,18 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	signal_name = deparse(substitute(signal))
 	target_name = deparse(substitute(target))
 
+	## if value is categorical data
+	if(!is.null(value_column)) {
+		x = mcols(signal)[, value_column]
+		if(is.factor(x) || is.character(x)) {
+			mat = normalize_with_category_variable(signal, target, x, w = w, mapping_column = mapping_column, background = 0,
+				empty_value = 0, target_ratio = target_ratio, k = k, smooth = smooth, smooth_fun = smooth_fun, keep = keep, trim = trim)
+			attributes(mat)$signal_name = signal_name
+			attributes(mat)$target_name = target_name
+			return(mat)
+		}
+	}
+
 	if(abs(target_ratio - 1) < 1e-6 || abs(target_ratio) >= 1) {
 		if(!all(extend == 0)) warning("Rest `extend` to 0 when `target_ratio` is larger than or euqal to 1.")
 		extend = c(0, 0)
@@ -235,6 +247,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	attr(mat, "target_is_single_point") = target_is_single_point
 	attr(mat, "failed_rows") = failed_rows
 	attr(mat, "background") = background
+	attr(mat, "signal_is_categorical") = FALSE
 
 	.paste0 = function(a, b) {
 		if(length(a) == 0 || length(b) == 0) {
@@ -259,6 +272,36 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
   	mat[mat <= min_v] = min_v
   	mat[mat >= max_v] = max_v
 	class(mat) = c("normalizedMatrix", "matrix")
+	return(mat)
+}
+
+normalize_with_category_variable = function(signal, target, category, ...) {
+	if(!is.factor(category)) {
+		category = factor(category)
+	}
+
+	level = levels(category)
+	n_level = length(level)
+	mat_list = lapply(as.list(split(signal, category)), function(gr) {
+		normalizeToMatrix(gr, target, value_column = NULL, mean_mode = "w0", ...)
+	})[level]
+
+	arr = array(, dim = c(dim(mat_list[[1]]), n_level))
+	for(i in 1:n_level) {
+		arr[, , i] = mat_list[[i]]
+	}
+
+	mat = apply(arr, c(1, 2), function(x) {
+		if(all(x == 0)) {
+			return(0)
+		} else {
+			which.max(x)
+		}
+	})
+	mat = copyAttr(mat_list[[1]], mat)
+	attributes(mat)$signal_is_categorical = TRUE
+	attributes(mat)$signal_level = level
+
 	return(mat)
 }
 
@@ -639,7 +682,12 @@ print.normalizedMatrix = function(x, ...) {
 			qqcat("  Include target regions (@{length(target_index)} window@{ifelse(length(target_index) > 1, 's', '')})\n")
 		}
 	}
-	qqcat("  @{nrow(x)} signal region@{ifelse(nrow(x) > 1, 's', '')}\n")
+	qqcat("  @{nrow(x)} target region@{ifelse(nrow(x) > 1, 's', '')}\n")
+	signal_is_categorical = attr(x, "signal_is_categorical")
+	if(is.null(signal_is_categorical)) signal_is_categorical = FALSE
+	if(signal_is_categorical) {
+		qqcat("  signal is categorical (@{length(attr(x, 'signal_level'))} levels)\n")
+	}
 }
 
 # == title

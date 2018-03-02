@@ -7,17 +7,19 @@ Constructor method for EnrichedHeatmap class
 Constructor method for EnrichedHeatmap class
 }
 \usage{
-EnrichedHeatmap(mat, top_annotation = HeatmapAnnotation(enriched = anno_enriched()),
+EnrichedHeatmap(mat, col, top_annotation = HeatmapAnnotation(enriched = anno_enriched()),
     top_annotation_height = unit(2, "cm"),
     row_order = order(enriched_score(mat), decreasing = TRUE), pos_line = TRUE,
     pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = 0,
     axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE,
     row_dend_reorder = -enriched_score(mat),
-    show_row_dend = FALSE, show_row_names = FALSE, ...)
+    show_row_dend = FALSE, show_row_names = FALSE,
+    heatmap_legend_param = list(), ...)
 }
 \arguments{
 
   \item{mat}{a matrix which is returned by \code{\link{normalizeToMatrix}}}
+  \item{col}{color settings. If the signals are categorical, color should be a vector with category levels as names.}
   \item{top_annotation}{a specific annotation which is always put on top of the enriched heatmap and is constructed by \code{\link{anno_enriched}}}
   \item{top_annotation_height}{the height of the top annotation}
   \item{row_order}{row order. Default rows are ordered by enriched scores calculated from \code{\link{enriched_score}}}
@@ -31,6 +33,7 @@ EnrichedHeatmap(mat, top_annotation = HeatmapAnnotation(enriched = anno_enriched
   \item{show_row_dend}{whether show dendrograms on rows if apply hierarchical clustering on rows}
   \item{row_dend_reorder}{weight for reordering the row dendrogram. It is reordered by enriched scores by default.}
   \item{show_row_names}{whether show row names}
+  \item{heatmap_legend_param}{a list of settings for heatmap legends. \code{at} and \code{labels} can not be set here.}
   \item{...}{pass to \code{\link[ComplexHeatmap]{Heatmap}}}
 
 }

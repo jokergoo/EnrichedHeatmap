@@ -61,6 +61,10 @@ draw(ht_list, main_heatmap = "H3K4me3", gap = unit(c(2, 10, 2), "mm"))
 
 ![image](https://cloud.githubusercontent.com/assets/449218/14768684/41a6d534-0a49-11e6-800a-36ce15ad83ca.png)
 
+Also when signals are discreate values. E.g. chromatin states:
+
+![test](https://user-images.githubusercontent.com/449218/36900761-e3d2ff86-1e24-11e8-865c-2cedb2674707.png)
+
 Actually you can generate rather complex heatmaps:
 
 <img width="1043" alt="screen shot 2017-10-13 at 10 42 42" src="https://user-images.githubusercontent.com/449218/31608873-50c497d6-b272-11e7-8d81-cd88156d18aa.png">

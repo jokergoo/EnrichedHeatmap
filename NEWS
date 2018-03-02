@@ -3,6 +3,7 @@ changes in version 1.9.2
 * improvement on vignettes
 * enriched_scores() directly applied to the normalized matrix
 * row dendrogram is reordered by enriched scores if cluster_row is set to TRUE
+* support visualize category signals
 
 ==================================
 

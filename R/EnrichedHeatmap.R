@@ -107,6 +107,7 @@ enriched_score = function(mat) {
 # 
 # == param
 # -mat a matrix which is returned by `normalizeToMatrix`
+# -col color settings. If the signals are categorical, color should be a vector with category levels as names.
 # -top_annotation a specific annotation which is always put on top of the enriched heatmap and is constructed by `anno_enriched`
 # -top_annotation_height the height of the top annotation
 # -row_order row order. Default rows are ordered by enriched scores calculated from `enriched_score`
@@ -123,6 +124,7 @@ enriched_score = function(mat) {
 # -show_row_dend whether show dendrograms on rows if apply hierarchical clustering on rows
 # -row_dend_reorder weight for reordering the row dendrogram. It is reordered by enriched scores by default.
 # -show_row_names whether show row names
+# -heatmap_legend_param a list of settings for heatmap legends. ``at`` and ``labels`` can not be set here.
 # -... pass to `ComplexHeatmap::Heatmap`
 #
 # == details
@@ -152,13 +154,14 @@ enriched_score = function(mat) {
 # EnrichedHeatmap(mat3, name = "methylation", column_title = "methylation near CGI")
 # EnrichedHeatmap(mat3, name = "meth1") + EnrichedHeatmap(mat3, name = "meth2")
 # # for more examples, please go to the vignette
-EnrichedHeatmap = function(mat, top_annotation = HeatmapAnnotation(enriched = anno_enriched()),
+EnrichedHeatmap = function(mat, col, top_annotation = HeatmapAnnotation(enriched = anno_enriched()),
 	top_annotation_height = unit(2, "cm"),
 	row_order = order(enriched_score(mat), decreasing = TRUE), pos_line = TRUE, 
 	pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = 0, 
 	axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, 
 	row_dend_reorder = -enriched_score(mat),
-	show_row_dend = FALSE, show_row_names = FALSE, ...) {
+	show_row_dend = FALSE, show_row_names = FALSE, 
+	heatmap_legend_param = list(), ...) {
 
 	upstream_index = attr(mat, "upstream_index")
 	downstream_index = attr(mat, "downstream_index")
@@ -327,10 +330,40 @@ EnrichedHeatmap = function(mat, top_annotation = HeatmapAnnotation(enriched = an
 
 	class(mat) = NULL
 
-	ht = Heatmap(mat, row_order = row_order, cluster_columns = FALSE, cluster_rows = cluster_rows,
+	signal_is_categorical = attr(mat, "signal_is_categorical")
+	if(is.null(signal_is_categorical)) signal_is_categorical = FALSE
+	if(signal_is_categorical) {
+		signal_level = attr(mat, "signal_level")
+		n_level = length(signal_level)
+		if(missing(col)) {
+			default_col = colorRamp2(c(1, (1+n_level)/2, n_level), c("blue", "white", "red"))(1:n_level)
+			col = structure(default_col, names = 1:n_level)
+			col = c("0" = "white", col)
+		} else {
+			if(is.null(names(col))) {
+				if(length(col) != n_level) {
+					stop("If `col` has no name, it must have same length as number of levels in signals.")
+				} else {
+					col = structure(col, names = 1:n_level)
+				}
+			} else {
+				if(!identical(sort(names(col)), sort(signal_level))) {
+					stop("Names of `col` should be same as the levels in signals.")
+				} else {
+					col = structure(col[signal_level], names = 1:n_level)
+				}
+			}
+			col = c("0" = "white", col)
+		}
+		heatmap_legend_param$at = 1:n_level
+		heatmap_legend_param$labels = signal_level
+	}
+	
+	ht = Heatmap(mat, col, row_order = row_order, cluster_columns = FALSE, cluster_rows = cluster_rows,
 			show_row_names = show_row_names, show_column_names = FALSE, bottom_annotation = NULL, 
 			column_title_side = "top", show_row_dend = show_row_dend, row_dend_reorder = row_dend_reorder,
-			top_annotation = top_annotation, top_annotation_height = top_annotation_height, ...)
+			top_annotation = top_annotation, top_annotation_height = top_annotation_height, 
+			heatmap_legend_param = heatmap_legend_param, ...)
 
 	# additional parameters specific for `EnrichedHeatmap` class
 	ht@heatmap_param$pos_line = pos_line
@@ -479,7 +512,7 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 
 		ht = get("object", envir = parent.frame(n = 5))
 		mat = ht@matrix
-
+		
 		if(by_sign) {
 			mat_pos = mat
 			mat_pos[mat_pos < 0] = 0
@@ -492,13 +525,37 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 		upstream_index = attr(mat, "upstream_index")
 		downstream_index = attr(mat, "downstream_index")
 		target_index = attr(mat, "target_index")
-
+		signal_is_categorical = attr(mat, "signal_is_categorical")
+		signal_level = attr(mat, "signal_level")
+		if(is.null(signal_is_categorical)) signal_is_categorical = FALSE
+	
 		n1 = length(upstream_index)
 		n2 = length(target_index)
 		n3 = length(downstream_index)
 		n = n1 + n2 + n3
 
-		if(by_sign) {
+		if(signal_is_categorical) {
+			mat_list = lapply(seq_along(signal_level), function(i) {
+				mat0 = mat
+				mat0[mat0 != i] = 0
+				mat0[mat0 > 0] = 1
+				mat0
+			})
+			yl = lapply(ht@row_order_list, function(i) {
+				if(value == "sum" || value == "abs_sum") {
+					y = sapply(mat_list, function(m) {
+						colSums(m[i, , drop = FALSE], na.rm = TRUE)
+					})
+					
+				} else if(value == "mean" || value == "abs_mean") {
+					y = sapply(mat_list, function(m) {
+						colMeans(m[i, , drop = FALSE], na.rm = TRUE)
+					})
+				}
+				y
+			})
+			show_error = FALSE
+		} else if(by_sign) {
 			if(value == "sum" || value == "abs_sum") {
 				y_pos = sapply(ht@row_order_list, function(i) {
 					colSums(mat_pos[i, , drop = FALSE], na.rm = TRUE)
@@ -547,37 +604,54 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 			}
 		} else {
 			if(is.null(ylim)) {
-				if(by_sign) {
-					ylim = range(c(y_pos, y_neg), na.rm = TRUE)
+				if(signal_is_categorical) {
+					ylim = range(unlist(yl), na.rm = TRUE)
 				} else {
-					ylim = range(y, na.rm = TRUE)
+					if(by_sign) {
+						ylim = range(c(y_pos, y_neg), na.rm = TRUE)
+					} else {
+						ylim = range(y, na.rm = TRUE)
+					}
 				}
 				ylim[2] = ylim[2] + (ylim[2] - ylim[1]) * 0.05
 			}
 		}
 
-		gp = recycle_gp(gp, length(ht@row_order_list))
-
 		pushViewport(viewport(xscale = c(0, n), yscale = ylim))
 		grid.rect(gp = gpar(col = "black", fill = NA))
-		if(by_sign) {
-			for(i in seq_len(ncol(y_pos))) {
-				gp2 = subset_gp(gp, i); gp2$col = gp2$pos_col
-				grid.lines(seq_len(n)-0.5, y_pos[,i], default.units = "native", gp = gp2)
-				gp2 = subset_gp(gp, i); gp2$col = gp2$neg_col
-				grid.lines(seq_len(n)-0.5, y_neg[,i], default.units = "native", gp = gp2)
+		if(signal_is_categorical) {
+			gp = recycle_gp(gp, length(ht@row_order_list))
+			mat_col = ht@matrix_color_mapping@colors
+			for(k in seq_along(yl)) {
+				y = yl[[k]]
+				for(i in seq_len(ncol(y))) {
+					gp2 = subset_gp(gp, k)
+					gp2$col = mat_col[as.character(i)]
+					grid.lines(seq_len(n)-0.5, y[,i], default.units = "native", gp = gp2)
+				}
 			}
 		} else {
-			for(i in seq_len(ncol(y))) {
-				if(show_error) {
-					line_col = col2rgb(subset_gp(gp, i)$col, alpha = TRUE)[, 1]
-					line_col[4] = floor(line_col[4]*0.25)
-					grid.polygon(c(seq_len(n)-0.5, rev(seq_len(n)-0.5)), c(y[,i]+y_se[,i], rev(y[,i]-y_se[,i])), 
-						default.units = "native", gp = gpar(col = NA, fill = rgb(line_col[1], line_col[2], line_col[3], line_col[4], maxColorValue = 255)))
+			gp = recycle_gp(gp, length(ht@row_order_list))
+			if(by_sign) {
+				for(i in seq_len(ncol(y_pos))) {
+					gp2 = subset_gp(gp, i); gp2$col = gp2$pos_col
+					grid.lines(seq_len(n)-0.5, y_pos[,i], default.units = "native", gp = gp2)
+					gp2 = subset_gp(gp, i); gp2$col = gp2$neg_col
+					grid.lines(seq_len(n)-0.5, y_neg[,i], default.units = "native", gp = gp2)
 				}
-				grid.lines(seq_len(n)-0.5, y[,i], default.units = "native", gp = subset_gp(gp, i))
+			} else {
+				for(i in seq_len(ncol(y))) {
+					if(show_error) {
+						line_col = col2rgb(subset_gp(gp, i)$col, alpha = TRUE)[, 1]
+						line_col[4] = floor(line_col[4]*0.25)
+						grid.polygon(c(seq_len(n)-0.5, rev(seq_len(n)-0.5)), c(y[,i]+y_se[,i], rev(y[,i]-y_se[,i])), 
+							default.units = "native", gp = gpar(col = NA, fill = rgb(line_col[1], line_col[2], line_col[3], line_col[4], maxColorValue = 255)))
+					}
+					grid.lines(seq_len(n)-0.5, y[,i], default.units = "native", gp = subset_gp(gp, i))
+				}
 			}
 		}
+
 		if(pos_line) {
 		    if(n1 && n2 && n3) {
                 grid.lines(rep((n1+0.5)/n, 2), c(0, 1), gp = pos_line_gp)
