@@ -904,7 +904,7 @@ default_smooth_fun = function(x) {
 #         "very_high" = c(100, Inf),
 #         "high" = c(50, 100),
 #         "intermediate" = c(25, 50),
-#         "low" = c(0, 25)
+#         "low" = c(1e-6, 25)
 #     )
 #
 # == author
