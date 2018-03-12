@@ -5,6 +5,7 @@ changes in version 1.9.2
 * row dendrogram is reordered by enriched scores if cluster_row is set to TRUE
 * support visualize category signals
 * add `discretize()` to transform continuous matrices to discrete matrices
+* add one more vignette showing the usage of categorical signals 
 
 ==================================
 
