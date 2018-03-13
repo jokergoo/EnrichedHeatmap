@@ -2,7 +2,7 @@ Package: EnrichedHeatmap
 Type: Package
 Title: Making Enriched Heatmaps
 Version: 1.9.2
-Date: 2018-3-9
+Date: 2018-3-15
 Author: Zuguang Gu
 Maintainer: Zuguang Gu <z.gu@dkfz.de>
 Depends: R (>= 3.1.2), methods, grid, ComplexHeatmap (>= 1.15.2), GenomicRanges
@@ -19,7 +19,7 @@ Description: Enriched heatmap is a special type of heatmap which
 biocViews: Software, Visualization, Sequencing, GenomeAnnotation, Coverage
 URL: https://github.com/jokergoo/EnrichedHeatmap
 License: GPL (>= 2)
-Packaged: 2018-3-9 00:00:00 UTC; Administrator
+Packaged: 2018-3-15 00:00:00 UTC; Administrator
 Repository: Bioconductor
-Date/Publication: 2018-3-9 00:00:00
+Date/Publication: 2018-3-15 00:00:00
 LinkingTo: Rcpp

@@ -141,7 +141,7 @@ corresponds to one chromatin state and the value in each window is the
 fraction how much the window is overlapped to the state (with `w0` or
 `weighted` mean mode). Since the i^th row and the j^th column in all matrices
 correspond to a same window around a same target, if there are multiple states
-overlap to this window, when summarizing from all states, the state with
+overlapping to this window, when summarizing from all states, the state with
 largest overlap fraction is assigned to this window.
 
 There is some special visualization designed for categorical signals where
@@ -188,6 +188,21 @@ of different states.).
 
 
 ```r
+data.frame(states = states_name, value = 1:7)
+```
+
+```
+##            states value
+## 1       TssActive     1
+## 2      Transcript     2
+## 3        Enhancer     3
+## 4 Heterochromatin     4
+## 5     TssBivalent     5
+## 6      Repressive     6
+## 7       Quiescent     7
+```
+
+```r
 states$states_simplified = factor(states$states_simplified, levels = states_name)
 mat_states = normalizeToMatrix(states, tss_chr1, value_column = "states_simplified")
 EnrichedHeatmap(mat_states, name = "states", col = states_col)
@@ -216,10 +231,10 @@ EnrichedHeatmap(mat_states, name = "states", col = states_col, cluster_rows = TR
 
 After closely looking at above heatmap, we found the TSS states are consistently enriched around TSS
 while in the flanking regions, the states are a little bit diverse. Actually this suggests that in order to enhance
-the pattern of the TSS-related states, we can apply k-means clustering only for the states near TSS regions.
-In following we only clustering the matrix which is upstrean and downstream 1kb of TSS (The default
+the pattern of the TSS-related states, we can apply k-means clustering only for the windows near TSS.
+In following we only cluster the subset of matrix which is upstrean and downstream 1kb of TSS (The default
 extension of TSS is 5kb upstream and downstream, the number of columns in the normalized matrix is 100,
-thus from 40^th column to 60^th column are the states in 1kb upstream and downstream of TSS).
+thus from 40^th column to 60^th column are the windows in 1kb upstream and downstream of TSS).
 
 Of couse we need to calculate this partitioning in advance.
 
@@ -232,9 +247,9 @@ EnrichedHeatmap(mat_states, name = "states", col = states_col, cluster_rows = TR
 ![plot of chunk categorical_partial_kmeans](figure/categorical_partial_kmeans-1.png)
 
 Now it is quite nice to see genes with active TSS are all clustered in cluster 2 while in cluster 1, genes are
-either have no function or have bivalent TSS function.
+either with no function or bivalent TSS function.
 
-Similarly, we can visualize how the chromatin states enriched at gene bodies. Since the gene bodies have
+Similarly, we can visualize how the chromatin states are enriched at gene bodies. Since the gene bodies have
 unequal widths, we add an additional point plot to show the width of genes.
 
 
@@ -310,8 +325,8 @@ are generally more lowly expressed.
 
 ## Bivalent TSS
 
-It is believed that in embryonic stem cell, there are a huge number of genes
-showing bivalency states on promoters. They are called bivalent states
+It is believed that in embryonic stem cell (ESC), there are a huge number of genes
+showing bivalent state on promoters. They are called bivalent states
 because both H3K4me3 which is a histone mark for active transcription and H3K27me3
 which is for repressive transcription exist. The loss/gain of active histone
 mark or repressive histone mark which transite into mature cells is essential for tissue development and differentiation.
@@ -327,12 +342,12 @@ states_lung = GRanges(seqnames = states_bed[[1]], ranges = IRanges(states_bed[[2
 states_lung$states_simplified = factor(map[states_lung$states], levels = states_name)
 ```
 
-ChromHMM is applied with 200bp window, thus we split whole genome by 200bp window and assign corresponding
-states to each window, both for ESC and lung.
+ChromHMM was applied with 200bp window, thus we split whole genome by 200bp window and assign corresponding
+state to each window, both for ESC and lung.
 
 
 ```r
-window = makeWindows(states, w = 200)
+window = makeWindows(states, w = 200) # makeWindow() is from EnrichedHeatmap package
 mtch = as.matrix(findOverlaps(window, states))
 window$ESC_states = states$states_simplified[mtch[, 2]]
 mtch = as.matrix(findOverlaps(window, states_lung))
@@ -346,7 +361,7 @@ We only use the windows which are annotated with `TssBivalent` state either in E
 window = window[window$ESC_states == "TssBivalent" | window$lung_states == "TssBivalent"]
 ```
 
-We first make a Chord diagram to show how the transsition happens.
+We first make a Chord diagram to show how the transition happens.
 
 
 ```r
@@ -371,7 +386,7 @@ transition_mat
 The values in the transition matrix mean how many base pairs change from
 one chromatin state to the other state.
 
-Rows and columns are from different cells, we add prefix to row and column names.
+Rows and columns are from different cells, we add different prefix to row and column names.
 
 
 ```r
@@ -379,7 +394,7 @@ rownames(transition_mat) = paste0("ESC_", rownames(transition_mat))
 colnames(transition_mat) = paste0("lung_", colnames(transition_mat))
 ```
 
-Now we make the chord diagram.
+Now we make the Chord diagram by using the **circlize** package.
 
 
 ```r
@@ -396,20 +411,20 @@ legend("left", pch = 15, col = states_col, legend = names(states_col))
 
 ![plot of chunk tssbiv_chord_diagram](figure/tssbiv_chord_diagram-1.png)
 
-As we can see from the Chord diagram, a lot of regions with bivalent tss states have been
-tansite to active or repressive states in lung.
+As we can see from the Chord diagram, a lot of regions with bivalent tss states in ESC have been
+transited to active or repressive states in lung.
 
-To get more deep of how the transistion looks like, we can make enriched heatmaps to see
+To get more deep of how the transition looks like, we can make enriched heatmaps to see
 the associations between different epigenomic signals.
 
 Since `TssBivalent` states basically are states for TSS related regions,
-we only keep genes for which in 1kb upstream and downstream of TSS there must be a window with TssBivalent state.
-Again, we only use chromosome 1 as demonstration.
+we only keep genes for which in 1kb upstream and downstream of TSS there must be a window with `TssBivalent` state annotated.
+Again, we only use chromosome 1 for demonstration.
 
 
 ```r
 mat_bivtss = normalizeToMatrix(states[states$states_simplified == "TssBivalent"], tss_chr1)
-l = rowSums(mat_bivtss[, 40:60]) > 0 # 1kb upstream and downstream
+l = rowSums(mat_bivtss[, 40:60]) > 0 # recall it is 1kb upstream and downstream
 tss_biv = tss_chr1[l]
 tss_biv
 ```
@@ -508,7 +523,7 @@ We continue to add more heatmaps.
 
 ```r
 ht_list = ht_list + EnrichedHeatmap(mat_meth_diff_discrete, name = "meth_diff_discrete", 
-	col = c("hyper" = "#df8640", hypo = "#3794bf"),
+	col = c("hyper" = "#df8640", "hypo" = "#3794bf"),
 	top_annotation = HeatmapAnnotation(enrich = anno_enriched(gp = gpar(lty = 1:2))))
 ```
 
@@ -518,10 +533,13 @@ Finally the heatmap for gene expression.
 ```r
 e = log2(expr[names(tss_biv), c("E003", "E096")] + 1)
 ht_list = ht_list + Heatmap(e, name = "expr", 
-	show_row_names = FALSE, width = unit(10, "mm"), cluster_columns = FALSE)
+	show_row_names = FALSE, width = unit(1, "cm"), cluster_columns = FALSE)
 ```
 
-The row ordering for all heatmaps is from hierarchical clustering on the merged matrix from states in ESC and lung, 1kb upstream and downstream of TSS.
+The row ordering for all heatmaps is from hierarchical clustering on the
+merged normalized states matrix which corresponds to 1kb upstream and downstream of TSS both
+in ESC and lung. All heatmaps are split into two groups by rows where one is high gene expression
+in lung and the other is low gene expression in lung.
 
 
 ```r
@@ -536,10 +554,10 @@ draw(ht_list, row_order = row_order, split = split)
 
 There are some other examples where the genomic signals are categorical.
 
-1. repeats where different repeat family can be different categories
-2. genome segmentation based on methylation. E.g. hign methylated regions (HMRs),
-   partially methylated regions (PMDs), low methylated regions (LMRs), unmethylated regions (UMRs)
-3. for gene-related regions, genic annotation is also categorical.
+1. repeats where different repeat families can be different categories
+2. genome segmentation based on methylation. E.g. hign methylation regions (HMRs),
+   partially methylated regions (PMDs), low methylation regions (LMRs), unmethylation regions (UMRs)
+3. gene-related regions where genic annotation is also categorical.
 
 ## Session Info
 
