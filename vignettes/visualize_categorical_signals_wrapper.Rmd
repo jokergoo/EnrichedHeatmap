@@ -1,0 +1,28 @@
+<!--
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{Visualize Categorical Signals}
+-->
+
+
+```{r, echo = FALSE, message = FALSE}
+library(knitr)
+knitr::opts_chunk$set(
+    error = FALSE,
+    warning = FALSE,
+    message = FALSE)
+library(markdown)
+options(markdown.HTML.options = setdiff(options('markdown.HTML.options')[[1]], "toc"))
+options(markdown.HTML.stylesheet = "custom.css")
+options(width = 100)
+```
+
+
+```{r, eval = grepl("tbi", Sys.info()["nodename"]) & Sys.info()["user"] == "guz", echo = FALSE}
+library(knitr)
+knit("visualize_categorical_signals", output = "visualize_categorical_signals.md", quiet = TRUE)
+```
+
+```{r, echo = FALSE, results = "asis"}
+lines = readLines("visualize_categorical_signals.md")
+cat(lines, sep = "\n")
+```
