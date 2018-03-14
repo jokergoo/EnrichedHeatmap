@@ -283,7 +283,7 @@ normalize_with_category_variable = function(signal, target, category, ...) {
 	level = levels(category)
 	n_level = length(level)
 	mat_list = lapply(as.list(split(signal, category)), function(gr) {
-		normalizeToMatrix(gr, target, value_column = NULL, mean_mode = "w0", ...)
+		normalizeToMatrix(gr, target, value_column = NULL, mean_mode = "coverage", ...)
 	})[level]
 
 	arr = array(, dim = c(dim(mat_list[[1]]), n_level))
