@@ -90,7 +90,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	if(!is.null(value_column)) {
 		x = mcols(signal)[, value_column]
 		if(is.factor(x) || is.character(x)) {
-			mat = normalize_with_category_variable(signal, target, x, w = w, mapping_column = mapping_column, background = 0,
+			mat = normalize_with_category_variable(signal, target, x, extend = extend, w = w, mapping_column = mapping_column, background = 0,
 				empty_value = 0, target_ratio = target_ratio, k = k, smooth = smooth, smooth_fun = smooth_fun, keep = keep, trim = trim)
 			attributes(mat)$signal_name = signal_name
 			attributes(mat)$target_name = target_name
