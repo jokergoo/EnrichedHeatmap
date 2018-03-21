@@ -355,8 +355,12 @@ EnrichedHeatmap = function(mat, col, top_annotation = HeatmapAnnotation(enriched
 			}
 			col = c("0" = "white", col)
 		}
-		heatmap_legend_param$at = 1:n_level
-		heatmap_legend_param$labels = signal_level
+		if(!is.null(heatmap_legend_param$at)) {
+			heatmap_legend_param$at = 1:n_level
+		}
+		if(!is.null(heatmap_legend_param$labels)) {
+			heatmap_legend_param$labels = signal_level
+		}
 	}
 	
 	ht = Heatmap(mat, col, row_order = row_order, cluster_columns = FALSE, cluster_rows = cluster_rows,
