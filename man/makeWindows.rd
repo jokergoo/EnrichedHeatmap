@@ -12,7 +12,7 @@ makeWindows(query, w = NULL, k = NULL, direction = c("normal", "reverse"),
 }
 \arguments{
 
-  \item{query}{a \code{\link[GenomicRanges]{GRanges}} object.}
+  \item{query}{a \code{\link[GenomicRanges]{GRanges-class}} object.}
   \item{w}{window size, a value larger than 1 means the number of base pairs and a value between 0 and 1 is the percent to the current region.}
   \item{k}{number of partitions for each region. If it is set, all other arguments are ignored.}
   \item{direction}{where to start the splitting. See 'Details' section.}
@@ -30,7 +30,7 @@ Following illustrates the meaning of \code{direction} and \code{short.keep}:
     abbbcccddd  direction = "reverse", short.keep = TRUE  }
 }
 \value{
-A \code{\link[GenomicRanges]{GRanges}} object with two additional columns attached:
+A \code{\link[GenomicRanges]{GRanges-class}} object with two additional columns attached:
 
 \itemize{
   \item \code{.i_query} which contains the correspondance between small windows and original regions in \code{query}

@@ -112,10 +112,10 @@ setMethod(f = "show",
 # -object an `EnrichedHeatmapList-class` object
 # -padding padding of the plot. The four values correspond to bottom, left, top, right paddings.
 # -newpage whether to create a new page
-# -... pass to `ComplexHeatmap::make_layout,HeatmapList-method` or `ComplexHeatmap::draw,HeatmapList-method`
+# -... pass to `ComplexHeatmap::make_layout`, HeatmapList-method or `ComplexHeatmap::draw`, HeatmapList-method
 #
 # == detail
-# It calls `ComplexHeatmap::draw,HeatmapList-method` to make the plot but with some adjustment
+# It calls `ComplexHeatmap::draw`, HeatmapList-method to make the plot but with some adjustment
 # specificly for enriched heatmaps.
 #
 # == value
@@ -255,7 +255,7 @@ setMethod(f = "draw",
 extract_anno_enriched = function(ht_list, which = NULL, newpage = TRUE) {
 
     if(!inherits(ht_list, "EnrichedHeatmapList")) {
-        stop("`ht_list` should be returned by `draw()` function.")
+        stop("`ht_list` should be an `EnrichedHeatmapList` object.")
     }
     if(!ht_list@layout$initialized) {
         stop("`ht_list` should be returned by `draw()` function.")

@@ -11,6 +11,10 @@ Enriched heatmap is a special type of heatmap which visualizes the enrichment of
 
 There are several tools that can make such heatmap (e.g. [ngs.plot](https://github.com/shenlab-sinai/ngsplot) or [deepTools](https://github.com/fidelram/deepTools)). Here we implement Enriched heatmap by [ComplexHeatmap](https://github.com/jokergoo/ComplexHeatmap) package. Since this type of heatmap is just a normal heatmap but with some fixed settings, with the functionality of ComplexHeatmap, it would be much easier to customize the heatmap as well as concatenating a list of heatmaps to show correspondance between differnet data sources.
 
+### Citation
+
+Zuguang Gu, et al., EnrichedHeatmap: an R/Bioconductor package for comprehensive visualization of genomic signal associations, 2018. BMC Genomics. [link](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4625-x)
+
 ### Install
 
 **EnrichedHeatmap** is available on [Bioconductor](http://bioconductor.org/packages/devel/bioc/html/EnrichedHeatmap.html), you can install it by:

@@ -15,11 +15,11 @@ Draw a list of heatmaps
   \item{object}{an \code{\link{EnrichedHeatmapList-class}} object}
   \item{padding}{padding of the plot. The four values correspond to bottom, left, top, right paddings.}
   \item{newpage}{whether to create a new page}
-  \item{...}{pass to \code{\link[ComplexHeatmap]{make_layout,HeatmapList-method}} or \code{\link[ComplexHeatmap]{draw,HeatmapList-method}}}
+  \item{...}{pass to \code{\link[ComplexHeatmap]{make_layout}}, HeatmapList-method or \code{\link[ComplexHeatmap]{draw}}, HeatmapList-method}
 
 }
 \details{
-It calls \code{\link[ComplexHeatmap]{draw,HeatmapList-method}} to make the plot but with some adjustment
+It calls \code{\link[ComplexHeatmap]{draw}}, HeatmapList-method to make the plot but with some adjustment
 specificly for enriched heatmaps.
 }
 \value{

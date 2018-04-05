@@ -13,7 +13,7 @@ Draw a single heatmap
 
   \item{object}{an \code{\link{EnrichedHeatmap-class}} object.}
   \item{internal}{only used internally.}
-  \item{...}{pass to \code{\link[ComplexHeatmap]{draw,HeatmapList-method}}.}
+  \item{...}{pass to \code{\link[ComplexHeatmap]{draw}},HeatmapList-method.}
 
 }
 \details{

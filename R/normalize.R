@@ -4,8 +4,8 @@
 # Normalize associations between genomic signals and target regions into a matrix
 #
 # == param
-# -signal a `GenomicRanges::GRanges` object.
-# -target a `GenomicRanges::GRanges` object.
+# -signal a `GenomicRanges::GRanges-class` object.
+# -target a `GenomicRanges::GRanges-class` object.
 # -extend extended base pairs to the upstream and/or downstream of ``target``. It can be a vector of length one or two.
 #         Length one means same extension to the upstream and downstream.
 # -w window size for splitting upstream and downstream, measured in base pairs
@@ -426,7 +426,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 # Split regions into windows
 #
 # == param
-# -query a `GenomicRanges::GRanges` object.
+# -query a `GenomicRanges::GRanges-class` object.
 # -w window size, a value larger than 1 means the number of base pairs and a value between 0 and 1
 #    is the percent to the current region.
 # -k number of partitions for each region. If it is set, all other arguments are ignored.
@@ -445,7 +445,7 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 #     
 #
 # == value
-# A `GenomicRanges::GRanges` object with two additional columns attached:
+# A `GenomicRanges::GRanges-class` object with two additional columns attached:
 # 
 # - ``.i_query`` which contains the correspondance between small windows and original regions in ``query``
 # - ``.i_window`` which contains the index of the small window on the current region.

@@ -2,4 +2,6 @@ test/
 .DS_Store
 ^\.
 README.md
+src/*o
+src/*so
 

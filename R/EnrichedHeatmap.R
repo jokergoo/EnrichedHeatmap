@@ -413,7 +413,7 @@ setMethod(f = "show",
 # == param
 # -object an `EnrichedHeatmap-class` object.
 # -internal only used internally.
-# -... pass to `ComplexHeatmap::draw,HeatmapList-method`.
+# -... pass to `ComplexHeatmap::draw`,HeatmapList-method.
 #
 # == detail
 # The function creates an `EnrichedHeatmapList-class` object which only contains a single heatmap

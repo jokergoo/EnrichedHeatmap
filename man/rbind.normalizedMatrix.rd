@@ -7,7 +7,7 @@ Bind matrix by rows
 Bind matrix by rows
 }
 \usage{
-rbind.normalizedMatrix(..., deparse.level = 1)
+\method{rbind}{normalizedMatrix}(..., deparse.level = 1)
 }
 \arguments{
 

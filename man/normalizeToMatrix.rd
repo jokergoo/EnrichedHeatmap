@@ -16,8 +16,8 @@ normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50,
 }
 \arguments{
 
-  \item{signal}{a \code{\link[GenomicRanges]{GRanges}} object.}
-  \item{target}{a \code{\link[GenomicRanges]{GRanges}} object.}
+  \item{signal}{a \code{\link[GenomicRanges]{GRanges-class}} object.}
+  \item{target}{a \code{\link[GenomicRanges]{GRanges-class}} object.}
   \item{extend}{extended base pairs to the upstream and/or downstream of \code{target}. It can be a vector of length one or two. Length one means same extension to the upstream and downstream.}
   \item{w}{window size for splitting upstream and downstream, measured in base pairs}
   \item{value_column}{column index in \code{signal} that is mapped to colors. If it is not set, it assumes values for all signal regions are 1.}
