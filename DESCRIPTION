@@ -18,7 +18,7 @@ Description: Enriched heatmap is a special type of heatmap which
   show correspondance between different data sources.
 biocViews: Software, Visualization, Sequencing, GenomeAnnotation, Coverage
 URL: https://github.com/jokergoo/EnrichedHeatmap
-License: MIT
+License: MIT + file LICENSE
 Packaged: 2018-4-6 00:00:00 UTC; Administrator
 Repository: Bioconductor
 Date/Publication: 2018-4-6 00:00:00
