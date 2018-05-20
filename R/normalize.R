@@ -1040,12 +1040,6 @@ as.normalizedMatrix = function(mat, k_upstream = 0, k_downstream = 0, k_target =
 	} else if(length(extend) > 2) {
 		stop("length of `extend` should only be 1 or 2.")
 	}
-
-	if(length(target_index) == 0) {
-		target_is_single_point = TRUE
-	} else {
-		target_is_single_point = FALSE
-	}
 	
 	attr(mat, "upstream_index") = upstream_index
 	attr(mat, "target_index") = target_index
@@ -1054,7 +1048,7 @@ as.normalizedMatrix = function(mat, k_upstream = 0, k_downstream = 0, k_target =
 	attr(mat, "smooth") = smooth
 	attr(mat, "signal_name") = signal_name
 	attr(mat, "target_name") = target_name
-	attr(mat, "target_is_single_point") = target_is_single_point
+	attr(mat, "target_is_single_point") = FALSE
 	attr(mat, "failed_rows") = failed_rows
 	attr(mat, "background") = background
 	attr(mat, "signal_is_categorical") = FALSE
