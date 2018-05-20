@@ -355,10 +355,10 @@ EnrichedHeatmap = function(mat, col, top_annotation = HeatmapAnnotation(enriched
 			}
 			col = c("0" = "white", col)
 		}
-		if(!is.null(heatmap_legend_param$at)) {
+		if(is.null(heatmap_legend_param$at)) {
 			heatmap_legend_param$at = 1:n_level
 		}
-		if(!is.null(heatmap_legend_param$labels)) {
+		if(is.null(heatmap_legend_param$labels)) {
 			heatmap_legend_param$labels = signal_level
 		}
 	}
