@@ -1,10 +1,10 @@
 \name{makeWindows}
 \alias{makeWindows}
 \title{
-Split regions into windows
+Split Regions into Windows
 }
 \description{
-Split regions into windows
+Split Regions into Windows
 }
 \usage{
 makeWindows(query, w = NULL, k = NULL, direction = c("normal", "reverse"),
@@ -12,11 +12,11 @@ makeWindows(query, w = NULL, k = NULL, direction = c("normal", "reverse"),
 }
 \arguments{
 
-  \item{query}{a \code{\link[GenomicRanges]{GRanges-class}} object.}
-  \item{w}{window size, a value larger than 1 means the number of base pairs and a value between 0 and 1 is the percent to the current region.}
-  \item{k}{number of partitions for each region. If it is set, all other arguments are ignored.}
-  \item{direction}{where to start the splitting. See 'Details' section.}
-  \item{short.keep}{if the the region can not be split equally under the window size,  the argument controls whether to keep the windows that are smaller than the window size. See 'Details' section.}
+  \item{query}{A \code{\link[GenomicRanges]{GRanges-class}} object.}
+  \item{w}{Window size. A value larger than 1 means the number of base pairs and a value between 0 and 1 is the percent to the current region.}
+  \item{k}{Number of partitions for each region. If it is set, all other arguments are ignored.}
+  \item{direction}{Where to start the splitting? See 'Details' section.}
+  \item{short.keep}{If the the region can not be split equally under the window size,  the argument controls whether to keep the windows that are smaller than the window size. See 'Details' section.}
 
 }
 \details{

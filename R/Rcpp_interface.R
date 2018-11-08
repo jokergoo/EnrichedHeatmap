@@ -3,17 +3,17 @@
 
 
 # == title
-# Distance by closeness
+# Distance by Closeness
 #
 # == param
-# -mat a numeric matrix where the distance is calculated by rows
+# -mat A numeric matrix where the distance is calculated by rows.
 #
 # == details
 # For two rows in the matrix, assume x_1, x_2, ..., x_n1 are the column index of none-zero values in row 1
 # and y_1, y_2, ... y_n2 are the column index for non-zero values in row 2, 
 # the distance between the two rows based on the closeness is calculated as:
 #
-# d_closeness = sum_i sum_j(|x_i - y_j|) / (n_1*n_2)
+#     d_closeness = sum_i sum_j(|x_i - y_j|) / (n_1*n_2)
 #
 # == value
 # A `stats::dist` object

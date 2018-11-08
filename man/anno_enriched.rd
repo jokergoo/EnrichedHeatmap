@@ -1,29 +1,30 @@
 \name{anno_enriched}
 \alias{anno_enriched}
 \title{
-Annotation function to show the enrichment
+Annotation Function to Show the Enrichment
 }
 \description{
-Annotation function to show the enrichment
+Annotation Function to Show the Enrichment
 }
 \usage{
 anno_enriched(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
-    yaxis = TRUE, ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"),
-    yaxis_side = "right", yaxis_facing = ifelse(yaxis_side == "right", "right", "left"),
-    yaxis_gp = gpar(fontsize = 8), show_error = FALSE)
+    ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"),
+    yaxis = TRUE, axis = yaxis, axis_param = default_axis_param("column"),
+    show_error = FALSE, height = unit(2, "cm"), ...)
 }
 \arguments{
 
-  \item{gp}{graphic parameters. There are two non-standard parameters: \code{neg_col} and \code{pos_col}.  If these two parameters are defined, the positive signals and negatie signals are visualized separatedly. The graphic parameters can be set as vectors when the heatmap or heatmap list is split into several row clusters.}
-  \item{pos_line}{whether to draw vertical lines which represent positions of \code{target}}
-  \item{pos_line_gp}{graphic parameters for the position lines}
-  \item{yaxis}{whether show yaxis}
-  \item{ylim}{ranges on y-axis, by default it is inferred from the data}
-  \item{value}{the method to summarize signals from columns of the noramlized matrix}
-  \item{yaxis_side}{side of y-axis}
-  \item{yaxis_facing}{facing of the axis ticks and labels. It can be set to avoid overlapping text when multiple heatmaps are plotted together}
-  \item{yaxis_gp}{graphic parameters for y-axis}
-  \item{show_error}{whether show error regions which are one standard error to the mean value. Color of error area is same as the corresponding lines with 75 percent transparency.}
+  \item{gp}{Graphic parameters. There are two non-standard parameters: \code{neg_col} and \code{pos_col}.  If these two parameters are defined, the positive signals and negatie signals are visualized separatedly. The graphic parameters can be set as vectors when the heatmap or heatmap list is split into several row clusters.}
+  \item{pos_line}{Whether draw vertical lines which represent positions of \code{target}?}
+  \item{pos_line_gp}{Graphic parameters for the position lines.}
+  \item{ylim}{Ranges on y-axis. By default it is inferred from the data.}
+  \item{value}{The method to summarize signals from columns of the normalized matrix.}
+  \item{yaxis}{Deprecated, use \code{axis} instead.}
+  \item{axis}{Whether show axis?}
+  \item{axis_param}{parameters for controlling axis. See \code{\link[ComplexHeatmap]{default_axis_param}} for all possible settings and default parameters.}
+  \item{show_error}{Whether show error regions which are one standard error to the mean value? Color of error area is same as the corresponding lines with 75 percent transparency.}
+  \item{height}{Height of the annotation.}
+  \item{...}{Other arguments.}
 
 }
 \details{
@@ -35,7 +36,7 @@ If rows are splitted, the enriched lines are calculated for each row cluster and
 It should only be placed as column annotation of the enriched heatmap.
 }
 \value{
-A column annotation function which can be set to \code{top_annotation} argument in \code{\link{EnrichedHeatmap}}.
+A column annotation function which should be set to \code{top_annotation} argument in \code{\link{EnrichedHeatmap}}.
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>

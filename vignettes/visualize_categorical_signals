@@ -176,7 +176,7 @@ EnrichedHeatmap(mat_states, name = "states", col = states_col, cluster_rows = TR
 Since the normalized matrix is numeric, k-means clustering can also be applied.
 
 ```{r categorical_kmeans, fig.width = 4}
-EnrichedHeatmap(mat_states, name = "states", col = states_col, cluster_rows = TRUE, km = 2)
+EnrichedHeatmap(mat_states, name = "states", col = states_col, cluster_rows = TRUE, row_km = 2)
 ```
 
 After closely looking at above heatmap, we found the TSS states are consistently enriched around TSS
@@ -190,7 +190,8 @@ Of couse we need to calculate this partitioning in advance.
 
 ```{r categorical_partial_kmeans, fig.width = 4}
 split = kmeans(mat_states[, 40:60], centers = 2)$cluster
-EnrichedHeatmap(mat_states, name = "states", col = states_col, cluster_rows = TRUE, split = split)
+EnrichedHeatmap(mat_states, name = "states", col = states_col, cluster_rows = TRUE, 
+	row_split = split)
 ```
 
 Now it is quite nice to see genes with active TSS are all clustered in cluster 2 while in cluster 1, genes are
@@ -203,8 +204,8 @@ unequal widths, we add an additional point plot to show the width of genes.
 g_chr1 = g[seqnames(g) == "chr1"]
 mat_states_2 = normalizeToMatrix(states, g_chr1, value_column = "states_simplified")
 EnrichedHeatmap(mat_states_2, name = "states", col = states_col, cluster_rows = TRUE) +
-rowAnnotation(gene_len = row_anno_points(log10(width(g_chr1) + 1), size = unit(1, "mm"),
-	gp = gpar(col = "#00000040"), axis = TRUE), width = unit(4, "cm"))
+rowAnnotation(gene_len = anno_points(log10(width(g_chr1) + 1), size = unit(1, "mm"),
+	gp = gpar(col = "#00000040"), axis = TRUE, width = unit(4, "cm")))
 ```
 
 Next we add methylation around TSS as well as expression for the corresponding genes.
@@ -246,10 +247,11 @@ mat_meth = normalizeToMatrix(meth, tss_chr1, value_column = "E003", mean_mode = 
 
 Similarly, k-means is applied on chromatin states 1kb upstream and downstream of TSS.
 
-```{r categorical_with_meth , fig.width = 6}
+```{r categorical_with_meth, fig.width = 6}
 split = kmeans(mat_states[, 40:60], centers = 2)$cluster
 meth_col_fun = colorRamp2(c(0, 0.5, 1), c("blue", "white", "red"))
-EnrichedHeatmap(mat_states, name = "states", col = states_col, cluster_rows = TRUE, split = split,
+EnrichedHeatmap(mat_states, name = "states", col = states_col, cluster_rows = TRUE, 
+	row_split = split, 
 	top_annotation = HeatmapAnnotation(enrich = anno_enriched(gp = gpar(lty = 1:2)))) +
 EnrichedHeatmap(mat_meth, name = "meth", col = meth_col_fun,
 	top_annotation = HeatmapAnnotation(enrich = anno_enriched(gp = gpar(lty = 1:2)))) +
@@ -384,7 +386,8 @@ EnrichedHeatmap(mat_meth_lung, name = "meth_lung", col = meth_col_fun,
 		ylim = c(0, 1))),
 	show_heatmap_legend = FALSE, column_title = "Meth lung") +
 EnrichedHeatmap(mat_meth_diff, name = "meth_diff", col = meth_diff_col_fun,
-	top_annotation = HeatmapAnnotation(enrich = anno_enriched(gp = gpar(lty = 1:2, pos_col = "#df8640", neg_col = "#3794bf"))),
+	top_annotation = HeatmapAnnotation(enrich = anno_enriched(gp = gpar(lty = 1:2, pos_col = "#df8640", 
+		neg_col = "#3794bf"))),
 	column_title = "Meth ESC - lung")
 ```
 
@@ -424,16 +427,16 @@ The row ordering for all heatmaps is from hierarchical clustering on the merged 
 ```{r categorical_with_lung, fig.width = 12}
 row_order = hclust(dist(cbind(mat_states_ESC[, 40:60], mat_states_lung[, 40:60])))$order
 split = ifelse(e[, "E096"] > e[, "E003"], "activation", "repression")
-draw(ht_list, row_order = row_order, split = split)
+draw(ht_list, row_order = row_order, row_split = split)
 ```
 
 ## Other examples
 
 There are some other examples where the genomic signals are categorical.
 
-1. repeats where different repeat family can be different categories
+1. repeats where different repeat family can be different categories,
 2. genome segmentation based on methylation. E.g. hign methylated regions (HMRs),
-   partially methylated regions (PMDs), low methylated regions (LMRs), unmethylated regions (UMRs)
+   partially methylated regions (PMDs), low methylated regions (LMRs), unmethylated regions (UMRs),
 3. for gene-related regions, genic annotation is also categorical.
 
 ## Session Info

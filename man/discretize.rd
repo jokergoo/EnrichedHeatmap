@@ -1,19 +1,19 @@
 \name{discretize}
 \alias{discretize}
 \title{
-Discretize a continuous matrix to a discrete matrix
+Discretize a Continuous Matrix to a Discrete Matrix
 }
 \description{
-Discretize a continuous matrix to a discrete matrix
+Discretize a Continuous Matrix to a Discrete Matrix
 }
 \usage{
 discretize(mat, rule, right_closed = FALSE)
 }
 \arguments{
 
-  \item{mat}{a normalize matrix from \code{\link{normalizeToMatrix}}.}
-  \item{rule}{a list of intervals which provide mapping between continuous values to discrete values. Note the order of intervals determines the order of corresponding discrete levels.}
-  \item{right_closed}{is the interval right closed?}
+  \item{mat}{A normalize matrix from \code{\link{normalizeToMatrix}}.}
+  \item{rule}{A list of intervals which provide mapping between continuous values to discrete values. Note the order of intervals determines the order of corresponding discrete levels.}
+  \item{right_closed}{Is the interval right closed?}
 
 }
 \details{

@@ -1,18 +1,18 @@
 \name{rbind.normalizedMatrix}
 \alias{rbind.normalizedMatrix}
 \title{
-Bind matrix by rows
+Bind Matrix by Rows
 }
 \description{
-Bind matrix by rows
+Bind Matrix by Rows
 }
 \usage{
 \method{rbind}{normalizedMatrix}(..., deparse.level = 1)
 }
 \arguments{
 
-  \item{...}{matrices}
-  \item{deparse.level}{-deparse.level}
+  \item{...}{Matrices}
+  \item{deparse.level}{Not used.}
 
 }
 \value{

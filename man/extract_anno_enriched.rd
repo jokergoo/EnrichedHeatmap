@@ -1,23 +1,24 @@
 \name{extract_anno_enriched}
 \alias{extract_anno_enriched}
 \title{
-Extarct enrichment annotation graphic as a separate plot
+Extarct Enrichment Annotation Graphics as a Separated Plot
 }
 \description{
-Extarct enrichment annotation graphic as a separate plot
+Extarct Enrichment Annotation Graphics as a Separated Plot
 }
 \usage{
-extract_anno_enriched(ht_list, which = NULL, newpage = TRUE)
+extract_anno_enriched(ht_list, which = NULL, newpage = TRUE, padding = NULL)
 }
 \arguments{
 
-  \item{ht_list}{the heatmap list returned by \code{\link{draw,EnrichedHeatmapList-method}}}
-  \item{which}{the index of enriched heamtap in the heatmap list. The value can be an integer index or a character index (which are names of heatmaps)}
-  \item{newpage}{whether call \code{\link[grid]{grid.newpage}} to create a new page}
+  \item{ht_list}{The heatmap list returned by \code{\link{draw,HeatmapList-method}}.}
+  \item{which}{The index of enriched heatmap in the heatmap list. The value can be an integer index or a character index (the name of the heatmap).}
+  \item{newpage}{Whether call \code{\link[grid]{grid.newpage}} to create a new page?}
+  \item{padding}{Padding of the plot.}
 
 }
 \details{
-The extracted plot is exactly the same as that on the heatmap.
+The extracted plot is exactly the same as that on the enriched heatmap.
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>

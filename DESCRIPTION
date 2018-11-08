@@ -1,12 +1,12 @@
 Package: EnrichedHeatmap
 Type: Package
 Title: Making Enriched Heatmaps
-Version: 1.11.2
-Date: 2018-5-20
+Version: 1.13.1
+Date: 2018-11-8
 Author: Zuguang Gu
 Maintainer: Zuguang Gu <z.gu@dkfz.de>
-Depends: R (>= 3.1.2), methods, grid, ComplexHeatmap (>= 1.15.2), GenomicRanges
-Imports: matrixStats, stats, GetoptLong, Rcpp, utils, locfit, circlize (>= 0.4.1), IRanges
+Depends: R (>= 3.1.2), methods, grid, ComplexHeatmap (>= 1.99.0), GenomicRanges
+Imports: matrixStats, stats, GetoptLong, Rcpp, utils, locfit, circlize (>= 0.4.5), IRanges
 Suggests: testthat (>= 0.3), knitr, markdown, genefilter, RColorBrewer
 VignetteBuilder: knitr
 Description: Enriched heatmap is a special type of heatmap which 

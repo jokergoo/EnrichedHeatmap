@@ -1,34 +1,34 @@
 
 
 # == title
-# Normalize associations between genomic signals and target regions into a matrix
+# Normalize Associations between Genomic Signals and Target Regions into a Matrix
 #
 # == param
-# -signal a `GenomicRanges::GRanges-class` object.
-# -target a `GenomicRanges::GRanges-class` object.
-# -extend extended base pairs to the upstream and/or downstream of ``target``. It can be a vector of length one or two.
+# -signal A `GenomicRanges::GRanges-class` object.
+# -target A `GenomicRanges::GRanges-class` object.
+# -extend Extended base pairs to the upstream and/or downstream of ``target``. It can be a vector of length one or two.
 #         Length one means same extension to the upstream and downstream.
-# -w window size for splitting upstream and downstream, measured in base pairs
-# -value_column column index in ``signal`` that is mapped to colors. If it is not set, it assumes values for all signal regions are 1.
-# -mapping_column mapping column to restrict overlapping between ``signal`` and ``target``. By default it tries to look for
+# -w Window size for splitting upstream and downstream, measured in base pairs
+# -value_column Column index in ``signal`` that is mapped to colors. If it is not set, it assumes values for all signal regions are 1.
+# -mapping_column Mapping column to restrict overlapping between ``signal`` and ``target``. By default it tries to look for
 #           all regions in ``signal`` that overlap with every target.
-# -background values for windows that don't overlap with ``signal``. 
-# -empty_value deprecated, please use ``background`` instead.
-# -mean_mode when a window is not perfectly overlapped to ``signal``, how to summarize 
+# -background Values for windows that don't overlap with ``signal``. 
+# -empty_value Deprecated, please use ``background`` instead.
+# -mean_mode When a window is not perfectly overlapped to ``signal``, how to summarize 
 #        values to the window. See 'Details' section for a detailed explanation.
-# -include_target  whether include ``target`` in the heatmap. If the width of all regions in ``target`` is 1, ``include_target``
+# -include_target  Whether include ``target`` in the heatmap? If the width of all regions in ``target`` is 1, ``include_target``
 #               is enforced to ``FALSE``.
-# -target_ratio  the ratio of ``target`` columns in the normalized matrix. If the value is 1, ``extend`` will be reset to 0.
-# -k number of windows only when ``target_ratio = 1`` or ``extend == 0``, otherwise ignored.
-# -smooth whether apply smoothing on rows in the matrix. 
-# -smooth_fun the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric
+# -target_ratio The ratio of ``target`` columns in the normalized matrix. If the value is 1, ``extend`` will be reset to 0.
+# -k Number of windows only when ``target_ratio = 1`` or ``extend == 0``, otherwise ignored.
+# -smooth Whether apply smoothing on rows in the matrix?
+# -smooth_fun The smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric
 #    vector (may contain ``NA`` values) and returns a vector with same length. If the smoothing is failed, the function
 #    should call `base::stop` to throw errors so that `normalizeToMatrix` can catch how many rows are failed in smoothing. 
 #    See the default `default_smooth_fun` for example.
-# -keep percentiles in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first
+# -keep Percentiles in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first
 #       percentile is replaces with the first pencentile and values larger than the second percentile is replaced with the
 #       second percentile.
-# -trim deprecated, please use ``keep`` instead.
+# -trim Deprecated, please use ``keep`` instead.
 #
 # == details
 # In order to visualize associations between ``signal`` and ``target``, the data is transformed into a matrix
@@ -99,10 +99,10 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	}
 
 	if(abs(target_ratio - 1) < 1e-6 || abs(target_ratio) >= 1) {
-		if(!all(extend == 0)) warning("Rest `extend` to 0 when `target_ratio` is larger than or euqal to 1.")
+		if(!all(extend == 0)) warning_wrap("Rest `extend` to 0 when `target_ratio` is larger than or euqal to 1.")
 		extend = c(0, 0)
 	} else if(all(extend == 0)) {
-		warning("Reset `target_ratio` to 1 when `extend` is 0.")
+		warning_wrap("Reset `target_ratio` to 1 when `extend` is 0.")
 		target_ratio = 1
 	}
 	if(abs(target_ratio) > 1) target_ratio = 1
@@ -111,7 +111,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 
 	if(target_is_single_point) {
 		if(include_target) {
-			warning("Width of `target` are all 1, `include_target` is set to `FALSE`.")
+			warning_wrap("Width of `target` are all 1, `include_target` is set to `FALSE`.")
 		}
 		include_target = FALSE
 	}
@@ -119,13 +119,13 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	if(length(extend) == 1) extend = c(extend, extend)
 	if(extend[1] > 0) {
 		if(extend[1] %% w > 0) {
-			warning("Length of upstream extension is not completely divisible by `w`.")
+			warning_wrap("Length of upstream extension is not completely divisible by `w`.")
 			extend[1] = extend[1] - extend[1] %% w
 		}
 	}
 	if(extend[2] > 0) {
 		if(extend[2] %% w > 0) {
-			warning("Length of downstream extension is not completely divisible by `w`.")
+			warning_wrap("Length of downstream extension is not completely divisible by `w`.")
 			extend[2] = extend[2] - extend[2] %% w
 		}
 	}
@@ -227,7 +227,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 				msg = paste(strwrap(paste0("Smoothing are failed for ", length(failed_rows), " rows because there are very few signals overlapped to them. Please use `attr(mat, 'failed_rows')` to get the index of failed rows and consider to remove them.\n")), collapse = "\n")
 			}
 			msg = paste0("\n", msg, "\n")
-			warning(msg)
+			warning_wrap(msg)
 		}
 	}
 	
@@ -419,15 +419,15 @@ makeMatrix = function(gr, target, w = NULL, k = NULL, value_column = NULL, mappi
 }
 
 # == title
-# Split regions into windows
+# Split Regions into Windows
 #
 # == param
-# -query a `GenomicRanges::GRanges-class` object.
-# -w window size, a value larger than 1 means the number of base pairs and a value between 0 and 1
+# -query A `GenomicRanges::GRanges-class` object.
+# -w Window size. A value larger than 1 means the number of base pairs and a value between 0 and 1
 #    is the percent to the current region.
-# -k number of partitions for each region. If it is set, all other arguments are ignored.
-# -direction where to start the splitting. See 'Details' section.
-# -short.keep if the the region can not be split equally under the window size, 
+# -k Number of partitions for each region. If it is set, all other arguments are ignored.
+# -direction Where to start the splitting? See 'Details' section.
+# -short.keep If the the region can not be split equally under the window size, 
 #             the argument controls whether to keep the windows that are smaller than the window size. See 'Details' section.
 #
 # == details
@@ -610,11 +610,11 @@ makeWindows = function(query, w = NULL, k = NULL, direction = c("normal", "rever
 }
 
 # == title
-# Bind matrix by rows
+# Bind Matrix by Rows
 #
 # == param
-# -... matrices
-# -deparse.level
+# -... Matrices
+# -deparse.level Not used.
 #
 # == value
 # A ``normalizedMatrix`` class object.
@@ -636,11 +636,11 @@ rbind.normalizedMatrix = function(..., deparse.level = 1) {
 }
 
 # == title
-# Print normalized matrix
+# Print the Normalized Matrix
 #
 # == param
-# -x the normalized matrix returned by `normalizeToMatrix`
-# -... other arguments
+# -x The normalized matrix returned by `normalizeToMatrix`.
+# -... Other arguments.
 #
 # == value
 # No value is returned.
@@ -687,11 +687,11 @@ print.normalizedMatrix = function(x, ...) {
 }
 
 # == title
-# Copy attributes to another object
+# Copy Attributes to Another Object
 #
 # == param
-# -x object 1
-# -y object 2
+# -x Object 1.
+# -y Object 2.
 #
 # == details
 # The `normalizeToMatrix` object is actually a matrix but with more additional attributes attached.
@@ -730,12 +730,12 @@ copyAttr = function(x, y) {
 }
 
 # == title
-# Get signals from a list
+# Get Signals from a List
 #
 # == param
-# -lt a list of normalized matrices which are returned by `normalizeToMatrix`. Matrices in the list should be generated with same settings (e.g. they
+# -lt A list of normalized matrices which are returned by `normalizeToMatrix`. Matrices in the list should be generated with same settings (e.g. they
 #     should use same target regions, same extension to targets and same number of windows).
-# -fun a user-defined function to summarize signals.
+# -fun A user-defined function to summarize signals.
 #
 # == details
 # Let's assume you have a list of histone modification signals for different samples and you want
@@ -781,11 +781,11 @@ copyAttr = function(x, y) {
 getSignalsFromList = function(lt, fun = function(x) mean(x, na.rm = TRUE)) {
 
 	if(!inherits(lt, "list")) {
-		stop("`lt` should be a list of objects which are returned by `normalizeToMatrix()`.")
+		stop_wrap("`lt` should be a list of objects which are returned by `normalizeToMatrix()`.")
 	}
 
 	if(!all(sapply(lt, inherits, "normalizedMatrix"))) {
-		stop("`lt` should be a list of objects which are returned by `normalizeToMatrix()`.")
+		stop_wrap("`lt` should be a list of objects which are returned by `normalizeToMatrix()`.")
 	}
 
 	n = length(lt)
@@ -794,7 +794,7 @@ getSignalsFromList = function(lt, fun = function(x) mean(x, na.rm = TRUE)) {
 			attr1 = attributes(lt[[i]])[ c("upstream_index", "target_index", "downstream_index", "extend") ]
 			attr2 = attributes(lt[[i+1]])[ c("upstream_index", "target_index", "downstream_index", "extend") ]
 			if(!identical(attr1, attr2)) {
-				stop("Objects in `lt` should have same settings.")
+				stop_wrap("Objects in `lt` should have same settings.")
 			}
 		}
 	}
@@ -829,17 +829,17 @@ getSignalsFromList = function(lt, fun = function(x) mean(x, na.rm = TRUE)) {
 			}
 		}
 	} else {
-		stop("`fun` can only have one or two arguments.")
+		stop_wrap("`fun` can only have one or two arguments.")
 	}
 	m = copyAttr(lt[[1]], m)
 	return(m)
 }
 
 # == title
-# Default smoothing function
+# Default Smoothing function
 #
 # == param
-# -x input numeric vector
+# -x Input numeric vector.
 #
 # == details
 # The smoothing function is applied to every row in the normalized matrix. For this default smoothing function,
@@ -857,7 +857,7 @@ default_smooth_fun = function(x) {
 			oe2 = try(x <-  suppressWarnings(predict(loess(x[l] ~ seq_along(x)[l], control = loess.control(surface = "direct")), seq_along(x))))
 
 			if(inherits(oe2, "try-error")) {
-				stop("error when doing locfit or loess smoothing")
+				stop_wrap("error when doing locfit or loess smoothing")
 			} else {
 				return(x)
 			}
@@ -865,20 +865,20 @@ default_smooth_fun = function(x) {
 			return(x)
 		}
 	} else {
-		stop("Too few data points.")
+		stop_wrap("Too few data points.")
 	}
 	return(x)
 }
 
 
 # == title
-# Discretize a continuous matrix to a discrete matrix
+# Discretize a Continuous Matrix to a Discrete Matrix
 #
 # == param
-# -mat a normalize matrix from `normalizeToMatrix`.
-# -rule a list of intervals which provide mapping between continuous values to discrete values.
+# -mat A normalize matrix from `normalizeToMatrix`.
+# -rule A list of intervals which provide mapping between continuous values to discrete values.
 #       Note the order of intervals determines the order of corresponding discrete levels.
-# -right_closed is the interval right closed?
+# -right_closed Is the interval right closed?
 #
 # == details
 # Assuming we have a normalized matrix with both positive values and negative values, we only 
@@ -910,15 +910,15 @@ default_smooth_fun = function(x) {
 #
 discretize = function(mat, rule, right_closed = FALSE) {
 	if(!inherits(mat, "normalizedMatrix")) {
-		stop("`mat` should be generated by `normalizeToMatrix().")
+		stop_wrap("`mat` should be generated by `normalizeToMatrix().")
 	}
 
 	if(!inherits(rule, "list")) {
-		stop("`rule` should be defined as a list of intervals.")
+		stop_wrap("`rule` should be defined as a list of intervals.")
 	}
 
 	if(!all(sapply(rule, length) == 2)) {
-		stop("All intervals in `rule` should have length of 2.")
+		stop_wrap("All intervals in `rule` should have length of 2.")
 	}
 
 	mat2 = matrix(0, nrow = nrow(mat), ncol = ncol(mat))
@@ -940,27 +940,27 @@ discretize = function(mat, rule, right_closed = FALSE) {
 }
 
 # == title
-# Convert a normal matrix to a normalizedMatrix object
+# Convert a Normal Matrix to a normalizedMatrix Object
 #
 # == param
-# -mat a matrix generated by other software.
-# -k_upstream number of windows in the upstream.
-# -k_downstream number of windows in the downstream.
-# -k_target number of windows in the target.
-# -extend extension to the target. The length should be 1 (if one of ``k_upstream`` or ``k_downstream`` is zero).
+# -mat A matrix generated by other software.
+# -k_upstream Number of windows in the upstream.
+# -k_downstream Number of windows in the downstream.
+# -k_target Number of windows in the target.
+# -extend Extension to the target. The length should be 1 (if one of ``k_upstream`` or ``k_downstream`` is zero).
 #  or 2 (if both of ``k_upstream`` and ``k_downstream`` are non-zero).
-# -signal_name the name of signal regions. It is only used for printing the object.
-# -target_name the name of the target names. It is only used for printing the object.
-# -background the background value in the matrix.
-# -smooth whether apply smoothing on rows in the matrix. 
-# -smooth_fun the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric
+# -signal_name The name of signal regions. It is only used for printing the object.
+# -target_name The name of the target names. It is only used for printing the object.
+# -background The background value in the matrix.
+# -smooth Whether apply smoothing on rows in the matrix. 
+# -smooth_fun The smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric
 #    vector (may contain ``NA`` values) and returns a vector with same length. If the smoothing is failed, the function
 #    should call `base::stop` to throw errors so that `normalizeToMatrix` can catch how many rows are failed in smoothing. 
 #    See the default `default_smooth_fun` for example.
-# -keep percentiles in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first
+# -keep Percentiles in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first
 #       percentile is replaces with the first pencentile and values larger than the second percentile is replaced with the
 #       second percentile.
-# -trim deprecated, please use ``keep`` instead.
+# -trim Deprecated, please use ``keep`` instead.
 #
 # == details
 # If users use the matrix from other software, they can use this function to convert it to the ``normalizedMatrix`` object
@@ -978,7 +978,7 @@ as.normalizedMatrix = function(mat, k_upstream = 0, k_downstream = 0, k_target =
 	keep = c(0, 1), trim = NULL) {
 
 	if(k_upstream + k_target + k_downstream != ncol(mat)) {
-		stop("sum of `k_upstream`, `k_target` and `k_downstream` should be equal to the col of `mat`.")
+		stop_wrap("sum of `k_upstream`, `k_target` and `k_downstream` should be equal to the col of `mat`.")
 	}
 
 	# apply smoothing on rows in mat
@@ -1006,7 +1006,7 @@ as.normalizedMatrix = function(mat, k_upstream = 0, k_downstream = 0, k_target =
 				msg = paste(strwrap(paste0("Smoothing are failed for ", length(failed_rows), " rows because there are very few signals overlapped to them. Please use `attr(mat, 'failed_rows')` to get the index of failed rows and consider to remove them.\n")), collapse = "\n")
 			}
 			msg = paste0("\n", msg, "\n")
-			warning(msg)
+			warning_wrap(msg)
 		}
 		background = NA
 	}
@@ -1038,7 +1038,7 @@ as.normalizedMatrix = function(mat, k_upstream = 0, k_downstream = 0, k_target =
 			extend = rep(extend, 2)
 		}
 	} else if(length(extend) > 2) {
-		stop("length of `extend` should only be 1 or 2.")
+		stop_wrap("length of `extend` should only be 1 or 2.")
 	}
 	
 	attr(mat, "upstream_index") = upstream_index
@@ -1062,7 +1062,7 @@ as.normalizedMatrix = function(mat, k_upstream = 0, k_downstream = 0, k_target =
 	}
 
 	# dimension names are mainly for debugging
-  	if(!target_is_single_point) {
+  	if(!attr(mat, "target_is_single_point")) {
   		colnames(mat) = c(.paste0("u", seq_along(upstream_index)), .paste0("t", seq_along(target_index)), .paste0("d", seq_along(downstream_index)))
   	} else {
   		colnames(mat) = c(.paste0("u", seq_along(upstream_index)), .paste0("d", seq_along(downstream_index)))

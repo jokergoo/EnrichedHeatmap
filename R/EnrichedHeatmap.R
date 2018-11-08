@@ -1,31 +1,9 @@
 
 # == title
-# Class for a single heatmap
-#
-# == details
-# The `EnrichedHeatmap-class` is inherited from `ComplexHeatmap::Heatmap-class`.
-#
-# == methods
-# The `EnrichedHeatmap-class` provides following methods:
-#
-# - `EnrichedHeatmap`: constructor method.
-# - `draw,EnrichedHeatmap-method`: draw a single heatmap.
-#
-# == seealso
-# `EnrichedHeatmapList-class`
-#
-# == author
-# Zuguang Gu <z.gu@dkfz.de>
-#
-EnrichedHeatmap = setClass("EnrichedHeatmap",
-	slots = getClass("Heatmap")@slots,
-	contains = "Heatmap")
-
-# == title
-# Enriched scores
+# Enriched Scores
 #
 # == param
-# -mat a normalized matrix from `normalizeToMatrix`
+# -mat A normalized matrix from `normalizeToMatrix`.
 #
 # == details
 # The function calculates how the signal is enriched in the target by weighting
@@ -103,46 +81,47 @@ enriched_score = function(mat) {
 
 
 # == title
-# Constructor method for EnrichedHeatmap class
+# Constructor Method for the Enriched Heatmap
 # 
 # == param
-# -mat a matrix which is returned by `normalizeToMatrix`
-# -col color settings. If the signals are categorical, color should be a vector with category levels as names.
-# -top_annotation a specific annotation which is always put on top of the enriched heatmap and is constructed by `anno_enriched`
-# -top_annotation_height the height of the top annotation
-# -row_order row order. Default rows are ordered by enriched scores calculated from `enriched_score`
-# -pos_line whether draw vertical lines which represent the positions of ``target``
-# -pos_line_gp graphic parameters for the position lines
-# -axis_name names for axis which is below the heatmap. If the targets are single points, ``axis_name`` is a vector
+# -mat A matrix which is returned by `normalizeToMatrix`.
+# -col Color settings. If the signals are categorical, color should be a vector with category levels as names.
+# -top_annotation A special annotation which is always put on top of the enriched heatmap and is constructed by `anno_enriched`.
+# -row_order Row order. Default rows are ordered by enriched scores calculated from `enriched_score`.
+# -pos_line Whether draw vertical lines which represent the positions of ``target``?
+# -pos_line_gp Graphic parameters for the position lines.
+# -axis_name Names for axis which is below the heatmap. If the targets are single points, ``axis_name`` is a vector
 #         of length three which corresponds to upstream, target itself and downstream. If the
 #         targets are regions with width larger than 1, ``axis_name`` should be a vector of length four which 
 #        corresponds to upstream, start of targets, end of targets and downstream.
-# -axis_name_rot rotation for axis names
-# -axis_name_gp graphic parameters for axis names
-# -border whether show border of the heatmap
-# -cluster_rows clustering on rows are turned off by default
-# -show_row_dend whether show dendrograms on rows if apply hierarchical clustering on rows
-# -row_dend_reorder weight for reordering the row dendrogram. It is reordered by enriched scores by default.
-# -show_row_names whether show row names
-# -heatmap_legend_param a list of settings for heatmap legends. ``at`` and ``labels`` can not be set here.
-# -... pass to `ComplexHeatmap::Heatmap`
+# -axis_name_rot Rotation for axis names.
+# -axis_name_gp Graphic parameters for axis names.
+# -border Whether show the border of the heatmap?
+# -cluster_rows Clustering on rows are turned off by default.
+# -show_row_dend Whether show dendrograms on rows if hierarchical clustering is applied on rows?
+# -row_dend_reorder Weight for reordering the row dendrogram. It is reordered by enriched scores by default.
+# -show_row_names Whether show row names?
+# -heatmap_legend_param A list of settings for heatmap legends. ``at`` and ``labels`` can not be set here.
+# -... Other arguments passed to `ComplexHeatmap::Heatmap`.
 #
 # == details
-# `EnrichedHeatmap-class` is inherited from `ComplexHeatmap::Heatmap-class`. Following parameters are 
+# The enriched heatmap is essentially a normal heatmap but with several special settings. Following parameters are 
 # set with pre-defined values:
 #
 # -``cluster_columns`` enforced to be ``FALSE``
 # -``show_column_names`` enforced to be ``FALSE``
 # -``bottom_annotation`` enforced to be ``NULL`` 
-# -``column_title_side`` enforced to be ``top``
 #
-# A `EnrichedHeatmap-class` object is also a `ComplexHeatmap::Heatmap-class` object, thus, most of the 
+# `EnrichedHeatmap` calls `ComplexHeatmap::Heatmap`, thus, most of the 
 # arguments in `ComplexHeatmap::Heatmap` are usable in `EnrichedHeatmap` such as
-# to apply clustering on rows, or to split rows by data frame or k-means clustering. Users can also 
-# add more than one heatmaps by ``+`` operator. For a detailed demonstration, please go to the vignette.
+# to apply clustering on rows, or to split rows by a data frame or k-means clustering. Users can also 
+# add more than one heatmaps by ``+`` operator. Enriched heatmaps and normal heatmaps can be
+# concatenated mixed.
+#
+# For detailed demonstration, please go to the vignette.
 #
 # == value
-# An `EnrichedHeatmap-class` object which is inherited from `ComplexHeatmap::Heatmap-class`.
+# A `Heatmap-class` object.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -154,21 +133,46 @@ enriched_score = function(mat) {
 # EnrichedHeatmap(mat3, name = "methylation", column_title = "methylation near CGI")
 # EnrichedHeatmap(mat3, name = "meth1") + EnrichedHeatmap(mat3, name = "meth2")
 # # for more examples, please go to the vignette
-EnrichedHeatmap = function(mat, col, top_annotation = HeatmapAnnotation(enriched = anno_enriched()),
-	top_annotation_height = unit(2, "cm"),
-	row_order = order(enriched_score(mat), decreasing = TRUE), pos_line = TRUE, 
-	pos_line_gp = gpar(lty = 2), axis_name = NULL, axis_name_rot = 0, 
-	axis_name_gp = gpar(fontsize = 10), border = TRUE, cluster_rows = FALSE, 
+EnrichedHeatmap = function(mat, 
+	col, 
+	top_annotation = HeatmapAnnotation(enriched = anno_enriched()),
+	row_order = order(enriched_score(mat), decreasing = TRUE), 
+	pos_line = TRUE, 
+	pos_line_gp = gpar(lty = 2), 
+	axis_name = NULL, 
+	axis_name_rot = 0, 
+	axis_name_gp = gpar(fontsize = 10), 
+	border = TRUE, 
+	cluster_rows = FALSE, 
 	row_dend_reorder = -enriched_score(mat),
-	show_row_dend = FALSE, show_row_names = FALSE, 
-	heatmap_legend_param = list(), ...) {
+	show_row_dend = FALSE, 
+	show_row_names = FALSE, 
+	heatmap_legend_param = list(), 
+	...) {
+
+	arg_list = list(...)
+	arg_name = names(arg_list)
+	for(an in arg_name) {
+		if(grepl("column_dend", an) || grepl("clustering*column", an)) {
+			stop_wrap("Column dendrogram is not allowed in enriched heatmap.")
+		}
+		if(grepl("column_name|column_labels", an)) {
+			stop_wrap("Column names are not allowed in enriched heatmap.")
+		}
+		if(an %in% c("column_gap", "column_km", "column_order", "column_split")) {
+			stop_wrap(paste0("`", an, "` is not allowed in enriched heatmap."))
+		}
+		if(an == "bottom_annotation") {
+			stop_wrap("`bottom_annotation` is not allowed to set in enriched heatmap.")
+		}
+	}
 
 	upstream_index = attr(mat, "upstream_index")
 	downstream_index = attr(mat, "downstream_index")
 	target_index = attr(mat, "target_index")
 
 	if(is.null(upstream_index) || is.null(downstream_index)) {
-		stop("`mat` should be generated by `normalizeToMatrix()`.")
+		stop_wrap("`mat` should be generated by `normalizeToMatrix()`.")
 	}
 	
 	n1 = length(upstream_index)
@@ -199,16 +203,16 @@ EnrichedHeatmap = function(mat, col, top_annotation = HeatmapAnnotation(enriched
 	if(axis_name_rot > 90 && axis_name_rot < 270) axis_name_rot = (axis_name_rot + 180) %% 360
 
 	axis_fun = function() {
-		grid.lines(c(0.5/n, (n-0.5)/n), c(1, 1))
+		grid.lines(c(0.5/n, (n-0.5)/n), c(0, 0))
 		if(n1 && n2 && n3) {
 			grid.segments(c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n), 
-				          unit(1, "npc") - unit(c(1, 1, 1, 1), "mm"), 
+				          unit(0, "npc") - unit(c(1, 1, 1, 1), "mm"), 
 				          c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n), 
-				          c(1, 1, 1, 1))
+				          c(0, 0, 0, 0))
 			if(axis_name_rot == 0) {
 				grid.text(axis_name,
 					      c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n),
-					      unit(1, "npc") - unit(c(2, 2, 2, 2), "mm"), gp = axis_name_gp,
+					      unit(0, "npc") - unit(c(2, 2, 2, 2), "mm"), gp = axis_name_gp,
 					      hjust = c(0, 0.5, 0.5, 1), vjust = 1)
 			} else {
 				if(axis_name_rot > 0 & axis_name_rot <= 90) {
@@ -220,18 +224,18 @@ EnrichedHeatmap = function(mat, col, top_annotation = HeatmapAnnotation(enriched
 				}
 				grid.text(axis_name,
 					      c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n, (n-0.5)/n),
-					      unit(1, "npc") - unit(c(2, 2, 2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
+					      unit(0, "npc") - unit(c(2, 2, 2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
 					      hjust = hjust, vjust = vjust)
 			}
 		} else if(n1 && !n2 && n3) {
 			grid.segments(c(0.5/n, (n1+0.5)/n, (n-0.5)/n), 
-				          unit(1, "npc") - unit(c(1, 1, 1), "mm"), 
+				          unit(0, "npc") - unit(c(1, 1, 1), "mm"), 
 				          c(0.5/n, (n1+0.5)/n, (n-0.5)/n), 
-				          c(1, 1, 1))
+				          c(0, 0, 0))
 			if(axis_name_rot == 0) {
 				grid.text(axis_name,
 					      c(0.5/n, (n1+0.5)/n, (n-0.5)/n),
-					      unit(1, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp,
+					      unit(0, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp,
 					      hjust = c(0, 0.5, 1), vjust = 1)
 			} else {
 				if(axis_name_rot > 0 & axis_name_rot <= 90) {
@@ -243,18 +247,18 @@ EnrichedHeatmap = function(mat, col, top_annotation = HeatmapAnnotation(enriched
 				}
 				grid.text(axis_name,
 					      c(0.5/n, (n1+0.5)/n, (n-0.5)/n),
-					      unit(1, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
+					      unit(0, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
 					      hjust = hjust, vjust = vjust)
 			}
 		} else if(!n1 && n2 && n3) {
 			grid.segments(c(0.5/n, (n1+n2-0.5)/n, (n-0.5)/n), 
-				          unit(1, "npc") - unit(c(1, 1, 1), "mm"), 
+				          unit(0, "npc") - unit(c(1, 1, 1), "mm"), 
 				          c(0.5/n, (n1+n2-0.5)/n, (n-0.5)/n), 
-				          c(1, 1, 1))
+				          c(0, 0, 0))
 			if(axis_name_rot == 0) {
 				grid.text(axis_name,
 					      c(0.5/n, (n1+n2-0.5)/n, (n-0.5)/n),
-					      unit(1, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp,
+					      unit(0, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp,
 					      hjust = c(0, 0.5, 1), vjust = 1)
 			} else {
 				if(axis_name_rot > 0 & axis_name_rot <= 90) {
@@ -266,18 +270,18 @@ EnrichedHeatmap = function(mat, col, top_annotation = HeatmapAnnotation(enriched
 				}
 				grid.text(axis_name,
 					      c(0.5/n, (n1+n2-0.5)/n, (n-0.5)/n),
-					      unit(1, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
+					      unit(0, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
 					      hjust = hjust, vjust = vjust)
 			}
 		} else if(n1 && n2 && !n3) {
 			grid.segments(c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n), 
-				          unit(1, "npc") - unit(c(1, 1, 1), "mm"), 
+				          unit(0, "npc") - unit(c(1, 1, 1), "mm"), 
 				          c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n), 
-				          c(1, 1, 1))
+				          c(0, 0, 0))
 			if(axis_name_rot == 0) {
 				grid.text(axis_name,
 					      c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n),
-					      unit(1, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp,
+					      unit(0, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp,
 					      hjust = c(0, 0.5, 1), vjust = 1)
 			} else {
 				if(axis_name_rot > 0 & axis_name_rot <= 90) {
@@ -289,18 +293,18 @@ EnrichedHeatmap = function(mat, col, top_annotation = HeatmapAnnotation(enriched
 				}
 				grid.text(axis_name,
 					      c(0.5/n, (n1+0.5)/n, (n1+n2-0.5)/n),
-					      unit(1, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
+					      unit(0, "npc") - unit(c(2, 2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
 					      hjust = hjust, vjust = vjust)
 			}
 		} else {
 			grid.segments(c(0.5/n, (n-0.5)/n), 
-				          unit(1, "npc") - unit(c(1, 1), "mm"), 
+				          unit(0, "npc") - unit(c(1, 1), "mm"), 
 				          c(0.5/n, (n-0.5)/n), 
-				          c(1, 1))
+				          c(0, 0))
 			if(axis_name_rot == 0) {
 				grid.text(axis_name,
 					      c(0.5/n, (n-0.5)/n),
-					      unit(1, "npc") - unit(c(2, 2), "mm"), gp = axis_name_gp,
+					      unit(0, "npc") - unit(c(2, 2), "mm"), gp = axis_name_gp,
 					      hjust = c(0, 1), vjust = 1)
 			} else {
 				if(axis_name_rot > 0 & axis_name_rot <= 90) {
@@ -312,13 +316,13 @@ EnrichedHeatmap = function(mat, col, top_annotation = HeatmapAnnotation(enriched
 				}
 				grid.text(axis_name,
 					      c(0.5/n, (n-0.5)/n),
-					      unit(1, "npc") - unit(c(2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
+					      unit(0, "npc") - unit(c(2, 2), "mm"), gp = axis_name_gp, rot = axis_name_rot,
 					      hjust = hjust, vjust = vjust)
 			}
 		}
 		minor_ticks = calc_minor_ticks(mat)
 		if(length(minor_ticks)) {
-	        grid.segments(minor_ticks, unit(1, "npc") - unit(0.5, "mm"), minor_ticks, 1)
+	        grid.segments(minor_ticks, unit(0, "npc") - unit(0.5, "mm"), minor_ticks, 0)
 	    }
 	}
 	
@@ -362,105 +366,73 @@ EnrichedHeatmap = function(mat, col, top_annotation = HeatmapAnnotation(enriched
 			heatmap_legend_param$labels = signal_level
 		}
 	}
-	
+
+	add_pos_line = function(ht) {
+        heatmap_name = ht@name
+
+        upstream_index = attr(ht@matrix, "upstream_index")
+        downstream_index = attr(ht@matrix, "downstream_index")
+        target_index = attr(ht@matrix, "target_index")
+        n1 = length(upstream_index)
+        n2 = length(target_index)
+        n3 = length(downstream_index)
+        n = n1 + n2 + n3
+
+        for(k in seq_along(ht@row_order_list)) {
+            if(pos_line) {
+                decorate_heatmap_body(heatmap_name, {
+                    if(n1 && n2 && n3) {
+                        grid.lines(rep((n1+0.5)/n, 2), c(0, 1), gp = pos_line_gp)
+                        grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = pos_line_gp)
+                    } else if(n1 && !n2 && n3) {
+                        grid.lines(rep((n1+0.5)/n, 2), c(0, 1), gp = pos_line_gp)
+                    } else if(!n1 && n2 && n3) {
+                        grid.lines(rep((n1+n2-0.5)/n, 2), c(0, 1), gp = pos_line_gp)
+                    } else if(n1 && n2 && !n3) {
+                        grid.lines(rep((n1+0.5)/n, 2), c(0, 1), gp = pos_line_gp)
+                    }
+                }, row_slice = k)
+            }
+        }
+
+        decorate_heatmap_body(heatmap_name, {
+        	axis_fun()
+        }, row_slice = length(ht@row_order_list))
+	}
+
 	ht = Heatmap(mat, col, row_order = row_order, cluster_columns = FALSE, cluster_rows = cluster_rows,
-			show_row_names = show_row_names, show_column_names = FALSE, bottom_annotation = NULL, 
+			show_row_names = show_row_names, show_column_names = FALSE,
 			column_title_side = "top", show_row_dend = show_row_dend, row_dend_reorder = row_dend_reorder,
-			top_annotation = top_annotation, top_annotation_height = top_annotation_height, 
-			heatmap_legend_param = heatmap_legend_param, ...)
+			top_annotation = top_annotation, border = border,
+			bottom_annotation = HeatmapAnnotation("_axis_" = anno_empty(height = axis_height - ht_opt$COLUMN_ANNO_PADDING, border = FALSE)),
+			heatmap_legend_param = heatmap_legend_param, 
+			post_fun = add_pos_line, ...)
 
-	# additional parameters specific for `EnrichedHeatmap` class
-	ht@heatmap_param$pos_line = pos_line
-	ht@heatmap_param$pos_line_gp = pos_line_gp
-	ht@heatmap_param$axis_fun = axis_fun
+	ht@heatmap_param$is_enriched_heatmap = TRUE # add a tag
 	ht@heatmap_param$axis_height = axis_height
-	ht@heatmap_param$border = border
-
-	return(changeClassName(ht, "EnrichedHeatmap"))
+	ht@heatmap_param$axis_fun = axis_fun
+	return(ht)
 }
 
-# == title
-# Draw the single heatmap with default parameters
-#
-# == param
-# -object an `EnrichedHeatmap-class` object.
-#
-# == details
-# Actually it calls `draw,EnrichedHeatmap-method`, but only with default parameters. If users want to customize the heatmap,
-# they can pass parameters directly to `draw,EnrichedHeatmap-method`.
-#
-# == value
-# An `EnrichedHeatmapList-class` object.
-#
-# == author
-# Zuguang Gu <z.gu@dkfz.de>
-#
-# == example
-# # see documentation of EnrichedHeatmap
-# NULL
-setMethod(f = "show",
-	signature = "EnrichedHeatmap",
-	definition = function(object) {
-
-	# `draw` method is inherited from `Heatmap` class
-	draw(object)
-
-})
 
 # == title
-# Draw a single heatmap
+# Annotation Function to Show the Enrichment
 #
 # == param
-# -object an `EnrichedHeatmap-class` object.
-# -internal only used internally.
-# -... pass to `ComplexHeatmap::draw`,HeatmapList-method.
-#
-# == detail
-# The function creates an `EnrichedHeatmapList-class` object which only contains a single heatmap
-# and call `draw,EnrichedHeatmapList-method` to make the final heatmap.
-#
-# == value
-# An `EnrichedHeatmapList-class` object.
-#
-# == author
-# Zuguang Gu <z.gu@dkfz.de>
-#
-# == example
-# # see documentation of EnrichedHeatmap
-# NULL
-setMethod(f = "draw",
-	signature = "EnrichedHeatmap",
-	definition = function(object, internal = FALSE, ...) {
-	
-	if(internal) {
-		object = changeClassName(object, "Heatmap")
-		draw(object, internal = internal)
-	} else {
-		ht_list = new("HeatmapList")
-	    ht_list = ht_list + object
-	    draw(ht_list, ...)
-	}
-})
-
-
-# == title
-# Annotation function to show the enrichment
-#
-# == param
-# -gp graphic parameters. There are two non-standard parameters: ``neg_col`` and ``pos_col``. 
+# -gp Graphic parameters. There are two non-standard parameters: ``neg_col`` and ``pos_col``. 
 #     If these two parameters are defined, the positive signals and negatie signals are visualized separatedly.
 #     The graphic parameters can be set as vectors when the heatmap or heatmap list is split into several row clusters.
-# -pos_line whether to draw vertical lines which represent positions of ``target``
-# -pos_line_gp graphic parameters for the position lines
-# -yaxis whether show yaxis
-# -ylim ranges on y-axis, by default it is inferred from the data
-# -value the method to summarize signals from columns of the noramlized matrix
-# -yaxis_side side of y-axis
-# -yaxis_facing facing of the axis ticks and labels. It can be set to avoid overlapping text when multiple
-#               heatmaps are plotted together
-# -yaxis_gp graphic parameters for y-axis
-# -show_error whether show error regions which are one standard error to the mean value. Color of error
+# -pos_line Whether draw vertical lines which represent positions of ``target``?
+# -pos_line_gp Graphic parameters for the position lines.
+# -ylim Ranges on y-axis. By default it is inferred from the data.
+# -value The method to summarize signals from columns of the normalized matrix.
+# -yaxis Deprecated, use ``axis`` instead.
+# -axis Whether show axis?
+# -axis_param parameters for controlling axis. See `ComplexHeatmap::default_axis_param` for all possible settings and default parameters.
+# -show_error Whether show error regions which are one standard error to the mean value? Color of error
 #            area is same as the corresponding lines with 75 percent transparency.
+# -height Height of the annotation.
+# -... Other arguments.
 #
 # == details
 # This annotation functions shows mean values (or depends on the method set in ``value`` argument) of columns in the normalized matrix
@@ -471,7 +443,7 @@ setMethod(f = "draw",
 # It should only be placed as column annotation of the enriched heatmap.
 #
 # == values
-# A column annotation function which can be set to ``top_annotation`` argument in `EnrichedHeatmap`.
+# A column annotation function which should be set to ``top_annotation`` argument in `EnrichedHeatmap`.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -486,35 +458,45 @@ setMethod(f = "draw",
 #     km = 3, row_title_rot = 0)
 #
 anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
-	yaxis = TRUE, ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"), 
-	yaxis_side = "right", yaxis_facing = ifelse(yaxis_side == "right", "right", "left"), 
-	yaxis_gp = gpar(fontsize = 8), show_error = FALSE) {
+	ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"), 
+	yaxis = TRUE, axis = yaxis, axis_param = default_axis_param("column"), 
+	show_error = FALSE, height = unit(2, "cm"), ...) {
 
-	# in case of lazy loading
-	gp = gp
-	pos_line = pos_line
-	pos_line_gp = pos_line_gp
-	yaxis = yaxis
-	ylim = ylim
-	yaxis_side = yaxis_side
-	yaxis_facing = yaxis_facing
-	yaxis_gp = yaxis_gp
-	show_error = show_error
+	other_args = list(...)
+	if(length(other_args)) {
+		if("yaxis_gp" %in% names(other_args)) {
+			stop_wrap("`yaxis_gp` is removed from the arguments. Use `axis_param = list(gp = ...)` instead.")
+		}
+		if("yaxis_side" %in% names(other_args)) {
+			stop_wrap("`yaxis_side` is removed from the arguments. Use `axis_param = list(side = ...)` instead.")
+		}
+		if("yaxis_facing" %in% names(other_args)) {
+			stop_wrap("`yaxis_facing` is removed from the arguments. Use `axis_param = list(facing = ...)` instead.")
+		}	
+	}
+
+	axis_param = ComplexHeatmap:::validate_axis_param(axis_param, "column")
+
+	if(is.null(ylim)) {
+		axis_grob = if(axis) ComplexHeatmap:::construct_axis_grob(axis_param, "column", c(0, 1)) else NULL
+	} else {
+		axis_grob = if(axis) ComplexHeatmap:::construct_axis_grob(axis_param, "column", ylim) else NULL
+	}
 
 	by_sign = FALSE
 	if(!is.null(gp$neg_col) && !is.null(gp$pos_col)) {
 		by_sign = TRUE
 		show_error = FALSE
 	} else if(!is.null(gp$neg_col) && is.null(gp$pos_col)) {
-		stop("Since you defined `neg_col` in `gp`, you should also define `pos_col`.")
+		stop_wrap("Since you defined `neg_col` in `gp`, you should also define `pos_col`.")
 	} else if(is.null(gp$neg_col) && !is.null(gp$pos_col)) {
-		stop("Since you defined `pos_col` in `gp`, you should also define `neg_col`.")
+		stop_wrap("Since you defined `pos_col` in `gp`, you should also define `neg_col`.")
 	}
 
 	value = match.arg(value)[1]
-	function(index) {
+	fun = function(index) {
 
-		ht = get("object", envir = parent.frame(n = 5))
+		ht = get("object", envir = parent.frame(n = 7))
 		mat = ht@matrix
 		
 		if(by_sign) {
@@ -668,60 +650,84 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
                 grid.lines(rep((n1-0.5)/n, 2), c(0, 1), gp = pos_line_gp)
             }
 		}
-		if(yaxis) {
-			le1 = grid.pretty(ylim)
-			le2 = pretty(ylim, n = 3)
-			if(abs(length(le1) - 5) < abs(length(le2) - 5)) {
-				le = le1
-			} else {
-				le = le2
-			}
-			breaks = le[le >= ylim[1] & le <= ylim[2]]
-			n_break = length(breaks)
-			if(yaxis_side == "right") {
-				if(yaxis_facing == "right") {
-					grid.segments(unit(1, "npc"), breaks, unit(1, "npc") + unit(1, "mm"), breaks, default.units = "native", gp = yaxis_gp)
-					grid.text(breaks, unit(1, "npc") + unit(2, "mm"), breaks, default.units = "native", gp = yaxis_gp, just = "left")
-				} else {
-					grid.segments(unit(1, "npc"), breaks, unit(1, "npc") - unit(1, "mm"), breaks, default.units = "native", gp = yaxis_gp)
-					grid.text(breaks, unit(1, "npc") - unit(2, "mm"), breaks, default.units = "native", gp = yaxis_gp, just = "right")
-				}
-			} else {
-				if(yaxis_facing == "right") {
-					grid.segments(unit(0, "npc"), breaks, unit(0, "npc") + unit(1, "mm"), breaks, default.units = "native", gp = yaxis_gp)
-					grid.text(breaks, unit(0, "npc") + unit(2, "mm"), breaks, default.units = "native", gp = yaxis_gp, just = "left")
-				} else {
-					grid.segments(unit(0, "npc"), breaks, unit(0, "npc") - unit(1, "mm"), breaks, default.units = "native", gp = yaxis_gp)
-					grid.text(breaks, unit(0, "npc") - unit(2, "mm"), breaks, default.units = "native", gp = yaxis_gp, just = "right")
-				}
-			}
-		}
 
-		# minor_ticks = calc_minor_ticks(mat)
-		# if(length(minor_ticks)) {
-	 #        grid.segments(minor_ticks, unit(0.5, "mm"), minor_ticks, 0)
-	 #    }
-
-	    upViewport()
+		axis_param = ComplexHeatmap:::validate_axis_param(axis_param, "column")
+		axis_grob = if(axis) ComplexHeatmap:::construct_axis_grob(axis_param, "column", ylim) else NULL
+		
+		if(axis) grid.draw(axis_grob)
+	    popViewport()
 	}
+
+	anno = AnnotationFunction(
+		fun = fun,
+		fun_name = "anno_enriched",
+		which = "column",
+		width = unit(1, "npc"),
+		height = height,
+		var_import = list(axis, axis_grob, axis_param, ylim, gp, pos_line, pos_line_gp,
+			value, show_error, by_sign),
+		show_name = FALSE
+	)
+
+	anno@subsetable = FALSE
+	anno@extended = ComplexHeatmap:::update_anno_extend(anno, axis_grob, axis_param)
+
+	return(anno)
 }
 
-recycle_gp = function(gp, n = 1) {
-	g = lapply(gp, function(x) {
-		if(length(x) == 1 && n > 1) {
-			rep(x, n)
-		} else {
-			x
+
+calc_minor_ticks = function(mat, n = 20) {
+    mat_attr = attributes(mat)
+    pos = NULL
+    if(mat_attr$target_is_single_point) {
+        breaks = pretty(c(-mat_attr$extend[1], mat_attr$extend[2]), n = n)
+        w = breaks[2] - breaks[1]
+        breaks = breaks[breaks + mat_attr$extend[1] > 0.01*w & mat_attr$extend[2] - breaks > 0.01*w]
+        breaks = breaks[abs(breaks) > 0.01*w]
+        if(length(breaks)) {
+            pos = (breaks + mat_attr$extend[1])/sum(mat_attr$extend)
+        }
+    } else {
+        upstream_ratio = length(mat_attr$upstream_index)/ncol(mat)
+        downstream_ratio = length(mat_attr$downstream_index)/ncol(mat)
+        ratio = c(upstream_ratio, downstream_ratio)
+        i = which.max(mat_attr$extend)
+        breaks = pretty(c(0, mat_attr$extend[i]), n = round(n*ratio[i]))
+        w = breaks[2] - breaks[1]
+        # upstream
+        x = seq(-mat_attr$extend[1], 0, by = w)
+        x = x[x + mat_attr$extend[1] > 0.01*w & -x > 0.01*w]
+        if(length(x)) {
+            x = (x + mat_attr$extend[1])/mat_attr$extend[1] * upstream_ratio
+        }
+        pos = c(pos, x)
+        # downstream
+        x = seq(0, mat_attr$extend[2], by = w)
+        x = x[x > 1e-6 & mat_attr$extend[2]- x > 0.01*w]
+        if(length(x)) {
+            x = x/mat_attr$extend[2] * downstream_ratio + (1 - downstream_ratio)
+        }
+        pos = c(pos, x)
+        # target
+        if(length(mat_attr$target_index)) {
+            target_ratio = 1 - upstream_ratio - downstream_ratio
+            n_breaks = round(target_ratio*n)
+            if(n_breaks >= 2) {
+                x = seq(upstream_ratio, upstream_ratio + target_ratio, length.out = n_breaks)
+                w = x[2] - x[1]
+                x = x[x - upstream_ratio > 0.01*w & upstream_ratio + target_ratio - x > 0.01*w]
+                pos = c(pos, x)
+            }
+        }
+    }
+    return(pos)
+}
+
+is_enriched_heatmap = function(ht) {
+	if(inherits(ht, "Heatmap")) {
+		if(!is.null(ht@heatmap_param$is_enriched_heatmap)) {
+			return(TRUE)
 		}
-	})
-	class(g) = "gpar"
-	return(g)
-}
-
-subset_gp = function(gp, i = 1) {
-	g = lapply(gp, function(x) {
-		x[i]
-	})
-	class(g) = "gpar"
-	return(g)
+	}
+	return(FALSE)
 }

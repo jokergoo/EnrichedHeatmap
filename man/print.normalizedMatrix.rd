@@ -1,18 +1,18 @@
 \name{print.normalizedMatrix}
 \alias{print.normalizedMatrix}
 \title{
-Print normalized matrix
+Print the Normalized Matrix
 }
 \description{
-Print normalized matrix
+Print the Normalized Matrix
 }
 \usage{
 \method{print}{normalizedMatrix}(x, ...)
 }
 \arguments{
 
-  \item{x}{the normalized matrix returned by \code{\link{normalizeToMatrix}}}
-  \item{...}{other arguments}
+  \item{x}{The normalized matrix returned by \code{\link{normalizeToMatrix}}.}
+  \item{...}{Other arguments.}
 
 }
 \value{

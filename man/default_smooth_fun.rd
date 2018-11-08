@@ -1,17 +1,17 @@
 \name{default_smooth_fun}
 \alias{default_smooth_fun}
 \title{
-Default smoothing function
+Default Smoothing function
 }
 \description{
-Default smoothing function
+Default Smoothing function
 }
 \usage{
 default_smooth_fun(x)
 }
 \arguments{
 
-  \item{x}{input numeric vector}
+  \item{x}{Input numeric vector.}
 
 }
 \details{

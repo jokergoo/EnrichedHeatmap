@@ -1,5 +1,6 @@
 \name{[.normalizedMatrix}
 \alias{[.normalizedMatrix}
+\alias{Extract.normalizedMatrix}
 \title{
 Subset normalized matrix by rows
 }

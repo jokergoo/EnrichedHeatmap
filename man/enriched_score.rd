@@ -1,17 +1,17 @@
 \name{enriched_score}
 \alias{enriched_score}
 \title{
-Enriched scores
+Enriched Scores
 }
 \description{
-Enriched scores
+Enriched Scores
 }
 \usage{
 enriched_score(mat)
 }
 \arguments{
 
-  \item{mat}{a normalized matrix from \code{\link{normalizeToMatrix}}}
+  \item{mat}{A normalized matrix from \code{\link{normalizeToMatrix}}.}
 
 }
 \details{
@@ -29,14 +29,6 @@ where the first two terms are the distance to the start or end position of the t
 by weighting the distance to the position that if it is closer to the start or end position
 of the target, it has higher weight. The second term weight the distance to the center point
 of the target and similar, if it is closer to the center position, it has higher weight.
-}
-\seealso{
-This \code{\link{enriched_score}} is the default scoring function for \code{score_fun} argument in \code{\link{EnrichedHeatmap}}
-function. It is also an example function for implementing customized scoreing function.
-Basically, to be a score function which calculates enriched score, it should accept three arguments
-which are the values in upstream windows, the target windows and downstream windows 
-The user-defined function should return a single value. Rows are sorted decreasingly by the enriched scores.
-
 }
 \value{
 A numeric vector

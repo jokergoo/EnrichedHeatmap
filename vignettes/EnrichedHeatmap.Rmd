@@ -46,13 +46,14 @@ different data sources.
 suppressWarnings(suppressPackageStartupMessages(library(EnrichedHeatmap)))
 ```
 
-## Basic
+## Basic usages
 
 ```{r, eval = FALSE}
 library(EnrichedHeatmap)
 ```
 
-First load the example data that we will use for demostration. The data is for human lung tissue and is from [Roadmap dataset](http://www.roadmapepigenomics.org/data/).
+First let's load the example dataset that we will use for demonstration. The data for
+human lung tissue is from [Roadmap dataset](http://www.roadmapepigenomics.org/data/).
 
 ```{r}
 set.seed(123)
@@ -62,19 +63,19 @@ ls()
 
 There are following R objects:
 
-- `H3K4me3`: coverage for H3K4me3 histone modification from the ChIPSeq data
-- `cgi`: CpG islands
-- `genes`: genes
-- `meth`: methylation for CpG sites from WGBS
-- `rpkm`: gene expression from RNASeq
+- `H3K4me3`: coverage for H3K4me3 histone modification from the ChIP-seq data,
+- `cgi`: CpG islands,
+- `genes`: genes,
+- `meth`: methylation for CpG sites from WGBS,
+- `rpkm`: gene expression from RNASeq.
 
-In order to build the vignette fast, the data only includes chromosome 21. Also we downsampled 100000 CpG
-sites for methylation data.
+In order to build the vignette fast, the data only includes chromosome 21.
+Also we downsampled 100000 CpG sites for methylation data.
 
-We first visualize how H3K4me3 histone modification is enriched around gene TSS.
-First we extract TSS of genes (note `tss` has strand information):
+We first visualize how H3K4me3 histone modification is enriched around gene
+TSS. First we extract TSS of genes (note `tss` has strand information):
 
-```{r, fig.width = 3}
+```{r}
 tss = promoters(genes, upstream = 0, downstream = 1)
 tss[1:5]
 H3K4me3[1:5]
@@ -116,7 +117,7 @@ By default, rows are ordered according to the enrichment to the target regions. 
 of the heatmap there is a specific type of annotation which summarize the enrichment
 patterns as a line plot.
 
-`EnrichedHeatmap()` returns an `EnrichedHeatmap` class instance which is inherited from `Heatmap` class,
+`EnrichedHeatmap()` internally calls `Heatmap()` can returns a `Heatmap` class object,
 so parameters and methods for `Heatmap` class can be directly applied to `EnrichedHeatmap` class. Users can
 go to the [**ComplexHeatmap** package](http://www.bioconductor.org/packages/devel/bioc/html/ComplexHeatmap.html) to get a more comprehensive help.
 
@@ -171,19 +172,19 @@ mat1 = mat1_trim
 
 ### Split on rows
 
-Split rows by a vector or a data frame by specifying `split` option.
+Split rows by a vector or a data frame by specifying `row_split` option.
 
 ```{r, fig.width = 3}
 EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3", 
-    split = sample(c("A", "B"), length(genes), replace = TRUE),
+    row_split = sample(c("A", "B"), length(genes), replace = TRUE),
     column_title = "Enrichment of H3K4me3") 
 ```
 
-Split rows by k-means clustering by specifying `km` option.
+Split rows by k-means clustering by specifying `row_km` option.
 
 ```{r, fig.width = 4}
 set.seed(123)
-EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3", km = 3,
+EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3", row_km = 3,
     column_title = "Enrichment of H3K4me3", row_title_rot = 0)
 ```
 
@@ -194,7 +195,7 @@ as the number of row clusters.
 
 ```{r, fig.width = 4}
 set.seed(123)
-EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3", km = 3,
+EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3", row_km = 3,
     top_annotation = HeatmapAnnotation(enriched = anno_enriched(gp = gpar(col = 2:4, lty = 1:3))),
     column_title = "Enrichment of H3K4me3", row_title_rot = 0)
 ```
@@ -444,7 +445,7 @@ with low methylation and high H3K4me3 signal around TSS.
 
 ```{r, fig.width = 6}
 EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3",
-    top_annotation = HeatmapAnnotation(enrich = anno_enriched(yaxis_facing = "left"))) + 
+    top_annotation = HeatmapAnnotation(enrich = anno_enriched(axis_param = list(side = "left")))) + 
 EnrichedHeatmap(mat2, col = meth_col_fun, name = "methylation") +
 Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
     show_row_names = FALSE, width = unit(5, "mm"))
@@ -465,7 +466,7 @@ ht_list = Heatmap(partition, col = structure(2:4, names = paste0("cluster", 1:3)
               show_row_names = FALSE, width = unit(3, "mm")) +
           EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3",
               top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4),
-                yaxis_facing = "left")), 
+                axis_param = list(facing = "left"))), 
               column_title = "H3K4me3") + 
           EnrichedHeatmap(mat2, col = meth_col_fun, name = "methylation",
               top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
@@ -497,7 +498,7 @@ corr_col_fun = colorRamp2(c(-1, 0, 1), c("darkgreen", "white", "red"))
 EnrichedHeatmap(mat_H3K4me1, col = corr_col_fun, name = "corr_H3K4me1",
     top_annotation = HeatmapAnnotation(
         line = anno_enriched(gp = gpar(neg_col = "darkgreen", pos_col = "red"),
-            yaxis_facing = "left")
+            axis_param = list(facing = "left"))
     ), column_title = "separate neg and pos") +
 EnrichedHeatmap(mat_H3K4me1, col = corr_col_fun, show_heatmap_legend = FALSE,
     column_title = "pool neg and pos")
@@ -561,16 +562,6 @@ ht_list = draw(ht_list)
 row_order(ht_list)
 ```
 
-If you are interested in a small cluster, under the interactive mode,
-you can use mouse to select this region by `selectArea()` function, and it will give you the index of rows
-in the selected sub-region.
-
-```{r, eval = FALSE}
-# code not run
-draw(ht_list)
-pos = selectArea()
-```
-
 Since `EnrichedHeatmap` and `EnrichedHeamtapList` class are inherited from `Heamtap` and `HeamtapList` class
 respectively, all advanced parameters in the latter two classes can be directly used in the former two classes.
 
@@ -587,9 +578,9 @@ To change graphic settings for legends:
 # code not run
 EnrichedHeatmap(..., heatmap_legend_param = ...)
 # or set is globally
-ht_global_opt(...)
+ht_opt(...)
 EnrichedHeatmap(...)
-ht_global_opt(RESET = TRUE)
+ht_opt(RESET = TRUE)
 ```
 
 To set the width of the heatmaps if there are more than one heatmaps:
@@ -706,9 +697,12 @@ mat2
 
 ## Error caused from smoothing
 
-If you generate the plot for the whole genome, I suggest you first save the figure as pdf format and then
-convert to png by [`convert`](http://www.imagemagick.org/script/convert.php) software, instead of directly saving as png format.
-A second solution is to set `use_raster` to `TRUE` to replace the heatmap bodies with raster images. Check [this document](http://www.bioconductor.org/packages/devel/bioc/vignettes/ComplexHeatmap/inst/doc/s2.single_heatmap.html#toc_7)
+If you generate the plot for the whole genome, I suggest you first save the
+figure as pdf format and then convert to png by
+[`convert`](http://www.imagemagick.org/script/convert.php) software, instead
+of directly saving as png format. A second solution is to set `use_raster` to
+`TRUE` to replace the heatmap bodies with raster images. Check [this
+document](http://www.bioconductor.org/packages/devel/bioc/vignettes/ComplexHeatmap/inst/doc/s2.single_heatmap.html#toc_7)
 
 ```{r, eval = FALSE}
 # code not run

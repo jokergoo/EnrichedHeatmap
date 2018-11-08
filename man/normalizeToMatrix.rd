@@ -1,10 +1,10 @@
 \name{normalizeToMatrix}
 \alias{normalizeToMatrix}
 \title{
-Normalize associations between genomic signals and target regions into a matrix
+Normalize Associations between Genomic Signals and Target Regions into a Matrix
 }
 \description{
-Normalize associations between genomic signals and target regions into a matrix
+Normalize Associations between Genomic Signals and Target Regions into a Matrix
 }
 \usage{
 normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50,
@@ -16,22 +16,22 @@ normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50,
 }
 \arguments{
 
-  \item{signal}{a \code{\link[GenomicRanges]{GRanges-class}} object.}
-  \item{target}{a \code{\link[GenomicRanges]{GRanges-class}} object.}
-  \item{extend}{extended base pairs to the upstream and/or downstream of \code{target}. It can be a vector of length one or two. Length one means same extension to the upstream and downstream.}
-  \item{w}{window size for splitting upstream and downstream, measured in base pairs}
-  \item{value_column}{column index in \code{signal} that is mapped to colors. If it is not set, it assumes values for all signal regions are 1.}
-  \item{mapping_column}{mapping column to restrict overlapping between \code{signal} and \code{target}. By default it tries to look for all regions in \code{signal} that overlap with every target.}
-  \item{background}{values for windows that don't overlap with \code{signal}. }
-  \item{empty_value}{deprecated, please use \code{background} instead.}
-  \item{mean_mode}{when a window is not perfectly overlapped to \code{signal}, how to summarize  values to the window. See 'Details' section for a detailed explanation.}
-  \item{include_target}{whether include \code{target} in the heatmap. If the width of all regions in \code{target} is 1, \code{include_target} is enforced to \code{FALSE}.}
-  \item{target_ratio}{the ratio of \code{target} columns in the normalized matrix. If the value is 1, \code{extend} will be reset to 0.}
-  \item{k}{number of windows only when \code{target_ratio = 1} or \code{extend == 0}, otherwise ignored.}
-  \item{smooth}{whether apply smoothing on rows in the matrix. }
-  \item{smooth_fun}{the smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric vector (may contain \code{NA} values) and returns a vector with same length. If the smoothing is failed, the function should call \code{\link[base]{stop}} to throw errors so that \code{\link{normalizeToMatrix}} can catch how many rows are failed in smoothing.  See the default \code{\link{default_smooth_fun}} for example.}
-  \item{keep}{percentiles in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first percentile is replaces with the first pencentile and values larger than the second percentile is replaced with the second percentile.}
-  \item{trim}{deprecated, please use \code{keep} instead.}
+  \item{signal}{A \code{\link[GenomicRanges]{GRanges-class}} object.}
+  \item{target}{A \code{\link[GenomicRanges]{GRanges-class}} object.}
+  \item{extend}{Extended base pairs to the upstream and/or downstream of \code{target}. It can be a vector of length one or two. Length one means same extension to the upstream and downstream.}
+  \item{w}{Window size for splitting upstream and downstream, measured in base pairs}
+  \item{value_column}{Column index in \code{signal} that is mapped to colors. If it is not set, it assumes values for all signal regions are 1.}
+  \item{mapping_column}{Mapping column to restrict overlapping between \code{signal} and \code{target}. By default it tries to look for all regions in \code{signal} that overlap with every target.}
+  \item{background}{Values for windows that don't overlap with \code{signal}. }
+  \item{empty_value}{Deprecated, please use \code{background} instead.}
+  \item{mean_mode}{When a window is not perfectly overlapped to \code{signal}, how to summarize  values to the window. See 'Details' section for a detailed explanation.}
+  \item{include_target}{Whether include \code{target} in the heatmap? If the width of all regions in \code{target} is 1, \code{include_target} is enforced to \code{FALSE}.}
+  \item{target_ratio}{The ratio of \code{target} columns in the normalized matrix. If the value is 1, \code{extend} will be reset to 0.}
+  \item{k}{Number of windows only when \code{target_ratio = 1} or \code{extend == 0}, otherwise ignored.}
+  \item{smooth}{Whether apply smoothing on rows in the matrix?}
+  \item{smooth_fun}{The smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric vector (may contain \code{NA} values) and returns a vector with same length. If the smoothing is failed, the function should call \code{\link[base]{stop}} to throw errors so that \code{\link{normalizeToMatrix}} can catch how many rows are failed in smoothing.  See the default \code{\link{default_smooth_fun}} for example.}
+  \item{keep}{Percentiles in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first percentile is replaces with the first pencentile and values larger than the second percentile is replaced with the second percentile.}
+  \item{trim}{Deprecated, please use \code{keep} instead.}
 
 }
 \details{

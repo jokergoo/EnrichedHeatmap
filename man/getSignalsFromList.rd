@@ -1,18 +1,18 @@
 \name{getSignalsFromList}
 \alias{getSignalsFromList}
 \title{
-Get signals from a list
+Get Signals from a List
 }
 \description{
-Get signals from a list
+Get Signals from a List
 }
 \usage{
 getSignalsFromList(lt, fun = function(x) mean(x, na.rm = TRUE))
 }
 \arguments{
 
-  \item{lt}{a list of normalized matrices which are returned by \code{\link{normalizeToMatrix}}. Matrices in the list should be generated with same settings (e.g. they should use same target regions, same extension to targets and same number of windows).}
-  \item{fun}{a user-defined function to summarize signals.}
+  \item{lt}{A list of normalized matrices which are returned by \code{\link{normalizeToMatrix}}. Matrices in the list should be generated with same settings (e.g. they should use same target regions, same extension to targets and same number of windows).}
+  \item{fun}{A user-defined function to summarize signals.}
 
 }
 \details{

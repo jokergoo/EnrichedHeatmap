@@ -1,17 +1,17 @@
 \name{dist_by_closeness}
 \alias{dist_by_closeness}
 \title{
-Distance by closeness
+Distance by Closeness
 }
 \description{
-Distance by closeness
+Distance by Closeness
 }
 \usage{
 dist_by_closeness(mat)
 }
 \arguments{
 
-  \item{mat}{a numeric matrix where the distance is calculated by rows}
+  \item{mat}{A numeric matrix where the distance is calculated by rows.}
 
 }
 \details{
@@ -19,7 +19,8 @@ For two rows in the matrix, assume x_1, x_2, ..., x_n1 are the column index of n
 and y_1, y_2, ... y_n2 are the column index for non-zero values in row 2, 
 the distance between the two rows based on the closeness is calculated as:
 
-d_closeness = sum_i sum_j(|x_i - y_j|) / (n_1*n_2)
+  \preformatted{
+    d_closeness = sum_i sum_j(|x_i - y_j|) / (n_1*n_2)  }
 }
 \value{
 A \code{\link[stats]{dist}} object

@@ -1,18 +1,18 @@
 \name{copyAttr}
 \alias{copyAttr}
 \title{
-Copy attributes to another object
+Copy Attributes to Another Object
 }
 \description{
-Copy attributes to another object
+Copy Attributes to Another Object
 }
 \usage{
 copyAttr(x, y)
 }
 \arguments{
 
-  \item{x}{object 1}
-  \item{y}{object 2}
+  \item{x}{Object 1.}
+  \item{y}{Object 2.}
 
 }
 \details{
