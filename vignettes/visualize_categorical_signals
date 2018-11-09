@@ -15,8 +15,6 @@ knitr::opts_chunk$set(
     warning = FALSE,
     message = FALSE)
 library(markdown)
-options(markdown.HTML.options = setdiff(options('markdown.HTML.options')[[1]], "toc"))
-options(markdown.HTML.stylesheet = "custom.css")
 options(width = 100)
 ```
 
