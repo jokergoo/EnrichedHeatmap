@@ -9,7 +9,7 @@ Annotation Function to Show the Enrichment
 \usage{
 anno_enriched(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
     ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"),
-    yaxis = TRUE, axis = yaxis, axis_param = default_axis_param("column"),
+    yaxis = TRUE, axis = yaxis, axis_param = list(side = "right"),
     show_error = FALSE, height = unit(2, "cm"), ...)
 }
 \arguments{

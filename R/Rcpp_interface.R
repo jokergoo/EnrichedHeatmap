@@ -16,7 +16,7 @@
 #     d_closeness = sum_i sum_j(|x_i - y_j|) / (n_1*n_2)
 #
 # == value
-# A `stats::dist` object
+# A `stats::dist` object.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>

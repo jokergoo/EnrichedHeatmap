@@ -31,7 +31,7 @@ of the target, it has higher weight. The second term weight the distance to the 
 of the target and similar, if it is closer to the center position, it has higher weight.
 }
 \value{
-A numeric vector
+A numeric vector.
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>

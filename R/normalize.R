@@ -1076,4 +1076,15 @@ as.normalizedMatrix = function(mat, k_upstream = 0, k_downstream = 0, k_target =
 	return(mat)
 }
 
-
+# == title
+# Indices of Rows Failed from Smoothing
+#
+# == param
+# -m Matrix from `normalizeToMatrix`.
+#
+# == value
+# A numeric vector or ``NULL``.
+#
+failed_rows = function(m) {
+	attr(m, "failed_rows")
+}

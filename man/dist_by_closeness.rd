@@ -23,7 +23,7 @@ the distance between the two rows based on the closeness is calculated as:
     d_closeness = sum_i sum_j(|x_i - y_j|) / (n_1*n_2)  }
 }
 \value{
-A \code{\link[stats]{dist}} object
+A \code{\link[stats]{dist}} object.
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>

@@ -22,7 +22,7 @@
 # of the target and similar, if it is closer to the center position, it has higher weight.
 #
 # == value
-# A numeric vector
+# A numeric vector.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -400,6 +400,8 @@ EnrichedHeatmap = function(mat,
         }, row_slice = length(ht@row_order_list))
 	}
 
+	if(!identical(cluster_rows, FALSE)) row_order = NULL
+
 	ht = Heatmap(mat, col, row_order = row_order, cluster_columns = FALSE, cluster_rows = cluster_rows,
 			show_row_names = show_row_names, show_column_names = FALSE,
 			column_title_side = "top", show_row_dend = show_row_dend, row_dend_reorder = row_dend_reorder,
@@ -459,7 +461,7 @@ EnrichedHeatmap = function(mat,
 #
 anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
 	ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"), 
-	yaxis = TRUE, axis = yaxis, axis_param = default_axis_param("column"), 
+	yaxis = TRUE, axis = yaxis, axis_param = list(side = "right"), 
 	show_error = FALSE, height = unit(2, "cm"), ...) {
 
 	other_args = list(...)
@@ -473,6 +475,10 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 		if("yaxis_facing" %in% names(other_args)) {
 			stop_wrap("`yaxis_facing` is removed from the arguments. Use `axis_param = list(facing = ...)` instead.")
 		}	
+	}
+
+	if(!"side" %in% names(axis_param)) {
+		axis_param$side = "right"
 	}
 
 	axis_param = ComplexHeatmap:::validate_axis_param(axis_param, "column")
