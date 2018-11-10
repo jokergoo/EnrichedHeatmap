@@ -322,6 +322,7 @@ smoothed methylation data which can be replaced by using `granges()` and
 
 ```r
 expr = read.table("~/EnrichedHeatmap_test/57epigenomes.RPKM.pc.gz", row.names = 1, header = TRUE)
+expr = as.matrix(expr)
 obj = readRDS("~/EnrichedHeatmap_test/chr1_roadmap_merged_bsseq.rds")
 meth = obj@rowData
 meth_mat = obj@trans(obj@assays$data$coef)
@@ -364,7 +365,7 @@ EnrichedHeatmap(mat_meth, name = "meth", col = meth_col_fun,
 Heatmap(log2(expr[names(tss_chr1), "E003"] + 1), name = "expr", 
 	show_row_names = FALSE, width = unit(1, "cm"),
 	top_annotation = HeatmapAnnotation(summary = anno_summary(gp = gpar(lty = 1:2),
-		outline = FALSE)))
+		outline = FALSE, axis_param = list(side = "right"))))
 draw(ht_list, ht_gap = unit(8, "mm"))
 ```
 
@@ -456,7 +457,7 @@ Now we make the Chord diagram.
 grid.col = c(states_col, states_col)
 names(grid.col) = c(rownames(transition_mat), colnames(transition_mat))
 chordDiagram(transition_mat, grid.col = grid.col, annotationTrack = c("grid", "axis"),
-	directional = TRUE)
+	directional = TRUE, gap.degree = 5)
 circos.clear()
 text(0.5, -1, "ESC")
 text(0.5, 1, "lung")
