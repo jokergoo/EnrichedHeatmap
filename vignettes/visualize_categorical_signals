@@ -192,10 +192,10 @@ mat_states = normalizeToMatrix(states, tss_chr1, value_column = "states_simplifi
 EnrichedHeatmap(mat_states, name = "states", col = states_col)
 # shuffle levels for states_simplified
 states$states_simplified = factor(states$states_simplified, 
-	levels = states_name[c(1, 6, 2, 7, 4, 6, 5)])
+	levels = states_name[c(1, 6, 2, 7, 4, 3, 5)])
 mat_states = normalizeToMatrix(states, tss_chr1, value_column = "states_simplified")
 EnrichedHeatmap(mat_states, name = "states", col = states_col, 
-	row_title = "states_name[c(1, 6, 2, 7, 4, 6, 5)]")
+	row_title = "states_name[c(1, 6, 2, 7, 4, 3, 5)]")
 ```
 
 ```{r, fig.width = 8, echo = FALSE}
@@ -207,10 +207,10 @@ popViewport()
 
 pushViewport(viewport(x = 0.5, width = 0.5, just = "left"))
 states$states_simplified = factor(states$states_simplified, 
-	levels = states_name[c(1, 6, 2, 7, 4, 6, 5)])
+	levels = states_name[c(1, 6, 2, 7, 4, 3, 5)])
 mat_states = normalizeToMatrix(states, tss_chr1, value_column = "states_simplified")
 draw(EnrichedHeatmap(mat_states, name = "states", col = states_col, 
-	row_title = "states_name[c(1, 6, 2, 7, 4, 6, 5)]"), newpage = FALSE)
+	row_title = "states_name[c(1, 6, 2, 7, 4, 3, 5)]"), newpage = FALSE)
 popViewport()
 ```
 
@@ -283,6 +283,7 @@ smoothed methylation data which can be replaced by using `granges()` and
 
 ```{r}
 expr = read.table("~/EnrichedHeatmap_test/57epigenomes.RPKM.pc.gz", row.names = 1, header = TRUE)
+expr = as.matrix(expr)
 obj = readRDS("~/EnrichedHeatmap_test/chr1_roadmap_merged_bsseq.rds")
 meth = obj@rowData
 meth_mat = obj@trans(obj@assays$data$coef)

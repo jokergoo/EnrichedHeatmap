@@ -16,7 +16,6 @@ options(width = 100)
 
 
 ```{r, eval = grepl("tbi", Sys.info()["nodename"]) & Sys.info()["user"] == "guz", echo = FALSE}
-library(knitr)
 knit("visualize_categorical_signals", output = "visualize_categorical_signals.md", quiet = TRUE)
 ```
 
