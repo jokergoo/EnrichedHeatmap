@@ -20,8 +20,9 @@ Zuguang Gu, et al., EnrichedHeatmap: an R/Bioconductor package for comprehensive
 **EnrichedHeatmap** is available on [Bioconductor](http://bioconductor.org/packages/devel/bioc/html/EnrichedHeatmap.html), you can install it by:
 
 ```{r}
-source("http://bioconductor.org/biocLite.R")
-biocLite("EnrichedHeatmap") 
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("EnrichedHeatmap") 
 ```
 
 If you want the latest version, install it directly from GitHub:
