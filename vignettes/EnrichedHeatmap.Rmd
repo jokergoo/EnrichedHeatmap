@@ -261,9 +261,9 @@ EnrichedHeatmap(mat1, col = col_fun, name = "H3K4me3",
             ylim = c(0, 10),
             axis_param = list(
                 at = c(0, 5, 10),
-                labels = c("min", "median", "max"),
+                labels = c("zero", "five", "ten"),
                 side = "left",
-                facing = "inside"
+                facing = "outside"
     )))
 )     
 ```
@@ -527,8 +527,10 @@ ht_list = Heatmap(partition, col = structure(2:4, names = paste0("cluster", 1:3)
               column_title = "Methylation") +
           Heatmap(log2(rpkm+1), col = c("white", "orange"), name = "log2(rpkm+1)", 
               show_row_names = FALSE, width = unit(15, "mm"),
-              top_annotation = HeatmapAnnotation(summary = anno_summary(gp = gpar(fill = 2:4))))
-draw(ht_list, split = partition, annotation_legend_list = list(lgd), ht_gap = unit(8, "mm"))
+              top_annotation = HeatmapAnnotation(summary = anno_summary(gp = gpar(fill = 2:4),
+                outline = FALSE, axis_param = list(side = "right"))))
+draw(ht_list, split = partition, annotation_legend_list = list(lgd), 
+    ht_gap = unit(c(2, 8, 8), "mm"))
 ```
 
 ## Visualize positive signals and negative signals separatedly
@@ -660,7 +662,7 @@ Together with above features, you can make very complex heatmaps. Following
 example is from a real-world dataset and the details of making this plot can
 be found [in this vigentte](roadmap.html).
 
-<p><img src='roadmap.png' /></p>
+<p><img src='roadmap.gif' /></p>
 
 ## Summarize from a list of matrices
 
@@ -774,7 +776,7 @@ attr(mat2, "target_name") = "TSS"
 mat2
 ```
 
-To make the conversion simple, users can directly use `as.normalizedMatrix()` for the conversion.
+To make the conversion easier, users can directly use `as.normalizedMatrix()` for the conversion.
 
 ```{r}
 attributes(mat2) = NULL
@@ -794,10 +796,7 @@ Pleas check the documentation of this function.
 
 ## Reduce the size of the plot
 
-If you generate the plot for the whole genome, I suggest you first save the
-figure as pdf format and then convert to png by
-[`convert`](http://www.imagemagick.org/script/convert.php) software, instead
-of directly saving as png format. A second solution is to set `use_raster` to
+You can set `use_raster` to
 `TRUE` to replace the heatmap bodies with raster images. Check https://jokergoo.github.io/ComplexHeatmap-reference/book/a-single-heatmap.html#heatmap-as-raster-image.
 
 ```{r, eval = FALSE}
