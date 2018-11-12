@@ -385,6 +385,16 @@ EnrichedHeatmap = function(mat,
         n3 = length(downstream_index)
         n = n1 + n2 + n3
 
+        ## if heatmap names are duplicated, stop
+        vp_name = paste0(heatmap_name, "_heatmap_body_1_1")
+        vp = grid.ls(viewports = TRUE, grobs = FALSE, flatten = FALSE, print = FALSE)
+	    vp = unlist(vp)
+	    attributes(vp) = NULL
+
+	    if(sum(vp == vp_name) != 1) {
+	    	stop_wrap(qq("Found @{sum(vp == vp_name)} heatmaps with the same name '@{heatmap_name}'. Please give unique names to heatmaps."))
+	    }
+
         for(k in seq_along(ht@row_order_list)) {
             if(pos_line) {
                 decorate_heatmap_body(heatmap_name, {
