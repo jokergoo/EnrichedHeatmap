@@ -181,7 +181,7 @@ EnrichedHeatmap = function(mat,
 	n = n1 + n2 + n3
 
 	extend = attr(mat, "extend")
-	upstream_flipped = attr(x, "upstream_flipped")
+	upstream_flipped = attr(mat, "upstream_flipped")
 	if(is.null(upstream_flipped)) upstream_flipped = FALSE
 
 	if(is.null(axis_name)) {

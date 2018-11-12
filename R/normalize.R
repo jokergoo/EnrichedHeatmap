@@ -31,7 +31,7 @@
 # -trim Deprecated, please use ``keep`` instead.
 # -flip_upstream Sometimes whether the signals are on the upstream or the downstream of the targets
 #      are not important and users only want to show the relative distance to targets. If the value is set
-#      to ``TRUE``, the upstream part in the normalized matrix is flipped and added to the downstream side.
+#      to ``TRUE``, the upstream part in the normalized matrix is flipped and added to the downstream part
 #      The flipping is only allowed when the targets are single-point targets or the targets are excluded
 #      in the normalized matrix (by setting ``include_target = FALSE``). If the extension for the upstream
 #      and downstream is not equal, the smaller extension is used for the final matrix.
@@ -721,7 +721,7 @@ print.normalizedMatrix = function(x, ...) {
 	qqcat("Normalize @{signal_name} to @{target_name}:\n")
 	if(upstream_flipped) {
 		qqcat("  Extension @{extend[2]} bp (@{length(downstream_index)} window@{ifelse(length(upstream_index) > 1, 's', '')})\n")
-		qqcat("    with no information of upstream or downstream.\n")
+		qqcat("    upstream is flipped to downstream.\n")
 	} else {
 		qqcat("  Upstream @{extend[1]} bp (@{length(upstream_index)} window@{ifelse(length(upstream_index) > 1, 's', '')})\n")
 		qqcat("  Downstream @{extend[2]} bp (@{length(downstream_index)} window@{ifelse(length(upstream_index) > 1, 's', '')})\n")	

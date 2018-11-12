@@ -249,6 +249,22 @@ mat12 = normalizeToMatrix(H3K4me3, tss, value_column = "coverage",
 EnrichedHeatmap(mat12, name = "H3K4me3", col = col_fun)
 ```
 
+Sometimes whether the signals are on the upstream or the downstream of the targets
+are not important and users only want to show the relative distance to targets. If `flip_upstream` is set
+to `TRUE`, the upstream part in the normalized matrix is flipped and added to the downstream part.
+The flipping is only allowed when the targets are single-point targets or the targets are excluded
+in the normalized matrix (by setting `include_target = FALSE`). If the extension for the upstream
+and downstream is not equal, the smaller extension is used for the final matrix.
+
+
+```{r, fig.width = 3}
+mat_f = normalizeToMatrix(H3K4me3, tss, value_column = "coverage", 
+    extend = 5000, mean_mode = "w0", w = 50, flip_upstream = TRUE)
+mat_f
+EnrichedHeatmap(mat_f, name = "H3K4me3", col = col_fun)
+```
+
+
 ### Axis of the enriched annotation
 
 Axis of the enriched annotation is controlled by `axis_param` in `anno_enriched()`.
