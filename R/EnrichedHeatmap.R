@@ -181,6 +181,9 @@ EnrichedHeatmap = function(mat,
 	n = n1 + n2 + n3
 
 	extend = attr(mat, "extend")
+	upstream_flipped = attr(x, "upstream_flipped")
+	if(is.null(upstream_flipped)) upstream_flipped = FALSE
+
 	if(is.null(axis_name)) {
 		if(n1 && n2 && n3) {
 			axis_name = c(paste0("-", extend[1]), "start", "end", extend[2])
@@ -195,7 +198,11 @@ EnrichedHeatmap = function(mat,
 		} else if(n1 && !n2 && !n3) {
 			axis_name = c(paste0("-", extend[1]), "start")
 		} else if(!n1 && !n2 && n3) {
-			axis_name = c("end", extend[2])
+			if(upstream_flipped) {
+				axis_name = c("start", extend[2])
+			} else {
+				axis_name = c("end", extend[2])
+			}
 		}
 	}
 

@@ -29,6 +29,12 @@
 #       percentile is replaces with the first pencentile and values larger than the second percentile is replaced with the
 #       second percentile.
 # -trim Deprecated, please use ``keep`` instead.
+# -flip_upstream Sometimes whether the signals are on the upstream or the downstream of the targets
+#      are not important and users only want to show the relative distance to targets. If the value is set
+#      to ``TRUE``, the upstream part in the normalized matrix is flipped and added to the downstream side.
+#      The flipping is only allowed when the targets are single-point targets or the targets are excluded
+#      in the normalized matrix (by setting ``include_target = FALSE``). If the extension for the upstream
+#      and downstream is not equal, the smaller extension is used for the final matrix.
 #
 # == details
 # In order to visualize associations between ``signal`` and ``target``, the data is transformed into a matrix
@@ -81,7 +87,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1), 
 	target_ratio = min(c(0.4, mean(width(target))/(sum(extend) + mean(width(target))))), 
 	k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun,
-	keep = c(0, 1), trim = NULL) {
+	keep = c(0, 1), trim = NULL, flip_upstream = FALSE) {
 
 	signal_name = deparse(substitute(signal))
 	target_name = deparse(substitute(target))
@@ -90,6 +96,11 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	if(!is.null(value_column)) {
 		x = mcols(signal)[, value_column]
 		if(is.factor(x) || is.character(x)) {
+
+			if(flip_upstream) {
+				stop_wrap("The categorical signal is not allowed to flip the upstream signals.")
+			}
+
 			mat = normalize_with_category_variable(signal, target, x, extend = extend, w = w, mapping_column = mapping_column, background = 0,
 				empty_value = 0, target_ratio = target_ratio, k = k, smooth = smooth, smooth_fun = smooth_fun, keep = keep, trim = trim)
 			attributes(mat)$signal_name = signal_name
@@ -268,6 +279,11 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	mat[mat >= q2] = q2
   	
   	class(mat) = c("normalizedMatrix", "matrix")
+
+  	if(flip_upstream) {
+  		mat = flip_upstream(mat)
+  	}
+
 	return(mat)
 }
 
@@ -299,6 +315,40 @@ normalize_with_category_variable = function(signal, target, category, ...) {
 	attributes(mat)$signal_level = level
 
 	return(mat)
+}
+
+flip_upstream = function(mat) {
+	if(attributes(mat)$signal_is_categorical) {
+		stop_wrap("A normalized matrix with categorical signals is not allowed to flip the upstream signals.")
+	}
+
+	upstream_index = attr(mat, "upstream_index")
+	target_index = attr(mat, "target_index")
+	downstream_index = attr(mat, "downstream_index")
+	extend = attr(mat, "extend")
+
+	if(length(target_index) != 0) {
+		stop_wrap("Upstream can only be flipped when the targets are single points or excluded.")
+	}
+
+	k = min(length(upstream_index), length(downstream_index))
+	m = mat[, upstream_index[seq(length(upstream_index), length(upstream_index) - k + 1)]] + 
+	    mat[, downstream_index[1:k]]
+	attr(m, "upstream_index") = integer(0)
+	attr(m, "downstream_index") = 1:k
+	attr(m, "extend") = c(0, min(extend))
+	attr(m, "target_is_single_point") = attr(mat, "target_is_single_point")
+	attr(m, "target_index") = integer(0)
+	attr(m, "smooth") = attr(mat, "smooth")
+	attr(m, "signal_name") = attr(mat, "signal_name")
+	attr(m, "target_name") = attr(mat, "target_name")
+	attr(m, "failed_rows") = attr(mat, "failed_rows")
+	attr(m, "background") = attr(mat, "background")
+	colnames(m) = paste0("d", 1:k)
+	attr(m, "upstream_flipped") = TRUE
+
+	class(m) = c("normalizedMatrix", "matrix")
+	return(m)
 }
 
 # 
@@ -661,14 +711,21 @@ print.normalizedMatrix = function(x, ...) {
 	if(is.null(target_is_single_point)) {
 		target_is_single_point = FALSE
 	}
+	upstream_flipped = attr(x, "upstream_flipped")
+	if(is.null(upstream_flipped)) upstream_flipped = FALSE
 
 	op = qq.options(READ.ONLY = FALSE)
     on.exit(qq.options(op))
     qq.options(code.pattern = "@\\{CODE\\}")
 
 	qqcat("Normalize @{signal_name} to @{target_name}:\n")
-	qqcat("  Upstream @{extend[1]} bp (@{length(upstream_index)} window@{ifelse(length(upstream_index) > 1, 's', '')})\n")
-	qqcat("  Downstream @{extend[2]} bp (@{length(downstream_index)} window@{ifelse(length(upstream_index) > 1, 's', '')})\n")
+	if(upstream_flipped) {
+		qqcat("  Extension @{extend[2]} bp (@{length(downstream_index)} window@{ifelse(length(upstream_index) > 1, 's', '')})\n")
+		qqcat("    with no information of upstream or downstream.\n")
+	} else {
+		qqcat("  Upstream @{extend[1]} bp (@{length(upstream_index)} window@{ifelse(length(upstream_index) > 1, 's', '')})\n")
+		qqcat("  Downstream @{extend[2]} bp (@{length(downstream_index)} window@{ifelse(length(upstream_index) > 1, 's', '')})\n")	
+	}
 	if(target_is_single_point) {
 			qqcat("  Include target regions (width = 1)\n")
 	} else {

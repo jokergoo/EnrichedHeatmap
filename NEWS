@@ -2,6 +2,7 @@ changes in version 1.13.1
 
 * update the package according to the new version of ComplexHeatmap (>= 1.99.0)
 * removed `EnrichedHeatmap` class and now the enriched heatmap is purely a `Heatmap` class object.
+* add `flip_upstream` argument in `normalizeToMatrix()`.
 
 =================================
 
