@@ -7,7 +7,7 @@ Annotation Function to Show the Enrichment
 Annotation Function to Show the Enrichment
 }
 \usage{
-anno_enriched(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
+anno_enriched(gp = gpar(col = "red"), pos_line = NULL, pos_line_gp = NULL,
     ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"),
     yaxis = TRUE, axis = yaxis, axis_param = list(side = "right"),
     show_error = FALSE, height = unit(2, "cm"), ...)

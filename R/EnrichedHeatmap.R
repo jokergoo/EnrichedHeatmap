@@ -430,6 +430,8 @@ EnrichedHeatmap = function(mat,
 	ht@heatmap_param$is_enriched_heatmap = TRUE # add a tag
 	ht@heatmap_param$axis_height = axis_height
 	ht@heatmap_param$axis_fun = axis_fun
+	ht@heatmap_param$pos_line = pos_line
+	ht@heatmap_param$pos_line_gp = pos_line_gp
 	return(ht)
 }
 
@@ -476,7 +478,7 @@ EnrichedHeatmap = function(mat,
 #     top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
 #     km = 3, row_title_rot = 0)
 #
-anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = gpar(lty = 2),
+anno_enriched = function(gp = gpar(col = "red"), pos_line = NULL, pos_line_gp = NULL,
 	ylim = NULL, value = c("mean", "sum", "abs_mean", "abs_sum"), 
 	yaxis = TRUE, axis = yaxis, axis_param = list(side = "right"), 
 	show_error = FALSE, height = unit(2, "cm"), ...) {
@@ -521,6 +523,9 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 
 		ht = get("object", envir = parent.frame(n = 7))
 		mat = ht@matrix
+
+		if(is.null(pos_line)) pos_line = ht@heatmap_param$pos_line
+		if(is.null(pos_line_gp)) pos_line_gp = ht@heatmap_param$pos_line_gp
 		
 		if(by_sign) {
 			mat_pos = mat
@@ -605,7 +610,7 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = TRUE, pos_line_gp = 
 
 		if(show_error) {
 			y_se = sapply(ht@row_order_list, function(i) {
-				colSds(mat[i, , drop = FALSE], na.rm = TRUE)/sqrt(length(i))
+				matrixStats::colSds(mat[i, , drop = FALSE], na.rm = TRUE)/sqrt(length(i))
 			})
 			if(is.null(ylim)) {
 				ylim = range(c(y+y_se, y-y_se), na.rm = TRUE)
