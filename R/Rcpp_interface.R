@@ -30,7 +30,7 @@
 # dist_by_closeness(m)
 #
 dist_by_closeness <- function(mat) {
-    as.dist(.Call('_EnrichedHeatmap_dist_by_closeness', PACKAGE = 'EnrichedHeatmap', mat))
+    as.dist(.Call("_EnrichedHeatmap_dist_by_closeness", mat))
 }
 
 

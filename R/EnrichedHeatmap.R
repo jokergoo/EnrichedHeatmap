@@ -392,7 +392,7 @@ EnrichedHeatmap = function(mat,
 	    attributes(vp) = NULL
 
 	    if(sum(vp == vp_name) != 1) {
-	    	stop_wrap(qq("Found @{sum(vp == vp_name)} heatmaps with the same name '@{heatmap_name}'. Please give unique names to heatmaps."))
+	    	stop_wrap(paste0("Found ", sum(vp == vp_name),  " heatmaps with the same name '", heatmap_name, "'. Please give unique names to heatmaps."))
 	    }
 
         for(k in seq_along(ht@row_order_list)) {
