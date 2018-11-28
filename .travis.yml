@@ -12,13 +12,14 @@ r-packages:
 - markdown
 - png
 - covr
+- circlize
 
 bioc_packages:
 - GenomicRanges
 - genefilter
+- ComplexHeatmap
 
 r_github_packages:
-- jokergoo/circlize
 - jokergoo/ComplexHeatmap
 
 bioc_required: true

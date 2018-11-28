@@ -9,7 +9,7 @@ float closeness(NumericVector x1, NumericVector x2) {
 
 	for(int i = 0; i < n; i ++) {
 		for(int j = 0; j < n; j ++) {
-			if(std::abs(x1[i] - 0) < 1e-6 | std::abs(x2[j] - 0) < 1e-6) {
+			if( (std::abs(x1[i] - 0) < 1e-6) | (std::abs(x2[j] - 0) < 1e-6) ) {
 				continue;
 			}
 			y += std::abs(i - j);
