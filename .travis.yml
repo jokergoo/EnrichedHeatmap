@@ -1,31 +1,26 @@
-language: r
+## Sample .travis.yml file for use with metacran/r-builder
+## See https://github.com/metacran/r-builder for details.
 
+language: c
 sudo: required
 
-# Be strict when checking our package
-warnings_are_errors: true
+before_install:
+  - curl -OL https://raw.githubusercontent.com/metacran/r-builder/master/pkg-build.sh
+  - chmod 755 pkg-build.sh
+  - ./pkg-build.sh bootstrap
 
-r-packages:
-- testthat
-- matrixStats
-- knitr
-- markdown
-- png
-- covr
-- circlize
+install:
+  - ./pkg-build.sh install_deps testthat matrixStats knitr markdown png circlize
 
 bioc_packages:
 - GenomicRanges
 - genefilter
-- ComplexHeatmap
+  - ./pkg-build.sh install_github ComplexHeatmap
 
-r_github_packages:
-- jokergoo/ComplexHeatmap
 
-bioc_required: true
-
-r_check_args: --no-build-vignettes --no-vignettes
-
-after_success:
-  - Rscript -e 'library(covr);codecov()'
+after_failure:
+  - ./pkg-build.sh dump_logs
   
+env:
+  matrix:
+    - RVERSION=release
