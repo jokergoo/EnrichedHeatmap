@@ -2,3 +2,4 @@
 
 language: r
 r: bioc-devel
+r_packages: png
