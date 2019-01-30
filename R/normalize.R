@@ -91,6 +91,8 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 
 	signal_name = deparse(substitute(signal))
 	target_name = deparse(substitute(target))
+	
+	if(length(extend) == 1) extend = c(extend, extend)
 
 	## if value is categorical data
 	if(!is.null(value_column)) {
@@ -127,7 +129,6 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 		include_target = FALSE
 	}
   
-	if(length(extend) == 1) extend = c(extend, extend)
 	if(extend[1] > 0) {
 		if(extend[1] %% w > 0) {
 			warning_wrap("Length of upstream extension is not completely divisible by `w`.")
