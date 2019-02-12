@@ -77,4 +77,4 @@ Actually you can generate rather complex heatmaps:
 
 ### License
 
-GPL (>= 2)
+MIT @ Zuguang Gu
