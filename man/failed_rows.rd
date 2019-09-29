@@ -20,5 +20,4 @@ A numeric vector or \code{NULL}.
 \examples{
 # There is no example
 NULL
-
 }

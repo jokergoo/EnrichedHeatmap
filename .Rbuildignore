@@ -5,3 +5,7 @@ README.md
 src/*o
 src/*so
 
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+build_pkg_site.R
