@@ -53,7 +53,7 @@ lgd = Legend(at = c("cluster1", "cluster2", "cluster3"), title = "Clusters",
     type = "lines", legend_gp = gpar(col = 2:4))
 ht_list = Heatmap(partition, col = structure(2:4, names = as.character(1:3)), name = "partition",
               show_row_names = FALSE, width = unit(3, "mm")) +
-          EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", split = partition,
+          EnrichedHeatmap(mat1, col = c("white", "red"), name = "H3K4me3", row_split = partition,
               top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:4))), 
               column_title = "H3K4me3") + 
           EnrichedHeatmap(mat2, name = "methylation",
