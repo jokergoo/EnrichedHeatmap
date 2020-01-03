@@ -10,6 +10,9 @@ Documentation: http://bioconductor.org/packages/EnrichedHeatmap/
 If you use it in published research, please cite:
 Gu, Z. EnrichedHeatmap: an R/Bioconductor package for comprehensive 
 visualization of genomic signal associations. BMC Genomics 2018.
+
+This message can be suppressed by:
+  suppressPackageStartupMessages(library(EnrichedHeatmap))
 ========================================
 ")	
     packageStartupMessage(msg)
