@@ -463,7 +463,7 @@ These top genes are added as a text annotation.
 index =  which(rownames(expr) %in% top_genes)
 labels = gene_symbol[rownames(expr)[index]]
 ht_list = rowAnnotation(sig_gene = anno_mark(at = index, labels = labels,
-        side = "left", labels_gp = gpar(fontsize = 10), padding = 0.5, 
+        side = "left", labels_gp = gpar(fontsize = 10), 
         extend = unit(c(1, 0), "cm"))) + ht_list
 ```
 

@@ -4,7 +4,6 @@ test/
 README.md
 src/*o
 src/*so
-
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
