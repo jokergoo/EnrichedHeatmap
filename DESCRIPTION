@@ -1,7 +1,7 @@
 Package: EnrichedHeatmap
 Type: Package
 Title: Making Enriched Heatmaps
-Version: 1.18.0
+Version: 1.19.0
 Date: 2020-03-16
 Author: Zuguang Gu
 Maintainer: Zuguang Gu <z.gu@dkfz.de>
