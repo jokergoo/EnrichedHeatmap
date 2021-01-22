@@ -1,7 +1,6 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-
 float closeness(NumericVector x1, NumericVector x2) {
 	float y = 0;
 	int y_n = 0;
@@ -41,4 +40,3 @@ NumericMatrix dist_by_closeness(NumericMatrix mat) {
 	}
 	return dist;
 }
-

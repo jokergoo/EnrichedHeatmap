@@ -217,6 +217,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 
   	# apply smoothing on rows in mat
   	failed_rows = NULL
+  	all_positive = all(mat >= 0, na.rm = TRUE)
   	
 	if(smooth) {
 		i_row = 0
@@ -228,6 +229,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 			if(inherits(oe, "try-error")) {
 				failed_rows <<- c(failed_rows, i_row)
 			}
+			if(all_positive) x[x < 0] = 0
 			return(x)
 		}))
 		options(warn = ow)
