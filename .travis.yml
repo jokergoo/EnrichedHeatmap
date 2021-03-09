@@ -1,10 +1,17 @@
 language: r
-r: bioc-devel
-r_build_args: --no-manual --no-build-vignettes
-r_check_args: --no-manual --no-build-vignettes --ignore-vignettes
+script:
+  - R CMD build . --no-manual --no-build-vignettes
+  - R CMD check *tar.gz --no-manual --no-build-vignettes --ignore-vignettes --no-examples
+repos:
+  CRAN: https://cloud.r-project.org
+  BioCsoft: https://bioconductor.org/packages/devel/bioc
+  BioCann: https://bioconductor.org/packages/devel/data/annotation
+  BioCexp: https://bioconductor.org/packages/devel/data/experiment
+env:
+  - _R_CHECK_FORCE_SUGGESTS_=false
 r_github_packages:
   - r-lib/covr
-  - jokergoo/ComplexHeatmap
 after_success:
   - Rscript -e 'covr::codecov()'
   
+
