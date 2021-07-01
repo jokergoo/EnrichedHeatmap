@@ -8,3 +8,4 @@ src/*so
 ^docs$
 ^pkgdown$
 build_pkg_site.R
+^\.github$

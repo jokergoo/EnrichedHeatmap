@@ -1,11 +1,12 @@
-[![Build Status](https://travis-ci.org/jokergoo/EnrichedHeatmap.svg)](https://travis-ci.org/jokergoo/EnrichedHeatmap)
+# Make Enriched Heatmaps
+
+[![R-CMD-check](https://github.com/jokergoo/EnrichedHeatmap/workflows/R-CMD-check/badge.svg)](https://github.com/jokergoo/EnrichedHeatmap/actions)
 [![codecov](https://img.shields.io/codecov/c/github/jokergoo/EnrichedHeatmap.svg)](https://codecov.io/github/jokergoo/EnrichedHeatmap)
 [![bioc](https://bioconductor.org/shields/downloads/devel/EnrichedHeatmap.svg)](https://bioconductor.org/packages/stats/bioc/EnrichedHeatmap/) 
 [![bioc](http://mcube.nju.edu.cn/cgi-bin/zuguanggu/bioc_download.pl?package=EnrichedHeatmap)](https://bioconductor.org/packages/stats/bioc/EnrichedHeatmap/) 
 [![bioc](http://www.bioconductor.org/shields/years-in-bioc/EnrichedHeatmap.svg)](http://bioconductor.org/packages/devel/bioc/html/EnrichedHeatmap.html)
 
  
-## Make Enriched Heatmaps
 
 Enriched heatmap is a special type of heatmap which visualizes the enrichment of genomic signals on specific target regions. It is broadly used to visualize e.g. how histone marks are enriched to specific sites.
 
