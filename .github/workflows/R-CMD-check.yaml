@@ -66,6 +66,10 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install xquartz
+      - name: Install libcurl
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install libcurl4-gnutls-dev
       - name: Install dependencies
         run: |
           setRepositories(ind = 1:5)
