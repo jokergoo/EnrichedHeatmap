@@ -220,7 +220,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
   	# guess whether the signal is methylation
   	if(is.null(limit) && smooth) {
   		xx = mat[!is.na(mat)]
-  		if(all(xx >= 0 && xx <= 1)) {
+  		if(all(xx >= 0 & xx <= 1)) {
   			if(verbose) {
   				message_wrap("All signal values are within [0, 1], so we assume it is methylation signal. Automatically set limit [0, 1] to the smoothed values. If this is not the case, set argument `limit = NA` in the function to remove the limits. Set `verbose = FALSE` to turn off this message.")
   			}

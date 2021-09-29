@@ -439,6 +439,11 @@ should call `stop()` to throw errors so that `normalizeToMatrix()` can catch
 how many rows are failed in smoothing. Take a look at the source code of
 `default_smooth_fun()` to get an example.
 
+Another thing for smoothing methylation data is, methylation is already in a fixed range, i.e. [0, 1],
+smoothing on raw methylation might produce new values exceeding [0, 1]. Thus, by default,
+for methylation data (by a guess internally), after smoothing, values will be restricted within [0, 1], as
+you already saw in the output message in previous example.
+
 ### Targets are regions
 
 In the example of H3K4me3, the target regions are single points. 
