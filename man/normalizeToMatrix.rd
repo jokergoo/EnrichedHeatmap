@@ -12,7 +12,7 @@ normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50,
     mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1),
     target_ratio = min(c(0.4, mean(width(target))/(sum(extend) + mean(width(target))))),
     k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun,
-    keep = c(0, 1), trim = NULL, flip_upstream = FALSE)
+    keep = c(0, 1), limit = NULL, trim = NULL, flip_upstream = FALSE, verbose = TRUE)
 }
 \arguments{
 
@@ -31,8 +31,10 @@ normalizeToMatrix(signal, target, extend = 5000, w = max(extend)/50,
   \item{smooth}{Whether apply smoothing on rows in the matrix?}
   \item{smooth_fun}{The smoothing function that is applied to each row in the matrix. This self-defined function accepts a numeric vector (may contain \code{NA} values) and returns a vector with same length. If the smoothing is failed, the function should call \code{\link[base]{stop}} to throw errors so that \code{\link{normalizeToMatrix}} can catch how many rows are failed in smoothing.  See the default \code{\link{default_smooth_fun}} for example.}
   \item{keep}{Percentiles in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first percentile is replaces with the first pencentile and values larger than the second percentile is replaced with the second percentile.}
+  \item{limit}{Similar as \code{keep}, but it provides boundary for absolute values. The value should be a vector of length two.}
   \item{trim}{Deprecated, please use \code{keep} instead.}
   \item{flip_upstream}{Sometimes whether the signals are on the upstream or the downstream of the targets are not important and users only want to show the relative distance to targets. If the value is set to \code{TRUE}, the upstream part in the normalized matrix is flipped and added to the downstream part The flipping is only allowed when the targets are single-point targets or the targets are excluded in the normalized matrix (by setting \code{include_target = FALSE}). If the extension for the upstream and downstream is not equal, the smaller extension is used for the final matrix.}
+  \item{verbose}{Whether to print help messages.}
 
 }
 \details{

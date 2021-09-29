@@ -1,6 +1,7 @@
  
 stop_wrap = ComplexHeatmap:::stop_wrap
 warning_wrap = ComplexHeatmap:::warning_wrap
+message_wrap = ComplexHeatmap:::message_wrap
 
 
 recycle_gp = function(gp, n = 1) {

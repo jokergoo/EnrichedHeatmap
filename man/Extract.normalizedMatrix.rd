@@ -1,6 +1,6 @@
 \name{[.normalizedMatrix}
-\alias{[.normalizedMatrix}
 \alias{Extract.normalizedMatrix}
+\alias{[.normalizedMatrix}
 \title{
 Subset normalized matrix by rows
 }
@@ -27,4 +27,5 @@ Zuguang Gu <z.gu@dkfz.de>
 \examples{
 # There is no example
 NULL
+
 }

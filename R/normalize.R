@@ -28,6 +28,7 @@
 # -keep Percentiles in the normalized matrix to keep. The value is a vector of two percent values. Values less than the first
 #       percentile is replaces with the first pencentile and values larger than the second percentile is replaced with the
 #       second percentile.
+# -limit Similar as ``keep``, but it provides boundary for absolute values. The value should be a vector of length two.
 # -trim Deprecated, please use ``keep`` instead.
 # -flip_upstream Sometimes whether the signals are on the upstream or the downstream of the targets
 #      are not important and users only want to show the relative distance to targets. If the value is set
@@ -35,6 +36,7 @@
 #      The flipping is only allowed when the targets are single-point targets or the targets are excluded
 #      in the normalized matrix (by setting ``include_target = FALSE``). If the extension for the upstream
 #      and downstream is not equal, the smaller extension is used for the final matrix.
+# -verbose Whether to print help messages.
 #
 # == details
 # In order to visualize associations between ``signal`` and ``target``, the data is transformed into a matrix
@@ -87,7 +89,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1), 
 	target_ratio = min(c(0.4, mean(width(target))/(sum(extend) + mean(width(target))))), 
 	k = min(c(20, min(width(target)))), smooth = FALSE, smooth_fun = default_smooth_fun,
-	keep = c(0, 1), trim = NULL, flip_upstream = FALSE) {
+	keep = c(0, 1), limit = NULL, trim = NULL, flip_upstream = FALSE, verbose = TRUE) {
 
 	signal_name = deparse(substitute(signal))
 	target_name = deparse(substitute(target))
@@ -104,7 +106,7 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 			}
 
 			mat = normalize_with_category_variable(signal, target, x, extend = extend, w = w, mapping_column = mapping_column, background = 0,
-				empty_value = 0, target_ratio = target_ratio, k = k, smooth = smooth, smooth_fun = smooth_fun, keep = keep, trim = trim)
+				empty_value = 0, target_ratio = target_ratio, k = k, smooth = smooth, smooth_fun = smooth_fun, keep = keep, limit = limit, trim = trim)
 			attributes(mat)$signal_name = signal_name
 			attributes(mat)$target_name = target_name
 			return(mat)
@@ -215,6 +217,20 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 
   	mat = cbind(mat_upstream, mat_target, mat_downstream)
 
+  	# guess whether the signal is methylation
+  	if(is.null(limit) && smooth) {
+  		xx = mat[!is.na(mat)]
+  		if(all(xx >= 0 && xx <= 1)) {
+  			if(verbose) {
+  				message_wrap("All signal values are within [0, 1], so we assume it is methylation signal. Automatically set limit [0, 1] to the smoothed values. If this is not the case, set argument `limit = NA` in the function to remove the limits. Set `verbose = FALSE` to turn off this message.")
+  			}
+  			limit = c(0, 1)
+  		}
+  	}
+  	if(identical(limit, NA)) {
+  		limit = NULL
+  	}
+
   	# apply smoothing on rows in mat
   	failed_rows = NULL
   	all_positive = all(mat >= 0, na.rm = TRUE)
@@ -280,6 +296,10 @@ normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50,
 	q2 = quantile(mat, keep[2], na.rm = TRUE)
 	mat[mat <= q1] = q1
 	mat[mat >= q2] = q2
+	if(!is.null(limit)) {
+		mat[mat < limit[1]] = limit[1]
+		mat[mat > limit[2]] = limit[2]
+	}
   	
   	class(mat) = c("normalizedMatrix", "matrix")
 
