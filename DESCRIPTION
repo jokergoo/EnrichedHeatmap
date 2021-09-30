@@ -4,7 +4,8 @@ Title: Making Enriched Heatmaps
 Version: 1.21.3
 Date: 2021-09-29
 Author: Zuguang Gu
-Maintainer: Zuguang Gu <z.gu@dkfz.de>
+Authors@R: person("Zuguang", "Gu", email = "z.gu@dkfz.de", role = c("aut", "cre"),
+                  comment = c('ORCID'="0000-0002-7395-8709"))
 Depends: R (>= 3.1.2), methods, grid, ComplexHeatmap (>= 2.5.1), GenomicRanges
 Imports: matrixStats, stats, GetoptLong, Rcpp, utils, locfit, circlize (>= 0.4.5), IRanges
 Suggests: testthat (>= 0.3), knitr, markdown, rmarkdown, genefilter, RColorBrewer
