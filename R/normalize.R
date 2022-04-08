@@ -84,7 +84,7 @@
 # normalizeToMatrix(signal, target, extend = 10, w = 2, include_target = TRUE)
 # normalizeToMatrix(signal, target, extend = 10, w = 2, value_column = "score")
 #
-normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/50, 
+normalizeToMatrix = function(signal, target, extend = 5000, w = max(extend)/100, 
 	value_column = NULL, mapping_column = NULL, background = ifelse(smooth, NA, 0), empty_value = NULL, 
 	mean_mode = c("absolute", "weighted", "w0", "coverage"), include_target = any(width(target) > 1), 
 	target_ratio = min(c(0.4, mean(width(target))/(sum(extend) + mean(width(target))))), 

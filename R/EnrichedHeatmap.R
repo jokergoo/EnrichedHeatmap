@@ -432,6 +432,7 @@ EnrichedHeatmap = function(mat,
 	ht@heatmap_param$axis_fun = axis_fun
 	ht@heatmap_param$pos_line = pos_line
 	ht@heatmap_param$pos_line_gp = pos_line_gp
+	ht@heatmap_param$type = "EnrichedHeatmap"
 	return(ht)
 }
 
@@ -697,7 +698,7 @@ anno_enriched = function(gp = gpar(col = "red"), pos_line = NULL, pos_line_gp = 
 		show_name = FALSE
 	)
 
-	anno@subsetable = FALSE
+	anno@subsettable = FALSE
 	anno@extended = ComplexHeatmap:::update_anno_extend(anno, axis_grob, axis_param)
 
 	return(anno)
