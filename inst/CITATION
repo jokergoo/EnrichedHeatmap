@@ -9,7 +9,8 @@ citEntry(
                        as.person("Naveed Ishaque")),
    journal = "BMC Genomics",
    year = 2018,
-   textVersion = "Gu, Z. (2018) EnrichedHeatmap: an R/Bioconductor package for comprehensive visualization of genomic signal associations. BMC Genomics, https://doi.org/10.1186/s12864-018-4625-x."
+   doi = "10.1186/s12864-018-4625-x",
+   textVersion = "Gu, Z. (2018) EnrichedHeatmap: an R/Bioconductor package for comprehensive visualization of genomic signal associations. BMC Genomics."
 )
 
 citFooter("This free open-source software implements academic
