@@ -1,0 +1,26 @@
+<!--
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{2. Visualize Categorical Signals}
+-->
+
+
+```{r, echo = FALSE, message = FALSE}
+library(knitr)
+knitr::opts_chunk$set(
+    error = FALSE,
+    warning = FALSE,
+    message = FALSE)
+library(markdown)
+options(width = 100)
+```
+
+
+```{r, eval = FALSE, echo = FALSE}
+knit("visualize_categorical_signals.Rmd2", output = "visualize_categorical_signals.tmp", quiet = TRUE)
+invisible(file.copy("visualize_categorical_signals.tmp", "~/project/development/EnrichedHeatmap/vignettes/visualize_categorical_signals.tmp", overwrite = TRUE))
+```
+
+```{r, echo = FALSE, results = "asis"}
+lines = readLines("visualize_categorical_signals.tmp")
+cat(lines, sep = "\n")
+```
