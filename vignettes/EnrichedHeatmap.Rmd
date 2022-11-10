@@ -1,16 +1,13 @@
-<!--
-%\VignetteEngine{knitr}
-%\VignetteIndexEntry{1. Make Enriched Heatmaps}
--->
-
-Make Enriched Heatmaps
-========================================
-
-**Author**: Zuguang Gu ( z.gu@dkfz.de )
-
-**Date**: `r Sys.Date()`
-
--------------------------------------------------------------
+---
+title: "Make Enriched Heatmaps"
+author: "Zuguang Gu (z.gu@dkfz.de)"
+date: '`r Sys.Date()`'
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{1. Make Enriched Heatmaps}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
 ```{r, echo = FALSE, message = FALSE}
 library(markdown)

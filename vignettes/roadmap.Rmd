@@ -1,16 +1,14 @@
-<!--
-%\VignetteEngine{knitr}
-%\VignetteIndexEntry{4. Visualize Comprehensive Associations in Roadmap dataset}
--->
+---
+title: "Visualize Comprehensive Associations in Roadmap dataset"
+author: "Zuguang Gu (z.gu@dkfz.de)"
+date: '`r Sys.Date()`'
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{4. Visualize Comprehensive Associations in Roadmap dataset}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
-Visualize Comprehensive Associations in Roadmap dataset
-========================================
-
-**Author**: Zuguang Gu ( z.gu@dkfz.de )
-
-**Date**: `r Sys.Date()`
-
-----------------------------------------
 
 ```{r, echo = FALSE, message = FALSE}
 library(markdown)

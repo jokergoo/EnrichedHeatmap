@@ -1,16 +1,13 @@
-<!--
-%\VignetteEngine{knitr}
-%\VignetteIndexEntry{3. Compare row ordering methods}
--->
-
-Compare row ordering methods
-========================================
-
-**Author**: Zuguang Gu ( z.gu@dkfz.de )
-
-**Date**: `r Sys.Date()`
-
--------------------------------------------------------------
+---
+title: "Compare row ordering methods"
+author: "Zuguang Gu (z.gu@dkfz.de)"
+date: '`r Sys.Date()`'
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{3. Compare row ordering methods}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
 ```{r, echo = FALSE, message = FALSE}
 library(knitr)

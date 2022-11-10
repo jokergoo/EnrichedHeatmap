@@ -1,8 +1,13 @@
-<!--
-%\VignetteEngine{knitr}
-%\VignetteIndexEntry{2. Visualize Categorical Signals}
--->
-
+---
+title: "Visualize Categorical Signals"
+author: "Zuguang Gu (z.gu@dkfz.de)"
+date: '`r Sys.Date()`'
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{2. Visualize Categorical Signals}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
 ```{r, echo = FALSE, message = FALSE}
 library(knitr)
