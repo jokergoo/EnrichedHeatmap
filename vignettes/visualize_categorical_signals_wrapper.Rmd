@@ -1,13 +1,19 @@
 ---
 title: "Visualize Categorical Signals"
-author: "Zuguang Gu (z.gu@dkfz.de)"
+author: "Zuguang Gu ( z.gu@dkfz.de )"
 date: '`r Sys.Date()`'
-output: rmarkdown::html_vignette
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_collapsed: false
+    toc_float: true
 vignette: >
   %\VignetteIndexEntry{2. Visualize Categorical Signals}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 
 ```{r, echo = FALSE, message = FALSE}
 library(knitr)
@@ -20,12 +26,11 @@ options(width = 100)
 ```
 
 
-```{r, eval = FALSE, echo = FALSE}
-knit("visualize_categorical_signals.Rmd2", output = "visualize_categorical_signals.tmp", quiet = TRUE)
-invisible(file.copy("visualize_categorical_signals.tmp", "~/project/development/EnrichedHeatmap/vignettes/visualize_categorical_signals.tmp", overwrite = TRUE))
+```{r, eval = grepl("tbi", Sys.info()["nodename"]) & Sys.info()["user"] == "guz", echo = FALSE}
+knit("visualize_categorical_signals", output = "visualize_categorical_signals.md", quiet = TRUE)
 ```
 
 ```{r, echo = FALSE, results = "asis"}
-lines = readLines("visualize_categorical_signals.tmp")
+lines = readLines("visualize_categorical_signals.md")
 cat(lines, sep = "\n")
 ```
