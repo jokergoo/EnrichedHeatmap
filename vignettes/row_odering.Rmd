@@ -1,16 +1,18 @@
-<!--
-%\VignetteEngine{knitr}
-%\VignetteIndexEntry{3. Compare row ordering methods}
--->
-
-Compare row ordering methods
-========================================
-
-**Author**: Zuguang Gu ( z.gu@dkfz.de )
-
-**Date**: `r Sys.Date()`
-
--------------------------------------------------------------
+---
+title: "Compare row ordering methods"
+author: "Zuguang Gu ( z.gu@dkfz.de )"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_collapsed: false
+    toc_float: true
+vignette: >
+  %\VignetteIndexEntry{3. Compare row ordering methods}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
 ```{r, echo = FALSE, message = FALSE}
 library(knitr)
@@ -18,7 +20,6 @@ knitr::opts_chunk$set(
     error = FALSE,
     warning = FALSE,
     message = FALSE)
-options(markdown.HTML.options = setdiff(options('markdown.HTML.options')[[1]], "toc"))
 ```
 
 

@@ -1,8 +1,8 @@
 Package: EnrichedHeatmap
 Type: Package
 Title: Making Enriched Heatmaps
-Version: 1.28.0
-Date: 2022-04-12
+Version: 1.28.1
+Date: 2023-03-18
 Authors@R: person("Zuguang", "Gu", email = "z.gu@dkfz.de", role = c("aut", "cre"),
                   comment = c('ORCID'="0000-0002-7395-8709"))
 Depends: R (>= 3.6.0), methods, grid, ComplexHeatmap (>= 2.11.0), GenomicRanges

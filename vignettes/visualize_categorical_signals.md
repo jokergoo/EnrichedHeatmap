@@ -1,14 +1,4 @@
 
-Visualize Categorical Signals
-========================================
-
-**Author**: Zuguang Gu ( z.gu@dkfz.de )
-
-**Date**: 2018-11-10
-
--------------------------------------------------------------
-
-
 
 Normally genomic signals are represented as numeric (e.g. methylation from
 WGBS or histone modification intensity from ChIP-seq) or binary values (e.g.

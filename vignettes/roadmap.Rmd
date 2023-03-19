@@ -1,27 +1,27 @@
-<!--
-%\VignetteEngine{knitr}
-%\VignetteIndexEntry{4. Visualize Comprehensive Associations in Roadmap dataset}
--->
-
-Visualize Comprehensive Associations in Roadmap dataset
-========================================
-
-**Author**: Zuguang Gu ( z.gu@dkfz.de )
-
-**Date**: `r Sys.Date()`
-
-----------------------------------------
+---
+title: "Visualize Comprehensive Associations in Roadmap dataset"
+author: "Zuguang Gu ( z.gu@dkfz.de )"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_collapsed: false
+    toc_float: true
+vignette: >
+  %\VignetteIndexEntry{4. Visualize Comprehensive Associations in Roadmap dataset}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
 ```{r, echo = FALSE, message = FALSE}
 library(markdown)
-options(markdown.HTML.options = c(options('markdown.HTML.options')[[1]], "toc"))
 
 library(knitr)
 knitr::opts_chunk$set(
     error = FALSE,
     warning = FALSE,
     message = FALSE)
-options(markdown.HTML.stylesheet = "custom.css")
 options(width = 100)
 suppressPackageStartupMessages(library(circlize))
 suppressPackageStartupMessages(library(EnrichedHeatmap))
