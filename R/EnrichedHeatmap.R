@@ -50,19 +50,11 @@ enriched_score = function(mat) {
 		x3 = x3[l3]
 		x3_index = x3_index[l3]
 
-		if(length(n1) && length(n2)) {
-			sum(x1 * x1_index/n1) + 
-				sum(x2 * abs((n2+1)/2 - abs(x2_index - (n2+1)/2))) + 
+		enrich = sum(x1 * x1_index/n1) + 
+			sum(x2 * abs((n2+1)/2 - abs(x2_index - (n2+1)/2))) + 
 				sum(x3 * rev(x3_index)/n3)
-		} else if(!length(n1) && length(n2)) {
-		  sum(x2 * abs((n2+1)/2 - abs(x2_index - (n2+1)/2))) + 
-				sum(x3 * rev(x3_index)/n3)
-		} else if(length(n1) && !length(n2)) {
-			sum(x1 * x1_index/n1) + 
-		    sum(x2 * abs((n2+1)/2 - abs(x2_index - (n2+1)/2)))
-		} else {
-		  sum(x2 * abs((n2+1)/2 - abs(x2_index - (n2+1)/2)))
-		}
+		
+		return(enrich)
 	}
 
 	upstream_index = attr(mat, "upstream_index")
@@ -77,9 +69,8 @@ enriched_score = function(mat) {
 				calc_score(x1, x2, x3)
 			})
 	return(score)
-}
 
-
+	
 # == title
 # Constructor Method for the Enriched Heatmap
 # 
