@@ -52,16 +52,16 @@ enriched_score = function(mat) {
 
 		if(length(n1) && length(n2)) {
 			sum(x1 * x1_index/n1) + 
-				sum(x2 * abs(n2/2 - abs(x2_index - n2/2))) + 
+				sum(x2 * abs((n2+1)/2 - abs(x2_index - (n2+1)/2))) + 
 				sum(x3 * rev(x3_index)/n3)
 		} else if(!length(n1) && length(n2)) {
-			sum(x2 * abs(n2/2 - abs(x2_index - n2/2))) + 
+		  sum(x2 * abs((n2+1)/2 - abs(x2_index - (n2+1)/2))) + 
 				sum(x3 * rev(x3_index)/n3)
 		} else if(length(n1) && !length(n2)) {
 			sum(x1 * x1_index/n1) + 
-				sum(x2 * abs(n2/2 - abs(x2_index - n2/2)))
+		    sum(x2 * abs((n2+1)/2 - abs(x2_index - (n2+1)/2)))
 		} else {
-			sum(x2 * abs(n2/2 - abs(x2_index - n2/2)))
+		  sum(x2 * abs((n2+1)/2 - abs(x2_index - (n2+1)/2)))
 		}
 	}
 
