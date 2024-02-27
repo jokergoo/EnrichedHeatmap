@@ -3,7 +3,6 @@
 [![R-CMD-check](https://github.com/jokergoo/EnrichedHeatmap/workflows/R-CMD-check/badge.svg)](https://github.com/jokergoo/EnrichedHeatmap/actions)
 [![codecov](https://img.shields.io/codecov/c/github/jokergoo/EnrichedHeatmap.svg)](https://codecov.io/github/jokergoo/EnrichedHeatmap)
 [![bioc](https://bioconductor.org/shields/downloads/devel/EnrichedHeatmap.svg)](https://bioconductor.org/packages/stats/bioc/EnrichedHeatmap/) 
-[![bioc](http://mcube.nju.edu.cn/cgi-bin/zuguanggu/bioc_download.pl?package=EnrichedHeatmap)](https://bioconductor.org/packages/stats/bioc/EnrichedHeatmap/) 
 [![bioc](http://www.bioconductor.org/shields/years-in-bioc/EnrichedHeatmap.svg)](http://bioconductor.org/packages/devel/bioc/html/EnrichedHeatmap.html)
 
  

@@ -1,1 +1,24 @@
 destination: docs
+
+navbar:
+  title: "EnrichedHeatmap"
+  left:
+    - text: "Articles"
+      menu:
+        - text: Vignettes
+        - text: "Make Enriched Heatmaps"
+          href: articles/EnrichedHeatmap_intro.html
+        - text: "Visualize Categorical Signals"
+          href: articles/visualize_categorical_signals.html
+        - text: "Compare row ordering methods"
+          href: articles/row_ordering.html
+        - text: "Visualize Comprehensive Associations in Roadmap dataset"
+          href: articles/roadmap.html
+        - text: -------
+        - text: More applications
+    - text: "Reference"
+      href: reference/index.html
+
+template:
+  includes:
+    after_body: "<style>nav[data-toggle='toc'] .nav .nav {display: block;}</style>"

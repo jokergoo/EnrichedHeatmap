@@ -9,3 +9,10 @@ src/*so
 ^pkgdown$
 build_pkg_site.R
 ^\.github$
+vignettes/EnrichedHeatmap_intro.Rmd
+vignettes/custom.css
+vignettes/image
+vignettes/roadmap.Rmd
+vignettes/roadmap.gif
+vignettes/row_odering.Rmd
+vignettes/visualize_categorical_signals.Rmd

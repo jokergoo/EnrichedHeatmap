@@ -358,8 +358,8 @@ EnrichedHeatmap = function(mat,
 					col = structure(col, names = 1:n_level)
 				}
 			} else {
-				if(!identical(sort(names(col)), sort(signal_level))) {
-					stop("Names of `col` should be same as the levels in signals.")
+				if(length(setdiff(signal_level, names(col))) > 0) {
+					stop("Names of `col` should contain all levels in signals.")
 				} else {
 					col = structure(col[signal_level], names = 1:n_level)
 				}
